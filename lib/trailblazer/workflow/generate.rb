@@ -64,8 +64,15 @@ module Trailblazer
 
       def self.compile_intermediate(ctx, lane:, start_event:, termini_map:, **)
         wirings = lane.elements.collect do |node|
+          data = (node.data || {})
+            .merge(type: node.type)
+
+          data.merge!(label: node.label) if node.label
+
           [
-            Activity::Schema::Intermediate.TaskRef(node.id, (node.data || {}).merge(type: node.type)),
+            Activity::Schema::Intermediate.TaskRef(node.id,
+              data
+            ),
 
             node.links.collect do |link|
               Activity::Schema::Intermediate.Out(link.semantic, link.target_id)

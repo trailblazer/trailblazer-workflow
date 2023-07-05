@@ -37,7 +37,6 @@ class GenerateTest < Minitest::Spec
   end
 
   it do
-    skip
     moderation_json = File.read("test/fixtures/v1/moderation.json")
 
     signal, (ctx, _) = Trailblazer::Workflow::Generate.invoke([{json_document: moderation_json}, {}])
@@ -46,249 +45,626 @@ class GenerateTest < Minitest::Spec
 
     # pp lanes
     # TODO: test ui lane
+    # puts lanes["article moderation"].pretty_inspect
     assert_equal lanes["article moderation"].pretty_inspect, %(#<struct Trailblazer::Activity::Schema::Intermediate
  wiring=
   {#<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="Create",
-    data={:type=>:task}>=>
+    id="Event_0odjl3c",
+    data={:type=>:throw_event, :label=>"invalid!"}>=>
     [#<struct Trailblazer::Activity::Schema::Intermediate::Out
       semantic=:success,
-      target="throw-after-Create">,
+      target="suspend-gw-to-catch-before-Activity_0wwfenp">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Event_0txlti3",
+    data={:type=>:throw_event, :label=>"invalid!"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-Gateway_0fnbg3r">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Event_1p8873y",
+    data={:type=>:terminus, :label=>"success"}>=>[],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Event_1oucl4z",
+    data={:type=>:throw_event, :label=>"invalid!"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-Gateway_01p7uj7">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Activity_0wwfenp",
+    data={:type=>:task, :label=>"Create"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="throw-after-Activity_0wwfenp">,
      #<struct Trailblazer::Activity::Schema::Intermediate::Out
       semantic=:failure,
-      target="create_invalid!">],
+      target="Event_0odjl3c">],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="suspend-d15ef8ea-a55f-4eed-a0e8-37f717d21c2f",
-    data=
-     {"resumes"=>["catch-before-Update", "catch-before-Notify approver"],
-      :type=>:suspend}>=>[],
-   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="Update",
-    data={:type=>:task}>=>
+    id="Activity_0q9p56e",
+    data={:type=>:task, :label=>"Update"}>=>
     [#<struct Trailblazer::Activity::Schema::Intermediate::Out
       semantic=:success,
-      target="throw-after-Update">,
+      target="throw-after-Activity_0q9p56e">,
      #<struct Trailblazer::Activity::Schema::Intermediate::Out
       semantic=:failure,
-      target="update_invalid!">],
+      target="Event_0txlti3">],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="suspend-e1b7cd7c-55ca-48e8-ae4b-bdfee7b221e0",
-    data=
-     {"resumes"=>["catch-before-Notify approver", "catch-before-Update"],
-      :type=>:suspend}>=>[],
-   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="Notify approver",
-    data={:type=>:task}>=>
+    id="Activity_0wr78cv",
+    data={:type=>:task, :label=>"Notify approver"}>=>
     [#<struct Trailblazer::Activity::Schema::Intermediate::Out
       semantic=:success,
-      target="throw-after-Notify approver">],
+      target="throw-after-Activity_0wr78cv">],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="suspend-62921669-ef4e-4753-b3e9-b5ee498594a3",
-    data=
-     {"resumes"=>["catch-before-Reject", "catch-before-Approve"],
-      :type=>:suspend}>=>[],
-   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="Reject",
-    data={:type=>:task}>=>
+    id="Activity_1qrkaz0",
+    data={:type=>:task, :label=>"Approve"}>=>
     [#<struct Trailblazer::Activity::Schema::Intermediate::Out
       semantic=:success,
-      target="throw-after-Reject">],
+      target="throw-after-Activity_1qrkaz0">],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="Approve",
-    data={:type=>:task}>=>
+    id="Activity_1bjelgv",
+    data={:type=>:task, :label=>"Publish"}>=>
     [#<struct Trailblazer::Activity::Schema::Intermediate::Out
       semantic=:success,
-      target="throw-after-Approve">],
+      target="throw-after-Activity_1bjelgv">],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="suspend-d99c4fe5-ee6f-4bda-8ed5-c74464ff0ea5",
-    data={"resumes"=>["catch-before-Revise"], :type=>:suspend}>=>[],
-   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="Revise",
-    data={:type=>:task}>=>
+    id="Activity_1hgscu3",
+    data={:type=>:task, :label=>"Archive"}>=>
     [#<struct Trailblazer::Activity::Schema::Intermediate::Out
       semantic=:success,
-      target="throw-after-Revise">,
+      target="throw-after-Activity_1hgscu3">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Activity_0cc4us9",
+    data={:type=>:task, :label=>"Delete"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="throw-after-Activity_0cc4us9">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Activity_18qv6ob",
+    data={:type=>:task, :label=>"Revise"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="throw-after-Activity_18qv6ob">,
      #<struct Trailblazer::Activity::Schema::Intermediate::Out
       semantic=:failure,
-      target="revise_invalid!">],
+      target="Event_1oucl4z">],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="suspend-dec8907b-b3e0-43e4-a536-343052bd83c3",
-    data=
-     {"resumes"=>["catch-before-Notify approver", "catch-before-Revise"],
-      :type=>:suspend}>=>[],
+    id="Activity_0d9yewp",
+    data={:type=>:task, :label=>"Reject"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="throw-after-Activity_0d9yewp">],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="revise_invalid!",
+    id="catch-before-Activity_0wwfenp",
+    data={:type=>:catch_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="Activity_0wwfenp">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="throw-after-Activity_0wwfenp",
     data={:type=>:throw_event}>=>
     [#<struct Trailblazer::Activity::Schema::Intermediate::Out
       semantic=:success,
-      target="suspend-d99c4fe5-ee6f-4bda-8ed5-c74464ff0ea5">],
+      target="suspend-Gateway_0fnbg3r">],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="update_invalid!",
+    id="catch-before-Activity_0q9p56e",
+    data={:type=>:catch_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="Activity_0q9p56e">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="throw-after-Activity_0q9p56e",
     data={:type=>:throw_event}>=>
     [#<struct Trailblazer::Activity::Schema::Intermediate::Out
       semantic=:success,
-      target="suspend-d15ef8ea-a55f-4eed-a0e8-37f717d21c2f">],
+      target="suspend-Gateway_1wzosup">],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="suspend-21a0f9bb-0b3f-4dba-8951-04df2cdc50d0",
+    id="catch-before-Activity_0wr78cv",
+    data={:type=>:catch_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="Activity_0wr78cv">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="throw-after-Activity_0wr78cv",
+    data={:type=>:throw_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-Gateway_0y3f8tz">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="catch-before-Activity_1qrkaz0",
+    data={:type=>:catch_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="Activity_1qrkaz0">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="throw-after-Activity_1qrkaz0",
+    data={:type=>:throw_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-Gateway_1hp2ssj">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="catch-before-Activity_1bjelgv",
+    data={:type=>:catch_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="Activity_1bjelgv">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="throw-after-Activity_1bjelgv",
+    data={:type=>:throw_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-gw-to-catch-before-Activity_1hgscu3">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="catch-before-Activity_1hgscu3",
+    data={:type=>:catch_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="Activity_1hgscu3">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="throw-after-Activity_1hgscu3",
+    data={:type=>:throw_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="Event_1p8873y">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="catch-before-Activity_0cc4us9",
+    data={:type=>:catch_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="Activity_0cc4us9">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="throw-after-Activity_0cc4us9",
+    data={:type=>:throw_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="Event_1p8873y">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="catch-before-Activity_18qv6ob",
+    data={:type=>:catch_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="Activity_18qv6ob">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="throw-after-Activity_18qv6ob",
+    data={:type=>:throw_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-Gateway_1kl7pnm">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="catch-before-Activity_0d9yewp",
+    data={:type=>:catch_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="Activity_0d9yewp">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="throw-after-Activity_0d9yewp",
+    data={:type=>:throw_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-Gateway_01p7uj7">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="suspend-Gateway_0fnbg3r",
     data=
      {"resumes"=>
-       ["catch-before-Publish", "catch-before-Delete", "catch-before-Update"],
+       ["catch-before-Activity_0q9p56e", "catch-before-Activity_0wr78cv"],
       :type=>:suspend}>=>[],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="Publish",
-    data={:type=>:task}>=>
-    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
-      semantic=:success,
-      target="throw-after-Publish">],
+    id="suspend-Gateway_1wzosup",
+    data=
+     {"resumes"=>
+       ["catch-before-Activity_0wr78cv", "catch-before-Activity_0q9p56e"],
+      :type=>:suspend}>=>[],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="Archive",
-    data={:type=>:task}>=>
-    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
-      semantic=:success,
-      target="throw-after-Archive">],
+    id="suspend-Gateway_0y3f8tz",
+    data=
+     {"resumes"=>
+       ["catch-before-Activity_0d9yewp", "catch-before-Activity_1qrkaz0"],
+      :type=>:suspend}>=>[],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="success",
-    data={:type=>:terminus}>=>[],
+    id="suspend-Gateway_1hp2ssj",
+    data=
+     {"resumes"=>
+       ["catch-before-Activity_1bjelgv",
+        "catch-before-Activity_0cc4us9",
+        "catch-before-Activity_0q9p56e"],
+      :type=>:suspend}>=>[],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="Delete",
-    data={:type=>:task}>=>
-    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
-      semantic=:success,
-      target="throw-after-Delete">],
+    id="suspend-Gateway_01p7uj7",
+    data={"resumes"=>["catch-before-Activity_18qv6ob"], :type=>:suspend}>=>[],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="create_invalid!",
-    data={:type=>:throw_event}>=>
-    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
-      semantic=:success,
-      target="suspend-gw-to-catch-before-Create">],
+    id="suspend-Gateway_1kl7pnm",
+    data=
+     {"resumes"=>
+       ["catch-before-Activity_18qv6ob", "catch-before-Activity_0wr78cv"],
+      :type=>:suspend}>=>[],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="catch-before-Create",
-    data={:type=>:catch_event}>=>
-    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
-      semantic=:success,
-      target="Create">],
+    id="suspend-gw-to-catch-before-Activity_0wwfenp",
+    data={"resumes"=>["catch-before-Activity_0wwfenp"], :type=>:suspend}>=>[],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="throw-after-Create",
-    data={:type=>:throw_event}>=>
-    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
-      semantic=:success,
-      target="suspend-d15ef8ea-a55f-4eed-a0e8-37f717d21c2f">],
-   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="catch-before-Update",
-    data={:type=>:catch_event}>=>
-    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
-      semantic=:success,
-      target="Update">],
-   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="throw-after-Update",
-    data={:type=>:throw_event}>=>
-    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
-      semantic=:success,
-      target="suspend-e1b7cd7c-55ca-48e8-ae4b-bdfee7b221e0">],
-   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="catch-before-Notify approver",
-    data={:type=>:catch_event}>=>
-    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
-      semantic=:success,
-      target="Notify approver">],
-   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="throw-after-Notify approver",
-    data={:type=>:throw_event}>=>
-    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
-      semantic=:success,
-      target="suspend-62921669-ef4e-4753-b3e9-b5ee498594a3">],
-   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="catch-before-Reject",
-    data={:type=>:catch_event}>=>
-    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
-      semantic=:success,
-      target="Reject">],
-   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="throw-after-Reject",
-    data={:type=>:throw_event}>=>
-    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
-      semantic=:success,
-      target="suspend-d99c4fe5-ee6f-4bda-8ed5-c74464ff0ea5">],
-   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="catch-before-Approve",
-    data={:type=>:catch_event}>=>
-    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
-      semantic=:success,
-      target="Approve">],
-   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="throw-after-Approve",
-    data={:type=>:throw_event}>=>
-    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
-      semantic=:success,
-      target="suspend-21a0f9bb-0b3f-4dba-8951-04df2cdc50d0">],
-   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="catch-before-Revise",
-    data={:type=>:catch_event}>=>
-    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
-      semantic=:success,
-      target="Revise">],
-   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="throw-after-Revise",
-    data={:type=>:throw_event}>=>
-    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
-      semantic=:success,
-      target="suspend-dec8907b-b3e0-43e4-a536-343052bd83c3">],
-   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="catch-before-Publish",
-    data={:type=>:catch_event}>=>
-    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
-      semantic=:success,
-      target="Publish">],
-   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="throw-after-Publish",
-    data={:type=>:throw_event}>=>
-    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
-      semantic=:success,
-      target="suspend-gw-to-catch-before-Archive">],
-   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="catch-before-Archive",
-    data={:type=>:catch_event}>=>
-    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
-      semantic=:success,
-      target="Archive">],
-   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="throw-after-Archive",
-    data={:type=>:throw_event}>=>
-    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
-      semantic=:success,
-      target="success">],
-   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="catch-before-Delete",
-    data={:type=>:catch_event}>=>
-    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
-      semantic=:success,
-      target="Delete">],
-   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="throw-after-Delete",
-    data={:type=>:throw_event}>=>
-    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
-      semantic=:success,
-      target="success">],
-   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="suspend-gw-to-catch-before-Create",
-    data={"resumes"=>["catch-before-Create"], :type=>:suspend}>=>[],
-   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="suspend-gw-to-catch-before-Archive",
-    data={"resumes"=>["catch-before-Archive"], :type=>:suspend}>=>[]},
+    id="suspend-gw-to-catch-before-Activity_1hgscu3",
+    data={"resumes"=>["catch-before-Activity_1hgscu3"], :type=>:suspend}>=>[]},
  stop_task_ids=
-  {"success"=>:success,
-   "suspend-d15ef8ea-a55f-4eed-a0e8-37f717d21c2f"=>:suspend,
-   "suspend-e1b7cd7c-55ca-48e8-ae4b-bdfee7b221e0"=>:suspend,
-   "suspend-62921669-ef4e-4753-b3e9-b5ee498594a3"=>:suspend,
-   "suspend-d99c4fe5-ee6f-4bda-8ed5-c74464ff0ea5"=>:suspend,
-   "suspend-dec8907b-b3e0-43e4-a536-343052bd83c3"=>:suspend,
-   "suspend-21a0f9bb-0b3f-4dba-8951-04df2cdc50d0"=>:suspend,
-   "suspend-gw-to-catch-before-Create"=>:suspend,
-   "suspend-gw-to-catch-before-Archive"=>:suspend},
- start_task_id="Create">
+  {"Event_1p8873y"=>:Event_1p8873y,
+   "suspend-Gateway_0fnbg3r"=>:suspend,
+   "suspend-Gateway_1wzosup"=>:suspend,
+   "suspend-Gateway_0y3f8tz"=>:suspend,
+   "suspend-Gateway_1hp2ssj"=>:suspend,
+   "suspend-Gateway_01p7uj7"=>:suspend,
+   "suspend-Gateway_1kl7pnm"=>:suspend,
+   "suspend-gw-to-catch-before-Activity_0wwfenp"=>:suspend,
+   "suspend-gw-to-catch-before-Activity_1hgscu3"=>:suspend},
+ start_task_id="Event_0odjl3c">
 )
 
-    assert_equal lanes["article moderation"].pretty_inspect, %(#<struct Trailblazer::Activity::Schema::Intermediate
-    )
+
+  # puts lanes["<ui> author workflow"].pretty_inspect
+    assert_equal lanes["<ui> author workflow"].pretty_inspect, %(#<struct Trailblazer::Activity::Schema::Intermediate
+ wiring=
+  {#<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Event_16milya",
+    data={:type=>:start_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-gw-to-catch-before-Activity_0wc2mcq">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Event_0co8ygx",
+    data={:type=>:catch_event, :label=>"invalid?"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="Activity_08p0cun">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Event_0km79t5",
+    data={:type=>:catch_event, :label=>"valid?"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-Gateway_01cn7zv">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Event_1npw1tg",
+    data={:type=>:catch_event, :label=>"accepted?"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-Gateway_1sq41iq">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Event_1bz3ivj",
+    data={:type=>:catch_event, :label=>"valid?"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-Gateway_1g3fhu2">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Event_1wly6jj",
+    data={:type=>:catch_event, :label=>"invalid?"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="Activity_19m1lnz">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Event_1vb197y",
+    data={:type=>:catch_event, :label=>"rejected?"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-gw-to-catch-before-Activity_0zsock2">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Activity_0wc2mcq",
+    data={:type=>:task, :label=>"Create form"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-Gateway_14h0q7a">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Activity_1psp91r",
+    data={:type=>:task, :label=>"Create"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="throw-after-Activity_1psp91r">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Activity_1165bw9",
+    data={:type=>:task, :label=>"Update form"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-Gateway_0nxerxv">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Activity_1dt5di5",
+    data={:type=>:task, :label=>"Notify approver"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="throw-after-Activity_1dt5di5">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Activity_0bsjggk",
+    data={:type=>:task, :label=>"Publish"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="throw-after-Activity_0bsjggk">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Activity_15nnysv",
+    data={:type=>:task, :label=>"Delete"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="throw-after-Activity_15nnysv">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Activity_0ha7224",
+    data={:type=>:task, :label=>"Delete? form"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-Gateway_100g9dn">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Activity_1uhozy1",
+    data={:type=>:task, :label=>"Cancel"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-Gateway_1sq41iq">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Activity_1wiumzv",
+    data={:type=>:task, :label=>"Revise"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="throw-after-Activity_1wiumzv">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Activity_0zsock2",
+    data={:type=>:task, :label=>"Revise form"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-Gateway_1xs96ik">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Activity_0j78uzd",
+    data={:type=>:task, :label=>"Update"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="throw-after-Activity_0j78uzd">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Event_1vf88fn",
+    data={:type=>:catch_event, :label=>"valid?"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-Gateway_1g3fhu2">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Event_1nt0djb",
+    data={:type=>:catch_event, :label=>"invalid?"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="Activity_00kfo8w">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Activity_08p0cun",
+    data={:type=>:task, :label=>"Create form with errors"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-Gateway_14h0q7a">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Activity_00kfo8w",
+    data={:type=>:task, :label=>"Update form with errors"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-Gateway_0nxerxv">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Activity_19m1lnz",
+    data={:type=>:task, :label=>"Revise form with errors"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-Gateway_1xs96ik">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Activity_0fy41qq",
+    data={:type=>:task, :label=>"Archive"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="throw-after-Activity_0fy41qq">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Event_1vrfxsv",
+    data={:type=>:catch_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="Event_0h6yhq6">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Event_0j1jua6",
+    data={:type=>:catch_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="Event_0h6yhq6">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Event_19ha0ea",
+    data={:type=>:catch_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-gw-to-catch-before-Activity_0fy41qq">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Event_0h6yhq6",
+    data={:type=>:terminus, :label=>"success"}>=>[],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="catch-before-Activity_1psp91r",
+    data={:type=>:catch_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="Activity_1psp91r">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="throw-after-Activity_1psp91r",
+    data={:type=>:throw_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-Gateway_1d05yki">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="catch-before-Activity_1dt5di5",
+    data={:type=>:catch_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="Activity_1dt5di5">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="throw-after-Activity_1dt5di5",
+    data={:type=>:throw_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-Gateway_063k28q">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="catch-before-Activity_0bsjggk",
+    data={:type=>:catch_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="Activity_0bsjggk">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="throw-after-Activity_0bsjggk",
+    data={:type=>:throw_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-gw-to-Event_19ha0ea">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="catch-before-Activity_15nnysv",
+    data={:type=>:catch_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="Activity_15nnysv">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="throw-after-Activity_15nnysv",
+    data={:type=>:throw_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-gw-to-Event_1vrfxsv">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="catch-before-Activity_1wiumzv",
+    data={:type=>:catch_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="Activity_1wiumzv">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="throw-after-Activity_1wiumzv",
+    data={:type=>:throw_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-Gateway_1sch8el">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="catch-before-Activity_0j78uzd",
+    data={:type=>:catch_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="Activity_0j78uzd">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="throw-after-Activity_0j78uzd",
+    data={:type=>:throw_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-Gateway_1runwh1">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="catch-before-Activity_0fy41qq",
+    data={:type=>:catch_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="Activity_0fy41qq">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="throw-after-Activity_0fy41qq",
+    data={:type=>:throw_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-gw-to-Event_0j1jua6">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="catch-before-Activity_0wc2mcq",
+    data={:type=>:catch_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="Activity_0wc2mcq">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="catch-before-Activity_1165bw9",
+    data={:type=>:catch_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="Activity_1165bw9">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="catch-before-Activity_0ha7224",
+    data={:type=>:catch_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="Activity_0ha7224">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="catch-before-Activity_1uhozy1",
+    data={:type=>:catch_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="Activity_1uhozy1">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="catch-before-Activity_0zsock2",
+    data={:type=>:catch_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="Activity_0zsock2">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="suspend-Gateway_14h0q7a",
+    data={"resumes"=>["catch-before-Activity_1psp91r"], :type=>:suspend}>=>[],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="suspend-Gateway_1d05yki",
+    data=
+     {"resumes"=>
+       ["Event_0km79t5",
+        "Event_0co8ygx",
+        "catch-before-Activity_1165bw9",
+        "catch-before-Activity_1dt5di5"],
+      :type=>:suspend}>=>[],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="suspend-Gateway_01cn7zv",
+    data={"resumes"=>["catch-before-Activity_1165bw9"], :type=>:suspend}>=>[],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="suspend-Gateway_0nxerxv",
+    data={"resumes"=>["catch-before-Activity_0j78uzd"], :type=>:suspend}>=>[],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="suspend-Gateway_063k28q",
+    data={"resumes"=>["Event_1npw1tg", "Event_1vb197y"], :type=>:suspend}>=>[],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="suspend-Gateway_1sq41iq",
+    data=
+     {"resumes"=>
+       ["catch-before-Activity_1165bw9",
+        "catch-before-Activity_0ha7224",
+        "catch-before-Activity_0bsjggk"],
+      :type=>:suspend}>=>[],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="suspend-Gateway_1sch8el",
+    data={"resumes"=>["Event_1bz3ivj", "Event_1wly6jj"], :type=>:suspend}>=>[],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="suspend-Gateway_1xs96ik",
+    data={"resumes"=>["catch-before-Activity_1wiumzv"], :type=>:suspend}>=>[],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="suspend-Gateway_100g9dn",
+    data=
+     {"resumes"=>
+       ["catch-before-Activity_15nnysv", "catch-before-Activity_1uhozy1"],
+      :type=>:suspend}>=>[],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="suspend-Gateway_1runwh1",
+    data={"resumes"=>["Event_1vf88fn", "Event_1nt0djb"], :type=>:suspend}>=>[],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="suspend-Gateway_1g3fhu2",
+    data=
+     {"resumes"=>
+       ["catch-before-Activity_1165bw9", "catch-before-Activity_1dt5di5"],
+      :type=>:suspend}>=>[],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="suspend-gw-to-Event_1vrfxsv",
+    data={"resumes"=>["Event_1vrfxsv"], :type=>:suspend}>=>[],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="suspend-gw-to-Event_0j1jua6",
+    data={"resumes"=>["Event_0j1jua6"], :type=>:suspend}>=>[],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="suspend-gw-to-Event_19ha0ea",
+    data={"resumes"=>["Event_19ha0ea"], :type=>:suspend}>=>[],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="suspend-gw-to-catch-before-Activity_0fy41qq",
+    data={"resumes"=>["catch-before-Activity_0fy41qq"], :type=>:suspend}>=>[],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="suspend-gw-to-catch-before-Activity_0wc2mcq",
+    data={"resumes"=>["catch-before-Activity_0wc2mcq"], :type=>:suspend}>=>[],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="suspend-gw-to-catch-before-Activity_0zsock2",
+    data={"resumes"=>["catch-before-Activity_0zsock2"], :type=>:suspend}>=>[]},
+ stop_task_ids=
+  {"Event_0h6yhq6"=>:Event_0h6yhq6,
+   "suspend-Gateway_14h0q7a"=>:suspend,
+   "suspend-Gateway_1d05yki"=>:suspend,
+   "suspend-Gateway_01cn7zv"=>:suspend,
+   "suspend-Gateway_0nxerxv"=>:suspend,
+   "suspend-Gateway_063k28q"=>:suspend,
+   "suspend-Gateway_1sq41iq"=>:suspend,
+   "suspend-Gateway_1sch8el"=>:suspend,
+   "suspend-Gateway_1xs96ik"=>:suspend,
+   "suspend-Gateway_100g9dn"=>:suspend,
+   "suspend-Gateway_1runwh1"=>:suspend,
+   "suspend-Gateway_1g3fhu2"=>:suspend,
+   "suspend-gw-to-Event_1vrfxsv"=>:suspend,
+   "suspend-gw-to-Event_0j1jua6"=>:suspend,
+   "suspend-gw-to-Event_19ha0ea"=>:suspend,
+   "suspend-gw-to-catch-before-Activity_0fy41qq"=>:suspend,
+   "suspend-gw-to-catch-before-Activity_0wc2mcq"=>:suspend,
+   "suspend-gw-to-catch-before-Activity_0zsock2"=>:suspend},
+ start_task_id="Event_16milya">
+)
   end
 end
