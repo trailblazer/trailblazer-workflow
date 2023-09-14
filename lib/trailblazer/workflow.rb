@@ -9,3 +9,5 @@ module Trailblazer
 end
 
 require "trailblazer/workflow/generate"
+require "trailblazer/workflow/collaboration/lane"
+require "trailblazer/workflow/event"
