@@ -78,7 +78,7 @@ module Trailblazer
 
         def compile_terminus(task_ref, intermediate_links, **)
           # :a => Schema::Implementation::Task(Implementing.method(:a),           [Activity::Output(Activity::Right,       :success), Activity::Output(Activity::Left, :failure)],        [a_extension_1, a_extension_2]),
-          start_event = Activity::End.new(semantic: task_ref.id)
+          start_event = Activity::End.new(semantic: task_ref.data.fetch(:label))  # FIXME: what if label is missing?
 
           Activity::Schema::Implementation.Task(
             start_event,
