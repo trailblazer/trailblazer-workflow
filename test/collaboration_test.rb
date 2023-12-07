@@ -53,6 +53,29 @@ class CollaborationTest < Minitest::Spec
       # "Reject" => implementing.method(:reject),
     )
 
+    id_to_lane = {
+      "article moderation"    => lane_activity,
+      "<ui> author workflow"  => lane_activity_ui,
+    }
+
+    # pp ctx[:structure].lanes
+    message_flow = Trailblazer::Workflow::Collaboration.Messages(
+      ctx[:structure].messages,
+      id_to_lane
+    )
+
+    pp message_flow
+
+    Trailblazer::Workflow::Collaboration::Schema.new(
+      lanes: {
+        lifecycle:  lane_activity,
+        ui:         lane_activity_ui
+      },
+      messages: Trailblazer::Workflow::Collaboration.Messages(
+
+      )
+    )
+
 
   end
 end

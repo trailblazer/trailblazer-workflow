@@ -10,4 +10,5 @@ end
 
 require "trailblazer/workflow/generate"
 require "trailblazer/workflow/collaboration/lane"
+require "trailblazer/workflow/collaboration/messages"
 require "trailblazer/workflow/event"
