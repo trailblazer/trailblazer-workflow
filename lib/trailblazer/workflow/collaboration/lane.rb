@@ -12,7 +12,7 @@ module Trailblazer
           implementation_task =
             case task_ref.data[:type]
             when :start_event
-              Lane.compile_start_event(task_ref, links)
+              Lane.compile_start_event(task_ref, links) # TODO: test explicit start event in json or remove this!
             when :task
               # run some kind of Normalizer for tasks
               id = task_ref.id

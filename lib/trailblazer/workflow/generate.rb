@@ -45,9 +45,9 @@ module Trailblazer
         ctx[:start_event] = lane.elements.find { |el| el.id == "Start" }
       end
 
-      # DISCUSS: do we "want" this, should we handle that in the export/convert code and create some Start event?
+      # In the PRO JSON, usually a catch event is marked as {start_task: true}.
       def self.default_start_event(ctx, lane:, **)
-        ctx[:start_event] = lane.elements[0]
+        ctx[:start_event] = lane.elements.find { |node| node.data["start_task"] } || raise("no default start event found") # TODO: raise not tested.
       end
 
       def self.compute_termini_map(ctx, lane:, **)

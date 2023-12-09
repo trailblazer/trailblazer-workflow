@@ -61,9 +61,6 @@ class LaneTest < Minitest::Spec
 
 #<Trailblazer::Workflow::Event::Throw/[:throw, "Event_1oucl4z"]>
  {Trailblazer::Activity::Right} => #<Trailblazer::Workflow::Event::Suspend/[:suspend, "suspend-Gateway_01p7uj7"]>
-#<Trailblazer::Activity::TaskBuilder::Task user_proc=#<Method: #<Module:0x>.create>>
- {Trailblazer::Activity::Right} => #<Trailblazer::Workflow::Event::Throw/[:throw, "throw-after-Activity_0wwfenp"]>
- {Trailblazer::Activity::Left} => #<Trailblazer::Workflow::Event::Throw/[:throw, "Event_0odjl3c"]>
 #<Method: LaneTest#update_with_circuit_interface(_, **) test/lane_test.rb:18>
  {Trailblazer::Activity::Right} => #<Trailblazer::Workflow::Event::Throw/[:throw, "throw-after-Activity_0q9p56e"]>
  {Trailblazer::Activity::Left} => #<Trailblazer::Workflow::Event::Throw/[:throw, "Event_0txlti3"]>
@@ -82,6 +79,9 @@ LaneTest::NotifyApprover
  {Trailblazer::Activity::Left} => #<Trailblazer::Workflow::Event::Throw/[:throw, "Event_1oucl4z"]>
 #<Trailblazer::Activity::TaskBuilder::Task user_proc=#<Method: #<Module:0x>.reject>>
  {Trailblazer::Activity::Right} => #<Trailblazer::Workflow::Event::Throw/[:throw, "throw-after-Activity_0d9yewp"]>
+#<Trailblazer::Activity::TaskBuilder::Task user_proc=#<Method: #<Module:0x>.create>>
+ {Trailblazer::Activity::Right} => #<Trailblazer::Workflow::Event::Throw/[:throw, "throw-after-Activity_0wwfenp"]>
+ {Trailblazer::Activity::Left} => #<Trailblazer::Workflow::Event::Throw/[:throw, "Event_0odjl3c"]>
 #<Trailblazer::Workflow::Event::Catch/[:catch, "catch-before-Activity_0wwfenp"]>
  {Trailblazer::Activity::Right} => #<Trailblazer::Activity::TaskBuilder::Task user_proc=#<Method: #<Module:0x>.create>>
 #<Trailblazer::Workflow::Event::Throw/[:throw, "throw-after-Activity_0wwfenp"]>
@@ -134,6 +134,10 @@ LaneTest::NotifyApprover
 
 #<Trailblazer::Workflow::Event::Suspend/[:suspend, "suspend-gw-to-catch-before-Activity_1hgscu3"]>
 )
+
+  #@ test {start_task}
+  assert_equal lane_activity.to_h[:circuit].to_h[:start_task].inspect, %(#<Trailblazer::Workflow::Event::Catch start_task=true type=:catch_event semantic=[:catch, "catch-before-Activity_0wwfenp"]>)
+
 
   # it "runs as expected" do
 
