@@ -1,5 +1,5 @@
 {
-  "id": 1,
+  "id": 3,
   "type": "collaboration",
   "lanes": [
     {
@@ -10,8 +10,7 @@
           "id": "Event_0odjl3c",
           "label": "invalid!",
           "type": "throw_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "suspend-gw-to-catch-before-Activity_0wwfenp",
@@ -23,8 +22,7 @@
           "id": "Event_0txlti3",
           "label": "invalid!",
           "type": "throw_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "suspend-Gateway_0fnbg3r",
@@ -36,18 +34,14 @@
           "id": "Event_1p8873y",
           "label": "success",
           "type": "terminus",
-          "data": {
-          },
-          "links": [
-
-          ]
+          "data": {},
+          "links": []
         },
         {
           "id": "Event_1oucl4z",
           "label": "invalid!",
           "type": "throw_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "suspend-Gateway_01p7uj7",
@@ -56,28 +50,10 @@
           ]
         },
         {
-          "id": "Activity_0wwfenp",
-          "label": "Create",
-          "type": "task",
-          "data": {
-          },
-          "links": [
-            {
-              "target_id": "throw-after-Activity_0wwfenp",
-              "semantic": "success"
-            },
-            {
-              "target_id": "Event_0odjl3c",
-              "semantic": "failure"
-            }
-          ]
-        },
-        {
           "id": "Activity_0q9p56e",
           "label": "Update",
           "type": "task",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "throw-after-Activity_0q9p56e",
@@ -93,8 +69,7 @@
           "id": "Activity_0wr78cv",
           "label": "Notify approver",
           "type": "task",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "throw-after-Activity_0wr78cv",
@@ -106,8 +81,7 @@
           "id": "Activity_1qrkaz0",
           "label": "Approve",
           "type": "task",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "throw-after-Activity_1qrkaz0",
@@ -119,8 +93,7 @@
           "id": "Activity_1bjelgv",
           "label": "Publish",
           "type": "task",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "throw-after-Activity_1bjelgv",
@@ -132,8 +105,7 @@
           "id": "Activity_1hgscu3",
           "label": "Archive",
           "type": "task",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "throw-after-Activity_1hgscu3",
@@ -145,8 +117,7 @@
           "id": "Activity_0cc4us9",
           "label": "Delete",
           "type": "task",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "throw-after-Activity_0cc4us9",
@@ -158,8 +129,7 @@
           "id": "Activity_18qv6ob",
           "label": "Revise",
           "type": "task",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "throw-after-Activity_18qv6ob",
@@ -175,8 +145,7 @@
           "id": "Activity_0d9yewp",
           "label": "Reject",
           "type": "task",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "throw-after-Activity_0d9yewp",
@@ -185,10 +154,27 @@
           ]
         },
         {
+          "id": "Activity_0wwfenp",
+          "label": "Create",
+          "type": "task",
+          "data": {},
+          "links": [
+            {
+              "target_id": "throw-after-Activity_0wwfenp",
+              "semantic": "success"
+            },
+            {
+              "target_id": "Event_0odjl3c",
+              "semantic": "failure"
+            }
+          ]
+        },
+        {
           "id": "catch-before-Activity_0wwfenp",
           "label": null,
           "type": "catch_event",
           "data": {
+            "start_task": true
           },
           "links": [
             {
@@ -201,8 +187,7 @@
           "id": "throw-after-Activity_0wwfenp",
           "label": null,
           "type": "throw_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "suspend-Gateway_0fnbg3r",
@@ -214,8 +199,7 @@
           "id": "catch-before-Activity_0q9p56e",
           "label": null,
           "type": "catch_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "Activity_0q9p56e",
@@ -227,8 +211,7 @@
           "id": "throw-after-Activity_0q9p56e",
           "label": null,
           "type": "throw_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "suspend-Gateway_1wzosup",
@@ -240,8 +223,7 @@
           "id": "catch-before-Activity_0wr78cv",
           "label": null,
           "type": "catch_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "Activity_0wr78cv",
@@ -253,8 +235,7 @@
           "id": "throw-after-Activity_0wr78cv",
           "label": null,
           "type": "throw_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "suspend-Gateway_0y3f8tz",
@@ -266,8 +247,7 @@
           "id": "catch-before-Activity_1qrkaz0",
           "label": null,
           "type": "catch_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "Activity_1qrkaz0",
@@ -279,8 +259,7 @@
           "id": "throw-after-Activity_1qrkaz0",
           "label": null,
           "type": "throw_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "suspend-Gateway_1hp2ssj",
@@ -292,8 +271,7 @@
           "id": "catch-before-Activity_1bjelgv",
           "label": null,
           "type": "catch_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "Activity_1bjelgv",
@@ -305,8 +283,7 @@
           "id": "throw-after-Activity_1bjelgv",
           "label": null,
           "type": "throw_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "suspend-gw-to-catch-before-Activity_1hgscu3",
@@ -318,8 +295,7 @@
           "id": "catch-before-Activity_1hgscu3",
           "label": null,
           "type": "catch_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "Activity_1hgscu3",
@@ -331,8 +307,7 @@
           "id": "throw-after-Activity_1hgscu3",
           "label": null,
           "type": "throw_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "Event_1p8873y",
@@ -344,8 +319,7 @@
           "id": "catch-before-Activity_0cc4us9",
           "label": null,
           "type": "catch_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "Activity_0cc4us9",
@@ -357,8 +331,7 @@
           "id": "throw-after-Activity_0cc4us9",
           "label": null,
           "type": "throw_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "Event_1p8873y",
@@ -370,8 +343,7 @@
           "id": "catch-before-Activity_18qv6ob",
           "label": null,
           "type": "catch_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "Activity_18qv6ob",
@@ -383,8 +355,7 @@
           "id": "throw-after-Activity_18qv6ob",
           "label": null,
           "type": "throw_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "suspend-Gateway_1kl7pnm",
@@ -396,8 +367,7 @@
           "id": "catch-before-Activity_0d9yewp",
           "label": null,
           "type": "catch_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "Activity_0d9yewp",
@@ -409,8 +379,7 @@
           "id": "throw-after-Activity_0d9yewp",
           "label": null,
           "type": "throw_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "suspend-Gateway_01p7uj7",
@@ -428,9 +397,7 @@
               "catch-before-Activity_0wr78cv"
             ]
           },
-          "links": [
-
-          ]
+          "links": []
         },
         {
           "id": "suspend-Gateway_1wzosup",
@@ -442,9 +409,7 @@
               "catch-before-Activity_0q9p56e"
             ]
           },
-          "links": [
-
-          ]
+          "links": []
         },
         {
           "id": "suspend-Gateway_0y3f8tz",
@@ -456,9 +421,7 @@
               "catch-before-Activity_1qrkaz0"
             ]
           },
-          "links": [
-
-          ]
+          "links": []
         },
         {
           "id": "suspend-Gateway_1hp2ssj",
@@ -471,9 +434,7 @@
               "catch-before-Activity_0q9p56e"
             ]
           },
-          "links": [
-
-          ]
+          "links": []
         },
         {
           "id": "suspend-Gateway_01p7uj7",
@@ -484,9 +445,7 @@
               "catch-before-Activity_18qv6ob"
             ]
           },
-          "links": [
-
-          ]
+          "links": []
         },
         {
           "id": "suspend-Gateway_1kl7pnm",
@@ -498,9 +457,7 @@
               "catch-before-Activity_0wr78cv"
             ]
           },
-          "links": [
-
-          ]
+          "links": []
         },
         {
           "id": "suspend-gw-to-catch-before-Activity_0wwfenp",
@@ -511,9 +468,7 @@
               "catch-before-Activity_0wwfenp"
             ]
           },
-          "links": [
-
-          ]
+          "links": []
         },
         {
           "id": "suspend-gw-to-catch-before-Activity_1hgscu3",
@@ -524,9 +479,7 @@
               "catch-before-Activity_1hgscu3"
             ]
           },
-          "links": [
-
-          ]
+          "links": []
         }
       ]
     },
@@ -535,24 +488,10 @@
       "type": "lane",
       "elements": [
         {
-          "id": "Event_16milya",
-          "label": null,
-          "type": "start_event",
-          "data": {
-          },
-          "links": [
-            {
-              "target_id": "suspend-gw-to-catch-before-Activity_0wc2mcq",
-              "semantic": "success"
-            }
-          ]
-        },
-        {
           "id": "Event_0co8ygx",
           "label": "invalid?",
           "type": "catch_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "Activity_08p0cun",
@@ -564,8 +503,7 @@
           "id": "Event_0km79t5",
           "label": "valid?",
           "type": "catch_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "suspend-Gateway_01cn7zv",
@@ -577,8 +515,7 @@
           "id": "Event_1npw1tg",
           "label": "accepted?",
           "type": "catch_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "suspend-Gateway_1sq41iq",
@@ -590,8 +527,7 @@
           "id": "Event_1bz3ivj",
           "label": "valid?",
           "type": "catch_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "suspend-Gateway_1g3fhu2",
@@ -603,8 +539,7 @@
           "id": "Event_1wly6jj",
           "label": "invalid?",
           "type": "catch_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "Activity_19m1lnz",
@@ -616,8 +551,7 @@
           "id": "Event_1vb197y",
           "label": "rejected?",
           "type": "catch_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "suspend-gw-to-catch-before-Activity_0zsock2",
@@ -626,24 +560,10 @@
           ]
         },
         {
-          "id": "Activity_0wc2mcq",
-          "label": "Create form",
-          "type": "task",
-          "data": {
-          },
-          "links": [
-            {
-              "target_id": "suspend-Gateway_14h0q7a",
-              "semantic": "success"
-            }
-          ]
-        },
-        {
           "id": "Activity_1psp91r",
           "label": "Create",
           "type": "task",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "throw-after-Activity_1psp91r",
@@ -655,8 +575,7 @@
           "id": "Activity_1165bw9",
           "label": "Update form",
           "type": "task",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "suspend-Gateway_0nxerxv",
@@ -668,8 +587,7 @@
           "id": "Activity_1dt5di5",
           "label": "Notify approver",
           "type": "task",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "throw-after-Activity_1dt5di5",
@@ -681,8 +599,7 @@
           "id": "Activity_0bsjggk",
           "label": "Publish",
           "type": "task",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "throw-after-Activity_0bsjggk",
@@ -694,8 +611,7 @@
           "id": "Activity_15nnysv",
           "label": "Delete",
           "type": "task",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "throw-after-Activity_15nnysv",
@@ -707,8 +623,7 @@
           "id": "Activity_0ha7224",
           "label": "Delete? form",
           "type": "task",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "suspend-Gateway_100g9dn",
@@ -720,8 +635,7 @@
           "id": "Activity_1uhozy1",
           "label": "Cancel",
           "type": "task",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "suspend-Gateway_1sq41iq",
@@ -733,8 +647,7 @@
           "id": "Activity_1wiumzv",
           "label": "Revise",
           "type": "task",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "throw-after-Activity_1wiumzv",
@@ -746,8 +659,7 @@
           "id": "Activity_0zsock2",
           "label": "Revise form",
           "type": "task",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "suspend-Gateway_1xs96ik",
@@ -759,8 +671,7 @@
           "id": "Activity_0j78uzd",
           "label": "Update",
           "type": "task",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "throw-after-Activity_0j78uzd",
@@ -772,8 +683,7 @@
           "id": "Event_1vf88fn",
           "label": "valid?",
           "type": "catch_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "suspend-Gateway_1g3fhu2",
@@ -785,8 +695,7 @@
           "id": "Event_1nt0djb",
           "label": "invalid?",
           "type": "catch_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "Activity_00kfo8w",
@@ -798,8 +707,7 @@
           "id": "Activity_08p0cun",
           "label": "Create form with errors",
           "type": "task",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "suspend-Gateway_14h0q7a",
@@ -811,8 +719,7 @@
           "id": "Activity_00kfo8w",
           "label": "Update form with errors",
           "type": "task",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "suspend-Gateway_0nxerxv",
@@ -824,8 +731,7 @@
           "id": "Activity_19m1lnz",
           "label": "Revise form with errors",
           "type": "task",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "suspend-Gateway_1xs96ik",
@@ -837,8 +743,7 @@
           "id": "Activity_0fy41qq",
           "label": "Archive",
           "type": "task",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "throw-after-Activity_0fy41qq",
@@ -850,8 +755,7 @@
           "id": "Event_1vrfxsv",
           "label": null,
           "type": "catch_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "Event_0h6yhq6",
@@ -863,8 +767,7 @@
           "id": "Event_0j1jua6",
           "label": null,
           "type": "catch_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "Event_0h6yhq6",
@@ -876,8 +779,7 @@
           "id": "Event_19ha0ea",
           "label": null,
           "type": "catch_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "suspend-gw-to-catch-before-Activity_0fy41qq",
@@ -889,18 +791,14 @@
           "id": "Event_0h6yhq6",
           "label": "success",
           "type": "terminus",
-          "data": {
-          },
-          "links": [
-
-          ]
+          "data": {},
+          "links": []
         },
         {
           "id": "catch-before-Activity_1psp91r",
           "label": null,
           "type": "catch_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "Activity_1psp91r",
@@ -912,8 +810,7 @@
           "id": "throw-after-Activity_1psp91r",
           "label": null,
           "type": "throw_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "suspend-Gateway_1d05yki",
@@ -925,8 +822,7 @@
           "id": "catch-before-Activity_1dt5di5",
           "label": null,
           "type": "catch_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "Activity_1dt5di5",
@@ -938,8 +834,7 @@
           "id": "throw-after-Activity_1dt5di5",
           "label": null,
           "type": "throw_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "suspend-Gateway_063k28q",
@@ -951,8 +846,7 @@
           "id": "catch-before-Activity_0bsjggk",
           "label": null,
           "type": "catch_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "Activity_0bsjggk",
@@ -964,8 +858,7 @@
           "id": "throw-after-Activity_0bsjggk",
           "label": null,
           "type": "throw_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "suspend-gw-to-Event_19ha0ea",
@@ -977,8 +870,7 @@
           "id": "catch-before-Activity_15nnysv",
           "label": null,
           "type": "catch_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "Activity_15nnysv",
@@ -990,8 +882,7 @@
           "id": "throw-after-Activity_15nnysv",
           "label": null,
           "type": "throw_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "suspend-gw-to-Event_1vrfxsv",
@@ -1003,8 +894,7 @@
           "id": "catch-before-Activity_1wiumzv",
           "label": null,
           "type": "catch_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "Activity_1wiumzv",
@@ -1016,8 +906,7 @@
           "id": "throw-after-Activity_1wiumzv",
           "label": null,
           "type": "throw_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "suspend-Gateway_1sch8el",
@@ -1029,8 +918,7 @@
           "id": "catch-before-Activity_0j78uzd",
           "label": null,
           "type": "catch_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "Activity_0j78uzd",
@@ -1042,8 +930,7 @@
           "id": "throw-after-Activity_0j78uzd",
           "label": null,
           "type": "throw_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "suspend-Gateway_1runwh1",
@@ -1055,8 +942,7 @@
           "id": "catch-before-Activity_0fy41qq",
           "label": null,
           "type": "catch_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "Activity_0fy41qq",
@@ -1068,11 +954,22 @@
           "id": "throw-after-Activity_0fy41qq",
           "label": null,
           "type": "throw_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "suspend-gw-to-Event_0j1jua6",
+              "semantic": "success"
+            }
+          ]
+        },
+        {
+          "id": "Activity_0wc2mcq",
+          "label": "Create form",
+          "type": "task",
+          "data": {},
+          "links": [
+            {
+              "target_id": "suspend-Gateway_14h0q7a",
               "semantic": "success"
             }
           ]
@@ -1082,6 +979,7 @@
           "label": null,
           "type": "catch_event",
           "data": {
+            "start_task": true
           },
           "links": [
             {
@@ -1094,8 +992,7 @@
           "id": "catch-before-Activity_1165bw9",
           "label": null,
           "type": "catch_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "Activity_1165bw9",
@@ -1107,8 +1004,7 @@
           "id": "catch-before-Activity_0ha7224",
           "label": null,
           "type": "catch_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "Activity_0ha7224",
@@ -1120,8 +1016,7 @@
           "id": "catch-before-Activity_1uhozy1",
           "label": null,
           "type": "catch_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "Activity_1uhozy1",
@@ -1133,8 +1028,7 @@
           "id": "catch-before-Activity_0zsock2",
           "label": null,
           "type": "catch_event",
-          "data": {
-          },
+          "data": {},
           "links": [
             {
               "target_id": "Activity_0zsock2",
@@ -1151,9 +1045,7 @@
               "catch-before-Activity_1psp91r"
             ]
           },
-          "links": [
-
-          ]
+          "links": []
         },
         {
           "id": "suspend-Gateway_1d05yki",
@@ -1167,9 +1059,7 @@
               "catch-before-Activity_1dt5di5"
             ]
           },
-          "links": [
-
-          ]
+          "links": []
         },
         {
           "id": "suspend-Gateway_01cn7zv",
@@ -1180,9 +1070,7 @@
               "catch-before-Activity_1165bw9"
             ]
           },
-          "links": [
-
-          ]
+          "links": []
         },
         {
           "id": "suspend-Gateway_0nxerxv",
@@ -1193,9 +1081,7 @@
               "catch-before-Activity_0j78uzd"
             ]
           },
-          "links": [
-
-          ]
+          "links": []
         },
         {
           "id": "suspend-Gateway_063k28q",
@@ -1207,9 +1093,7 @@
               "Event_1vb197y"
             ]
           },
-          "links": [
-
-          ]
+          "links": []
         },
         {
           "id": "suspend-Gateway_1sq41iq",
@@ -1222,9 +1106,7 @@
               "catch-before-Activity_0bsjggk"
             ]
           },
-          "links": [
-
-          ]
+          "links": []
         },
         {
           "id": "suspend-Gateway_1sch8el",
@@ -1236,9 +1118,7 @@
               "Event_1wly6jj"
             ]
           },
-          "links": [
-
-          ]
+          "links": []
         },
         {
           "id": "suspend-Gateway_1xs96ik",
@@ -1249,9 +1129,7 @@
               "catch-before-Activity_1wiumzv"
             ]
           },
-          "links": [
-
-          ]
+          "links": []
         },
         {
           "id": "suspend-Gateway_100g9dn",
@@ -1263,9 +1141,7 @@
               "catch-before-Activity_1uhozy1"
             ]
           },
-          "links": [
-
-          ]
+          "links": []
         },
         {
           "id": "suspend-Gateway_1runwh1",
@@ -1277,9 +1153,7 @@
               "Event_1nt0djb"
             ]
           },
-          "links": [
-
-          ]
+          "links": []
         },
         {
           "id": "suspend-Gateway_1g3fhu2",
@@ -1291,9 +1165,7 @@
               "catch-before-Activity_1dt5di5"
             ]
           },
-          "links": [
-
-          ]
+          "links": []
         },
         {
           "id": "suspend-gw-to-Event_1vrfxsv",
@@ -1304,9 +1176,7 @@
               "Event_1vrfxsv"
             ]
           },
-          "links": [
-
-          ]
+          "links": []
         },
         {
           "id": "suspend-gw-to-Event_0j1jua6",
@@ -1317,9 +1187,7 @@
               "Event_0j1jua6"
             ]
           },
-          "links": [
-
-          ]
+          "links": []
         },
         {
           "id": "suspend-gw-to-Event_19ha0ea",
@@ -1330,9 +1198,7 @@
               "Event_19ha0ea"
             ]
           },
-          "links": [
-
-          ]
+          "links": []
         },
         {
           "id": "suspend-gw-to-catch-before-Activity_0fy41qq",
@@ -1343,9 +1209,7 @@
               "catch-before-Activity_0fy41qq"
             ]
           },
-          "links": [
-
-          ]
+          "links": []
         },
         {
           "id": "suspend-gw-to-catch-before-Activity_0wc2mcq",
@@ -1356,9 +1220,7 @@
               "catch-before-Activity_0wc2mcq"
             ]
           },
-          "links": [
-
-          ]
+          "links": []
         },
         {
           "id": "suspend-gw-to-catch-before-Activity_0zsock2",
@@ -1369,9 +1231,7 @@
               "catch-before-Activity_0zsock2"
             ]
           },
-          "links": [
-
-          ]
+          "links": []
         }
       ]
     }
