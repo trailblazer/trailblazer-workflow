@@ -1,5 +1,7 @@
 require "test_helper"
 
+# TODO: how can we prevent users from triggering lifecycle.Create? only UI events allowed?
+#
 class CollaborationTest < Minitest::Spec
   it "what" do
     ui_create_form = "Activity_0wc2mcq" # TODO: this is from pro-rails tests.
@@ -25,6 +27,18 @@ class CollaborationTest < Minitest::Spec
     ui_create_form_with_errors = "Activity_08p0cun"
     ui_update_form_with_errors = "Activity_00kfo8w"
     ui_rejected = "Event_1vb197y"
+
+    # FIXME: redundant with {lane_test}.
+    create_id = "Activity_0wwfenp"
+    update_id = "Activity_0q9p56e"
+    notify_id = "Activity_0wr78cv"
+    reject_id = "Activity_0d9yewp"
+    approve_id = "Activity_1qrkaz0"
+    revise_id = "Activity_18qv6ob"
+    publish_id = "Activity_1bjelgv"
+    delete_id = "Activity_0cc4us9"
+    archive_id = "Activity_1hgscu3"
+    success_id = "Event_1p8873y"
 
 
     moderation_json = File.read("test/fixtures/v1/moderation.json")
@@ -104,8 +118,8 @@ class CollaborationTest < Minitest::Spec
     initial_lane_positions = Trailblazer::Workflow::Collaboration::Synchronous.initial_lane_positions(schema_hash[:lanes].values)
 
     # TODO: do this in the State layer.
-    # start_task = [lane_activity_ui, initial_lane_positions[lane_activity_ui][:resume_events].first]
-    start_position = Trailblazer::Workflow::Collaboration::Position.new(lane_activity_ui, initial_lane_positions[lane_activity_ui][:resume_events].first)
+    start_task = Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_create_form}").task # catch-before-Activity_0wc2mcq
+    start_position = Trailblazer::Workflow::Collaboration::Position.new(lane_activity_ui, start_task)
 
     configuration, (ctx, flow) = Trailblazer::Workflow::Collaboration::Synchronous.advance(
       schema,
@@ -119,8 +133,29 @@ class CollaborationTest < Minitest::Spec
     )
 
     assert_equal configuration.lane_positions.keys, [lane_activity, lane_activity_ui]
-    assert_equal configuration.lane_positions.values.inspect, %([{:resume_events=>[#<Trailblazer::Workflow::Event::Catch start_task=true type=:catch_event semantic=[:catch, \"catch-before-Activity_0wwfenp\"]>]}, \
-#<Trailblazer::Workflow::Event::Suspend resumes=[\"catch-before-#{ui_create}\"] type=:suspend semantic=[:suspend, \"suspend-Gateway_14h0q7a\"]>])
+    assert_equal configuration.lane_positions.values.inspect, %([{"resumes"=>["catch-before-Activity_0wwfenp"]}, \
+#<Trailblazer::Workflow::Event::Suspend resumes=["catch-before-#{ui_create}"] type=:suspend semantic=[:suspend, "suspend-Gateway_14h0q7a"]>])
     assert_equal ctx.inspect, %({:seq=>[:create_form]})
+
+# create_form <submit>
+    start_task_id = Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "suspend-Gateway_14h0q7a").data["resumes"].first # "catch-before-Activity_1psp91r"
+    start_position = Trailblazer::Workflow::Collaboration::Position.new(lane_activity_ui, Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: start_task_id).task)
+
+    configuration, (ctx, flow) = Trailblazer::Workflow::Collaboration::Synchronous.advance(
+      schema,
+      [{seq: []}, {throw: []}],
+      {}, # circuit_options
+
+      start_position: start_position,
+      lane_positions: configuration.lane_positions, # current position/"state"
+
+      message_flow: schema_hash[:message_flow],
+    )
+
+    assert_equal configuration.lane_positions.keys, [lane_activity, lane_activity_ui]
+
+    assert_equal configuration.lane_positions.values.inspect, %([#<Trailblazer::Workflow::Event::Suspend resumes=["catch-before-#{update_id}", "catch-before-#{notify_id}"] type=:suspend semantic=[:suspend, "suspend-Gateway_0fnbg3r"]>, \
+#<Trailblazer::Workflow::Event::Suspend resumes=["catch-before-#{ui_update_form}"] type=:suspend semantic=[:suspend, "suspend-Gateway_01cn7zv"]>])
+    assert_equal ctx.inspect, %({:seq=>[:create, :create]})
   end
 end

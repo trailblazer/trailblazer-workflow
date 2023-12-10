@@ -40,11 +40,14 @@ module Trailblazer
         module_function
 
         # @private
+        # Returns a fake Suspend event that maintains the actual start events in its {:resume_events}.
         def initial_lane_positions(lanes)
           lanes.collect do |activity|
+            catch_id = Trailblazer::Activity::Introspect.Nodes(activity, task: activity.to_h[:circuit].to_h[:start_task]).id # DISCUSS: store IDs or the actual catch event in {:resumes}?
+
             [
               activity,
-              {resume_events: [activity.to_h[:circuit].to_h[:start_task]]} # We deliberately have *one* position per lane, we're Synchronous.
+              {"resumes" => [catch_id]} # We deliberately have *one* position per lane, we're Synchronous.
             ]
           end
           .to_h
@@ -64,7 +67,8 @@ module Trailblazer
 
             circuit_options = circuit_options.merge(start_task: start_position[:task])
 
-            signal, (ctx, flow) = Activity::TaskWrap.invoke(start_position[:activity], [ctx, flow], **circuit_options)
+            # signal, (ctx, flow) = Activity::TaskWrap.invoke(start_position[:activity], [ctx, flow], **circuit_options)
+            signal, (ctx, flow) = Trailblazer::Developer.wtf?(start_position[:activity], [ctx, flow], **circuit_options)
 
             # now we have :throw, or not
             # @returns Event::Throw::Queued
@@ -73,7 +77,7 @@ module Trailblazer
             lane_positions = advance_position(lane_positions, start_position[:activity], signal)
 
             break unless flow[:throw].any?
-            break if (@options[:skip_message_from] || []).include?(flow[:throw][-1][0]) # FIXME: untested!
+            # break if (@options[:skip_message_from] || []).include?(flow[:throw][-1][0]) # FIXME: untested!
 
             flow, start_position = receiver_task(flow, message_flow)
             # every time we "deliver" a message, we should check if it's allow (meaning the receiving activity is actually in the targeted catch event)
@@ -90,12 +94,15 @@ module Trailblazer
         # every time we "deliver" a message, we should check if it's allowed (meaning the receiving activity is actually in the targeted catch event)
         # {:activity} and {:task} are the targeted position.
         def validate_targeted_position(lane_positions, activity:, task:)
-          receiver_position = lane_positions[activity] # receiver should always be in a suspend task/event gateway.
-          # puts "@@@@@ #{start_task} ? #{receiver_position.inspect}"
+          # the *actual* receiver position, where we're currently.
+          actual_receiver_position = lane_positions[activity] # receiver should always be in a suspend task/event gateway.
 
-          if possible_catch_events = receiver_position.to_h[:resume_events]
-            return true if possible_catch_events.include?(task)
-          end
+          reachable_catch_events = actual_receiver_position.to_h["resumes"]
+            .collect { |catch_id| Trailblazer::Activity::Introspect.Nodes(activity, id: catch_id).task }
+
+          # if possible_catch_event_ids =
+          return true if reachable_catch_events.include?(task)
+          # end
 
           raise "Message can't be passed to #{task} because #{activity} is not in appropriate position"
         end
@@ -104,6 +111,27 @@ module Trailblazer
         # @param signal Workflow::Event::Suspend
         def advance_position(lane_positions, activity, suspend_event)
           lane_positions.merge(activity => suspend_event)
+        end
+
+
+
+
+
+        # @private
+        def receiver_task(flow, message_flow)
+          next_throw, *remaining = flow[:throw]
+
+          throwing_event  = next_throw[0] # DISCUSS: why array in Synchronous?
+          flow = flow.merge(throw: remaining)
+
+          return flow, receiver_position_for(message_flow, throwing_event)
+        end
+
+        # @private
+        def receiver_position_for(message_flow, throwing_event)
+          receiver_activity, catch_task = message_flow.fetch(throwing_event)
+
+          Position.new(receiver_activity, catch_task)
         end
       end # Synchronous
     end
