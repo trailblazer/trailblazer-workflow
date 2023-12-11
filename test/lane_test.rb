@@ -52,7 +52,7 @@ class LaneTest < Minitest::Spec
 
 # puts circuit
 
-    assert_equal circuit, %(
+    assert_equal circuit.gsub("/home/nick/projects/trailblazer-workflow/", ""), %(
 #<Trailblazer::Workflow::Event::Throw/[:throw, "Event_0odjl3c"]>
  {Trailblazer::Activity::Right} => #<Trailblazer::Workflow::Event::Suspend/[:suspend, "suspend-gw-to-catch-before-Activity_0wwfenp"]>
 #<Trailblazer::Workflow::Event::Throw/[:throw, "Event_0txlti3"]>

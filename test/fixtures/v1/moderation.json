@@ -1,5 +1,5 @@
 {
-  "id": 3,
+  "id": 1,
   "type": "collaboration",
   "lanes": [
     {
@@ -488,30 +488,6 @@
       "type": "lane",
       "elements": [
         {
-          "id": "Event_0co8ygx",
-          "label": "invalid?",
-          "type": "catch_event",
-          "data": {},
-          "links": [
-            {
-              "target_id": "Activity_08p0cun",
-              "semantic": "success"
-            }
-          ]
-        },
-        {
-          "id": "Event_0km79t5",
-          "label": "valid?",
-          "type": "catch_event",
-          "data": {},
-          "links": [
-            {
-              "target_id": "suspend-Gateway_01cn7zv",
-              "semantic": "success"
-            }
-          ]
-        },
-        {
           "id": "Event_1npw1tg",
           "label": "accepted?",
           "type": "catch_event",
@@ -555,18 +531,6 @@
           "links": [
             {
               "target_id": "suspend-gw-to-catch-before-Activity_0zsock2",
-              "semantic": "success"
-            }
-          ]
-        },
-        {
-          "id": "Activity_1psp91r",
-          "label": "Create",
-          "type": "task",
-          "data": {},
-          "links": [
-            {
-              "target_id": "throw-after-Activity_1psp91r",
               "semantic": "success"
             }
           ]
@@ -704,18 +668,6 @@
           ]
         },
         {
-          "id": "Activity_08p0cun",
-          "label": "Create form with errors",
-          "type": "task",
-          "data": {},
-          "links": [
-            {
-              "target_id": "suspend-Gateway_14h0q7a",
-              "semantic": "success"
-            }
-          ]
-        },
-        {
           "id": "Activity_00kfo8w",
           "label": "Update form with errors",
           "type": "task",
@@ -795,25 +747,49 @@
           "links": []
         },
         {
-          "id": "catch-before-Activity_1psp91r",
-          "label": null,
+          "id": "Event_0co8ygx",
+          "label": "invalid?",
           "type": "catch_event",
           "data": {},
           "links": [
             {
-              "target_id": "Activity_1psp91r",
+              "target_id": "Activity_08p0cun",
               "semantic": "success"
             }
           ]
         },
         {
-          "id": "throw-after-Activity_1psp91r",
-          "label": null,
-          "type": "throw_event",
+          "id": "Event_0km79t5",
+          "label": "valid?",
+          "type": "catch_event",
           "data": {},
           "links": [
             {
-              "target_id": "suspend-Gateway_1d05yki",
+              "target_id": "suspend-Gateway_0kknfje",
+              "semantic": "success"
+            }
+          ]
+        },
+        {
+          "id": "Activity_1psp91r",
+          "label": "Create",
+          "type": "task",
+          "data": {},
+          "links": [
+            {
+              "target_id": "throw-after-Activity_1psp91r",
+              "semantic": "success"
+            }
+          ]
+        },
+        {
+          "id": "Activity_08p0cun",
+          "label": "Create form with errors",
+          "type": "task",
+          "data": {},
+          "links": [
+            {
+              "target_id": "suspend-Gateway_14h0q7a",
               "semantic": "success"
             }
           ]
@@ -963,27 +939,25 @@
           ]
         },
         {
-          "id": "Activity_0wc2mcq",
-          "label": "Create form",
-          "type": "task",
+          "id": "catch-before-Activity_1psp91r",
+          "label": null,
+          "type": "catch_event",
           "data": {},
           "links": [
             {
-              "target_id": "suspend-Gateway_14h0q7a",
+              "target_id": "Activity_1psp91r",
               "semantic": "success"
             }
           ]
         },
         {
-          "id": "catch-before-Activity_0wc2mcq",
+          "id": "throw-after-Activity_1psp91r",
           "label": null,
-          "type": "catch_event",
-          "data": {
-            "start_task": true
-          },
+          "type": "throw_event",
+          "data": {},
           "links": [
             {
-              "target_id": "Activity_0wc2mcq",
+              "target_id": "suspend-Gateway_1d05yki",
               "semantic": "success"
             }
           ]
@@ -1037,29 +1011,30 @@
           ]
         },
         {
-          "id": "suspend-Gateway_14h0q7a",
-          "label": null,
-          "type": "suspend",
-          "data": {
-            "resumes": [
-              "catch-before-Activity_1psp91r"
-            ]
-          },
-          "links": []
+          "id": "Activity_0wc2mcq",
+          "label": "Create form",
+          "type": "task",
+          "data": {},
+          "links": [
+            {
+              "target_id": "suspend-Gateway_14h0q7a",
+              "semantic": "success"
+            }
+          ]
         },
         {
-          "id": "suspend-Gateway_1d05yki",
+          "id": "catch-before-Activity_0wc2mcq",
           "label": null,
-          "type": "suspend",
+          "type": "catch_event",
           "data": {
-            "resumes": [
-              "Event_0km79t5",
-              "Event_0co8ygx",
-              "catch-before-Activity_1165bw9",
-              "catch-before-Activity_1dt5di5"
-            ]
+            "start_task": true
           },
-          "links": []
+          "links": [
+            {
+              "target_id": "Activity_0wc2mcq",
+              "semantic": "success"
+            }
+          ]
         },
         {
           "id": "suspend-Gateway_01cn7zv",
@@ -1168,6 +1143,41 @@
           "links": []
         },
         {
+          "id": "suspend-Gateway_14h0q7a",
+          "label": null,
+          "type": "suspend",
+          "data": {
+            "resumes": [
+              "catch-before-Activity_1psp91r"
+            ]
+          },
+          "links": []
+        },
+        {
+          "id": "suspend-Gateway_1d05yki",
+          "label": null,
+          "type": "suspend",
+          "data": {
+            "resumes": [
+              "Event_0km79t5",
+              "Event_0co8ygx"
+            ]
+          },
+          "links": []
+        },
+        {
+          "id": "suspend-Gateway_0kknfje",
+          "label": null,
+          "type": "suspend",
+          "data": {
+            "resumes": [
+              "catch-before-Activity_1165bw9",
+              "catch-before-Activity_1dt5di5"
+            ]
+          },
+          "links": []
+        },
+        {
           "id": "suspend-gw-to-Event_1vrfxsv",
           "label": null,
           "type": "suspend",
@@ -1212,23 +1222,23 @@
           "links": []
         },
         {
-          "id": "suspend-gw-to-catch-before-Activity_0wc2mcq",
-          "label": null,
-          "type": "suspend",
-          "data": {
-            "resumes": [
-              "catch-before-Activity_0wc2mcq"
-            ]
-          },
-          "links": []
-        },
-        {
           "id": "suspend-gw-to-catch-before-Activity_0zsock2",
           "label": null,
           "type": "suspend",
           "data": {
             "resumes": [
               "catch-before-Activity_0zsock2"
+            ]
+          },
+          "links": []
+        },
+        {
+          "id": "suspend-gw-to-catch-before-Activity_0wc2mcq",
+          "label": null,
+          "type": "suspend",
+          "data": {
+            "resumes": [
+              "catch-before-Activity_0wc2mcq"
             ]
           },
           "links": []
@@ -1350,16 +1360,6 @@
     [
       [
         "<ui> author workflow",
-        "throw-after-Activity_1psp91r"
-      ],
-      [
-        "article moderation",
-        "catch-before-Activity_0wwfenp"
-      ]
-    ],
-    [
-      [
-        "<ui> author workflow",
         "throw-after-Activity_1dt5di5"
       ],
       [
@@ -1415,6 +1415,16 @@
       [
         "article moderation",
         "catch-before-Activity_1hgscu3"
+      ]
+    ],
+    [
+      [
+        "<ui> author workflow",
+        "throw-after-Activity_1psp91r"
+      ],
+      [
+        "article moderation",
+        "catch-before-Activity_0wwfenp"
       ]
     ]
   ]

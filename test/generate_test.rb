@@ -18,7 +18,7 @@ class GenerateTest < Minitest::Spec
     # assert_equal lifecycle_lane.type "lane"
     assert_equal lifecycle_lane.elements.size, 39
 
-    create = lifecycle_lane.elements[4]
+    create = lifecycle_lane.elements[12]
     assert_equal create.id, "Activity_0wwfenp"
     assert_equal create.label, "Create"
     assert_equal create.type, :task
@@ -69,15 +69,6 @@ class GenerateTest < Minitest::Spec
     [#<struct Trailblazer::Activity::Schema::Intermediate::Out
       semantic=:success,
       target="suspend-Gateway_01p7uj7">],
-   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="Activity_0wwfenp",
-    data={:type=>:task, :label=>"Create"}>=>
-    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
-      semantic=:success,
-      target="throw-after-Activity_0wwfenp">,
-     #<struct Trailblazer::Activity::Schema::Intermediate::Out
-      semantic=:failure,
-      target="Event_0odjl3c">],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
     id="Activity_0q9p56e",
     data={:type=>:task, :label=>"Update"}>=>
@@ -133,8 +124,17 @@ class GenerateTest < Minitest::Spec
       semantic=:success,
       target="throw-after-Activity_0d9yewp">],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Activity_0wwfenp",
+    data={:type=>:task, :label=>"Create"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="throw-after-Activity_0wwfenp">,
+     #<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:failure,
+      target="Event_0odjl3c">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
     id="catch-before-Activity_0wwfenp",
-    data={:type=>:catch_event}>=>
+    data={"start_task"=>true, :type=>:catch_event}>=>
     [#<struct Trailblazer::Activity::Schema::Intermediate::Out
       semantic=:success,
       target="Activity_0wwfenp">],
@@ -291,32 +291,13 @@ class GenerateTest < Minitest::Spec
    "suspend-Gateway_1kl7pnm"=>:suspend,
    "suspend-gw-to-catch-before-Activity_0wwfenp"=>:suspend,
    "suspend-gw-to-catch-before-Activity_1hgscu3"=>:suspend},
- start_task_id="Event_0odjl3c">
+ start_task_id="catch-before-Activity_0wwfenp">
 )
 
 
-  # puts lanes["<ui> author workflow"].pretty_inspect
     assert_equal lanes["<ui> author workflow"].pretty_inspect, %(#<struct Trailblazer::Activity::Schema::Intermediate
  wiring=
   {#<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="Event_16milya",
-    data={:type=>:start_event}>=>
-    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
-      semantic=:success,
-      target="suspend-gw-to-catch-before-Activity_0wc2mcq">],
-   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="Event_0co8ygx",
-    data={:type=>:catch_event, :label=>"invalid?"}>=>
-    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
-      semantic=:success,
-      target="Activity_08p0cun">],
-   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="Event_0km79t5",
-    data={:type=>:catch_event, :label=>"valid?"}>=>
-    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
-      semantic=:success,
-      target="suspend-Gateway_01cn7zv">],
-   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
     id="Event_1npw1tg",
     data={:type=>:catch_event, :label=>"accepted?"}>=>
     [#<struct Trailblazer::Activity::Schema::Intermediate::Out
@@ -340,18 +321,6 @@ class GenerateTest < Minitest::Spec
     [#<struct Trailblazer::Activity::Schema::Intermediate::Out
       semantic=:success,
       target="suspend-gw-to-catch-before-Activity_0zsock2">],
-   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="Activity_0wc2mcq",
-    data={:type=>:task, :label=>"Create form"}>=>
-    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
-      semantic=:success,
-      target="suspend-Gateway_14h0q7a">],
-   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="Activity_1psp91r",
-    data={:type=>:task, :label=>"Create"}>=>
-    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
-      semantic=:success,
-      target="throw-after-Activity_1psp91r">],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
     id="Activity_1165bw9",
     data={:type=>:task, :label=>"Update form"}>=>
@@ -419,12 +388,6 @@ class GenerateTest < Minitest::Spec
       semantic=:success,
       target="Activity_00kfo8w">],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="Activity_08p0cun",
-    data={:type=>:task, :label=>"Create form with errors"}>=>
-    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
-      semantic=:success,
-      target="suspend-Gateway_14h0q7a">],
-   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
     id="Activity_00kfo8w",
     data={:type=>:task, :label=>"Update form with errors"}>=>
     [#<struct Trailblazer::Activity::Schema::Intermediate::Out
@@ -464,17 +427,29 @@ class GenerateTest < Minitest::Spec
     id="Event_0h6yhq6",
     data={:type=>:terminus, :label=>"success"}>=>[],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="catch-before-Activity_1psp91r",
-    data={:type=>:catch_event}>=>
+    id="Event_0co8ygx",
+    data={:type=>:catch_event, :label=>"invalid?"}>=>
     [#<struct Trailblazer::Activity::Schema::Intermediate::Out
       semantic=:success,
-      target="Activity_1psp91r">],
+      target="Activity_08p0cun">],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="throw-after-Activity_1psp91r",
-    data={:type=>:throw_event}>=>
+    id="Event_0km79t5",
+    data={:type=>:catch_event, :label=>"valid?"}>=>
     [#<struct Trailblazer::Activity::Schema::Intermediate::Out
       semantic=:success,
-      target="suspend-Gateway_1d05yki">],
+      target="suspend-Gateway_0kknfje">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Activity_1psp91r",
+    data={:type=>:task, :label=>"Create"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="throw-after-Activity_1psp91r">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="Activity_08p0cun",
+    data={:type=>:task, :label=>"Create form with errors"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-Gateway_14h0q7a">],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
     id="catch-before-Activity_1dt5di5",
     data={:type=>:catch_event}>=>
@@ -548,11 +523,17 @@ class GenerateTest < Minitest::Spec
       semantic=:success,
       target="suspend-gw-to-Event_0j1jua6">],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="catch-before-Activity_0wc2mcq",
+    id="catch-before-Activity_1psp91r",
     data={:type=>:catch_event}>=>
     [#<struct Trailblazer::Activity::Schema::Intermediate::Out
       semantic=:success,
-      target="Activity_0wc2mcq">],
+      target="Activity_1psp91r">],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="throw-after-Activity_1psp91r",
+    data={:type=>:throw_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-Gateway_1d05yki">],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
     id="catch-before-Activity_1165bw9",
     data={:type=>:catch_event}>=>
@@ -578,17 +559,17 @@ class GenerateTest < Minitest::Spec
       semantic=:success,
       target="Activity_0zsock2">],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="suspend-Gateway_14h0q7a",
-    data={"resumes"=>["catch-before-Activity_1psp91r"], :type=>:suspend}>=>[],
+    id="Activity_0wc2mcq",
+    data={:type=>:task, :label=>"Create form"}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="suspend-Gateway_14h0q7a">],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="suspend-Gateway_1d05yki",
-    data=
-     {"resumes"=>
-       ["Event_0km79t5",
-        "Event_0co8ygx",
-        "catch-before-Activity_1165bw9",
-        "catch-before-Activity_1dt5di5"],
-      :type=>:suspend}>=>[],
+    id="catch-before-Activity_0wc2mcq",
+    data={"start_task"=>true, :type=>:catch_event}>=>
+    [#<struct Trailblazer::Activity::Schema::Intermediate::Out
+      semantic=:success,
+      target="Activity_0wc2mcq">],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
     id="suspend-Gateway_01cn7zv",
     data={"resumes"=>["catch-before-Activity_1165bw9"], :type=>:suspend}>=>[],
@@ -628,6 +609,18 @@ class GenerateTest < Minitest::Spec
        ["catch-before-Activity_1165bw9", "catch-before-Activity_1dt5di5"],
       :type=>:suspend}>=>[],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="suspend-Gateway_14h0q7a",
+    data={"resumes"=>["catch-before-Activity_1psp91r"], :type=>:suspend}>=>[],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="suspend-Gateway_1d05yki",
+    data={"resumes"=>["Event_0km79t5", "Event_0co8ygx"], :type=>:suspend}>=>[],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="suspend-Gateway_0kknfje",
+    data=
+     {"resumes"=>
+       ["catch-before-Activity_1165bw9", "catch-before-Activity_1dt5di5"],
+      :type=>:suspend}>=>[],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
     id="suspend-gw-to-Event_1vrfxsv",
     data={"resumes"=>["Event_1vrfxsv"], :type=>:suspend}>=>[],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
@@ -640,15 +633,13 @@ class GenerateTest < Minitest::Spec
     id="suspend-gw-to-catch-before-Activity_0fy41qq",
     data={"resumes"=>["catch-before-Activity_0fy41qq"], :type=>:suspend}>=>[],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="suspend-gw-to-catch-before-Activity_0wc2mcq",
-    data={"resumes"=>["catch-before-Activity_0wc2mcq"], :type=>:suspend}>=>[],
-   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
     id="suspend-gw-to-catch-before-Activity_0zsock2",
-    data={"resumes"=>["catch-before-Activity_0zsock2"], :type=>:suspend}>=>[]},
+    data={"resumes"=>["catch-before-Activity_0zsock2"], :type=>:suspend}>=>[],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="suspend-gw-to-catch-before-Activity_0wc2mcq",
+    data={"resumes"=>["catch-before-Activity_0wc2mcq"], :type=>:suspend}>=>[]},
  stop_task_ids=
   {"Event_0h6yhq6"=>:Event_0h6yhq6,
-   "suspend-Gateway_14h0q7a"=>:suspend,
-   "suspend-Gateway_1d05yki"=>:suspend,
    "suspend-Gateway_01cn7zv"=>:suspend,
    "suspend-Gateway_0nxerxv"=>:suspend,
    "suspend-Gateway_063k28q"=>:suspend,
@@ -658,13 +649,16 @@ class GenerateTest < Minitest::Spec
    "suspend-Gateway_100g9dn"=>:suspend,
    "suspend-Gateway_1runwh1"=>:suspend,
    "suspend-Gateway_1g3fhu2"=>:suspend,
+   "suspend-Gateway_14h0q7a"=>:suspend,
+   "suspend-Gateway_1d05yki"=>:suspend,
+   "suspend-Gateway_0kknfje"=>:suspend,
    "suspend-gw-to-Event_1vrfxsv"=>:suspend,
    "suspend-gw-to-Event_0j1jua6"=>:suspend,
    "suspend-gw-to-Event_19ha0ea"=>:suspend,
    "suspend-gw-to-catch-before-Activity_0fy41qq"=>:suspend,
-   "suspend-gw-to-catch-before-Activity_0wc2mcq"=>:suspend,
-   "suspend-gw-to-catch-before-Activity_0zsock2"=>:suspend},
- start_task_id="Event_16milya">
+   "suspend-gw-to-catch-before-Activity_0zsock2"=>:suspend,
+   "suspend-gw-to-catch-before-Activity_0wc2mcq"=>:suspend},
+ start_task_id="catch-before-Activity_0wc2mcq">
 )
   end
 end
