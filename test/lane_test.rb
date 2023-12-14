@@ -138,10 +138,20 @@ LaneTest::NotifyApprover
   #@ test {start_task}
   assert_equal lane_activity.to_h[:circuit].to_h[:start_task].inspect, %(#<Trailblazer::Workflow::Event::Catch start_task=true type=:catch_event semantic=[:catch, "catch-before-Activity_0wwfenp"]>)
 
+  # FIXME: redundant with {lane_test}.
+    create_id = "Activity_0wwfenp"
+    # update_id = "Activity_0q9p56e"
+    # notify_id = "Activity_0wr78cv"
+    # reject_id = "Activity_0d9yewp"
+    # approve_id = "Activity_1qrkaz0"
+    # revise_id = "Activity_18qv6ob"
+    # publish_id = "Activity_1bjelgv"
+    # delete_id = "Activity_0cc4us9"
+    # archive_id = "Activity_1hgscu3"
+    # success_id = "Event_1p8873y"
 
-  # it "runs as expected" do
-
-      # start_from: ["catch-before-Create"]
+  #@ test {:data} field.
+  assert_equal Trailblazer::Activity::Introspect.Nodes(lane_activity, id: create_id).data.inspect, %({:type=>:task, :label=>"Create"}) # DISCUSS: test all elements?
 
   #   # We need a language to find/specify suspends.
   #   # Explict, but too redundant:
