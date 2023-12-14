@@ -115,6 +115,125 @@ class CollaborationTest < Minitest::Spec
 
     # raise schema_hash.keys.inspect
 
+
+    missing_throw_from_notify_approver = Trailblazer::Activity::Introspect.Nodes(lane_activity, id: "throw-after-Activity_0wr78cv").task
+
+    decision_is_approve_throw = nil
+    decision_is_reject_throw  = nil
+
+    approver_start_suspend = nil
+    approver_activity = Class.new(Trailblazer::Activity::Railway) do
+      step task: approver_start_suspend = Trailblazer::Workflow::Event::Suspend.new(semantic: "invented_semantic", "resumes" => ["xxx"])
+
+      fail :decider, id: "xxx",
+        Output(:failure) => Trailblazer::Activity::Railway.Id("xxx_reject")
+      fail task: decision_is_approve_throw = Trailblazer::Workflow::Event::Throw.new(semantic: "xxx_approve")
+
+      step task: decision_is_reject_throw = Trailblazer::Workflow::Event::Throw.new(semantic: "xxx_reject"),
+        magnetic_to: :reject, id: "xxx_reject"
+
+      def decider(ctx, decision: true, **)
+        # raise if !decision
+
+        decision
+      end
+    end
+
+    extended_message_flow = message_flow.merge(
+      # "throw-after-Activity_0wr78cv"
+      missing_throw_from_notify_approver => [approver_activity, Trailblazer::Activity::Introspect.Nodes(approver_activity, id: "xxx").task],
+      decision_is_approve_throw => [lane_activity, Trailblazer::Activity::Introspect.Nodes(lane_activity, id: "catch-before-#{approve_id}").task],
+      decision_is_reject_throw => [lane_activity, Trailblazer::Activity::Introspect.Nodes(lane_activity, id: "catch-before-#{reject_id}").task],
+    )
+
+    initial_lane_positions = Trailblazer::Workflow::Collaboration::Synchronous.initial_lane_positions(schema_hash[:lanes].values)
+    # TODO: do this in the State layer.
+    start_task = Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_create_form}").task # catch-before-Activity_0wc2mcq
+    start_position = Trailblazer::Workflow::Collaboration::Position.new(lane_activity_ui, start_task)
+
+    extended_initial_lane_positions = initial_lane_positions.merge(
+      approver_activity => approver_start_suspend
+    )
+
+    todo_resumes = [
+      [
+        start_position,
+        extended_initial_lane_positions,
+        {} # ctx_merge
+      ]
+    ]
+
+    states = []
+
+    already_visited_catch_events = {}
+    already_visited_catch_events_again = {} # FIXME: well, yeah.
+
+    run_multiple_times = {
+      # suspend after Notify approver in lifecycle
+      # it's not entirely correct but we're "clicking" the [notify_approver] button again, this time to get rejected.
+      Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_notify_approver}").task => {ctx_merge: {decision: false}}
+    }
+
+    while todo_resumes.any?
+      (start_position, lane_positions, ctx_merge) = todo_resumes.shift
+      puts "~~~~~~~~~"
+
+      ctx = {seq: []}.merge(ctx_merge)
+      start_task = start_position.to_h[:task]
+      if (do_again_config = run_multiple_times[start_task]) && !already_visited_catch_events_again[start_task] # TODO: do this by keying by resume event and ctx variable(s).
+
+        todo_resumes << [
+          start_position,
+          lane_positions, # same positions as the original situation.
+          do_again_config[:ctx_merge]
+        ]
+
+        already_visited_catch_events_again[start_task] = true
+      end
+
+      configuration, (ctx, flow) = Trailblazer::Workflow::Collaboration::Synchronous.advance(
+        schema,
+        [ctx, {throw: []}],
+        {}, # circuit_options
+
+        start_position: start_position,
+        lane_positions: lane_positions, # current position/"state"
+
+        message_flow: extended_message_flow,
+      )
+
+      # register new state.
+      states << configuration
+
+      # figure out possible next resumes/catchs:
+      last_lane        = configuration.last_lane
+      suspend_terminus = configuration.lane_positions[last_lane]
+
+      next if suspend_terminus.instance_of?(Trailblazer::Activity::End) # a real end event!
+      # elsif suspend_terminus.is_a?(Trailblazer::Activity::Railway::End) # a real end event!
+
+      #   raise suspend_terminus.inspect
+
+      # Go through all possible resume/catch events and "remember" them
+      suspend_terminus.to_h["resumes"].each do |resume_event_id|
+        resume_event = Trailblazer::Activity::Introspect.Nodes(last_lane, id: resume_event_id).task
+
+        unless already_visited_catch_events[resume_event]
+          todo_resumes << [
+            Trailblazer::Workflow::Collaboration::Position.new(last_lane, resume_event),
+            configuration.lane_positions,
+            {}
+          ]
+        end
+
+        already_visited_catch_events[resume_event] = true
+      end
+    end
+
+
+
+
+
     initial_lane_positions = Trailblazer::Workflow::Collaboration::Synchronous.initial_lane_positions(schema_hash[:lanes].values)
 
     # TODO: do this in the State layer.
@@ -132,8 +251,9 @@ class CollaborationTest < Minitest::Spec
       message_flow: schema_hash[:message_flow],
     )
 
+# TODO: test {:last_lane}.
     assert_equal configuration.lane_positions.keys, [lane_activity, lane_activity_ui]
-    assert_equal configuration.lane_positions.values.inspect, %([{"resumes"=>["catch-before-Activity_0wwfenp"]}, \
+    assert_equal configuration.lane_positions.values.inspect, %([{"resumes"=>["catch-before-#{create_id}"]}, \
 #<Trailblazer::Workflow::Event::Suspend resumes=["catch-before-#{ui_create}"] type=:suspend semantic=[:suspend, "suspend-Gateway_14h0q7a"]>])
     assert_equal ctx.inspect, %({:seq=>[:create_form]})
 

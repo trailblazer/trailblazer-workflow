@@ -33,7 +33,7 @@ module Trailblazer
 
       # DISCUSS: rename to State or something better matching?
       # Keeps the collaboration lane positions after running, it's a "state"
-      class Configuration < Struct.new(:lane_positions, :signal, :ctx, :flow_options, keyword_init: true) # DISCUSS: should we keep ctx/flow_options?
+      class Configuration < Struct.new(:lane_positions, :signal, :ctx, :flow_options, :last_lane, keyword_init: true) # DISCUSS: should we keep ctx/flow_options?
       end
 
       module Synchronous # DISCUSS: (file) location.
@@ -79,13 +79,19 @@ module Trailblazer
             break unless flow[:throw].any?
             # break if (@options[:skip_message_from] || []).include?(flow[:throw][-1][0]) # FIXME: untested!
 
+            debug_points_to = start_position[:activity].to_h[:circuit].to_h[:map][start_position[:task]]
+            Trailblazer::Activity::Introspect.Nodes(start_position[:activity], task: start_position[:task]).data
+            puts "
+>>>>>>>>> FROM \033[1msuspend ---> #{debug_points_to}\033[0m"
+
             flow, start_position = receiver_task(flow, message_flow)
-            # every time we "deliver" a message, we should check if it's allow (meaning the receiving activity is actually in the targeted catch event)
+            # every time we "deliver" a message, we should check if it's allowed (meaning the receiving activity is actually in the targeted catch event)
           end
 
           return Configuration.new(
             lane_positions: lane_positions,
             signal:         signal,
+            last_lane:      start_position[:activity], # DISCUSS: do we need that, or should we infer that using {signal}?
           ),
           [ctx, flow]
         end
@@ -96,6 +102,10 @@ module Trailblazer
         def validate_targeted_position(lane_positions, activity:, task:)
           # the *actual* receiver position, where we're currently.
           actual_receiver_position = lane_positions[activity] # receiver should always be in a suspend task/event gateway.
+
+#           puts "######### #{} | #{task}
+# >>>>>>>>> #{actual_receiver_position}"
+#           puts
 
           reachable_catch_events = actual_receiver_position.to_h["resumes"]
             .collect { |catch_id| Trailblazer::Activity::Introspect.Nodes(activity, id: catch_id).task }
