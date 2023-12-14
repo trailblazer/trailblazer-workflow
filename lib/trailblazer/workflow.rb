@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require_relative "workflow/version"
 
 module Trailblazer
@@ -9,6 +7,7 @@ module Trailblazer
 end
 
 require "trailblazer/workflow/generate"
+require "trailblazer/workflow/collaboration"
 require "trailblazer/workflow/collaboration/lane"
 require "trailblazer/workflow/collaboration/messages"
 require "trailblazer/workflow/event"
