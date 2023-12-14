@@ -47,7 +47,7 @@ module Trailblazer
 
             [
               activity,
-              {"resumes" => [catch_id]} # We deliberately have *one* position per lane, we're Synchronous.
+              {"resumes" => [catch_id], semantic: [:suspend, "from initial_lane_positions"]} # We deliberately have *one* position per lane, we're Synchronous. # TODO: use a real {Event::Suspend} here.
             ]
           end
           .to_h

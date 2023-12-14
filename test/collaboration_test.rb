@@ -191,6 +191,9 @@ class CollaborationTest < Minitest::Spec
         already_visited_catch_events_again[start_task] = true
       end
 
+      # register new state.
+      states << [lane_positions, start_position]
+
       configuration, (ctx, flow) = Trailblazer::Workflow::Collaboration::Synchronous.advance(
         schema,
         [ctx, {throw: []}],
@@ -202,8 +205,6 @@ class CollaborationTest < Minitest::Spec
         message_flow: extended_message_flow,
       )
 
-      # register new state.
-      states << configuration
 
       # figure out possible next resumes/catchs:
       last_lane        = configuration.last_lane
@@ -230,6 +231,42 @@ class CollaborationTest < Minitest::Spec
       end
     end
 
+    # here, we only have the resume/catch events.
+    # pp states
+
+    def render_states(states, lanes:)
+      rows = states.collect do |lane_positions, triggered_resume_event|
+
+        # Go through each lane.
+        row = lane_positions.flat_map do |activity, suspend|
+          next if suspend.to_h["resumes"].nil?
+
+          resumes = suspend.to_h["resumes"].collect do |catch_event_id|
+            catch_event = Trailblazer::Activity::Introspect.Nodes(activity, id: catch_event_id).task
+            task_after_catch = activity.to_h[:circuit].to_h[:map][catch_event][Trailblazer::Activity::Right]
+            # raise task_after_catch.inspect
+
+            Trailblazer::Activity::Introspect.Nodes(activity, task: task_after_catch).data[:label] || task_after_catch
+          end
+
+          [
+            lanes[activity],
+            resumes.inspect,
+
+            "#{lanes[activity]} suspend",
+            suspend.to_h[:semantic][1]
+          ]
+        end
+
+        row = Hash[*row.compact]
+      end
+      .uniq # remove me if you want to see all reached configurations
+
+
+      puts Hirb::Helpers::Table.render(rows, fields: ["UI", "UI suspend", "lifecycle", "lifecycle suspend"], max_width: 999)
+    end
+
+    render_states(states, lanes: {lane_activity => "lifecycle", lane_activity_ui => "UI", approver_activity => "approver"})
 
 
 
@@ -253,7 +290,7 @@ class CollaborationTest < Minitest::Spec
 
 # TODO: test {:last_lane}.
     assert_equal configuration.lane_positions.keys, [lane_activity, lane_activity_ui]
-    assert_equal configuration.lane_positions.values.inspect, %([{"resumes"=>["catch-before-#{create_id}"]}, \
+    assert_equal configuration.lane_positions.values.inspect, %([{"resumes"=>["catch-before-#{create_id}"], :semantic=>[:suspend, "from initial_lane_positions"]}, \
 #<Trailblazer::Workflow::Event::Suspend resumes=["catch-before-#{ui_create}"] type=:suspend semantic=[:suspend, "suspend-Gateway_14h0q7a"]>])
     assert_equal ctx.inspect, %({:seq=>[:create_form]})
 
