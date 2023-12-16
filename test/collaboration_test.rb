@@ -67,14 +67,14 @@ class CollaborationTest < Minitest::Spec
     article_moderation_intermediate = ctx[:intermediates]["<ui> author workflow"]
     # pp article_moderation_intermediate
 
-    implementing = Trailblazer::Activity::Testing.def_steps(:create_form, :create, :update_form, :update, :notify_approver, :reject, :approve, :revise, :publish, :archive, :delete, :delete_form, :cancel, :revise_form,
+    implementing = Trailblazer::Activity::Testing.def_steps(:create_form, :ui_create, :update_form, :update, :notify_approver, :reject, :approve, :revise, :publish, :archive, :delete, :delete_form, :cancel, :revise_form,
       :create_form_with_errors, :update_form_with_errors, :revise_form_with_errors)
 
     lane_activity_ui = Trailblazer::Workflow::Collaboration.Lane(
       article_moderation_intermediate,
 
       "Create form" => implementing.method(:create_form),
-      "Create" => implementing.method(:create),
+      "Create" => implementing.method(:ui_create),
       "Update form" => implementing.method(:update_form),
       "Notify approver" => implementing.method(:notify_approver),
       "Publish" => implementing.method(:publish),
@@ -155,6 +155,14 @@ class CollaborationTest < Minitest::Spec
       approver_activity => approver_start_suspend
     )
 
+# State discovery:
+# The idea is that we collect suspend events and follow up on all their resumes (catch) events.
+# We can't see into {Collaboration.call}, meaning we can really only collect public entry points,
+# just like a user (like a controller) of our process.
+# 1. one problem is, when a decision is involved in the run ahead of us we need to invoke the same
+#    catch multiple times, with different input data.
+#    DISCUSS: could we figure out the two different suspend termini that way, to make it easier for users to define
+#    which outcome is "success"?
     todo_resumes = [
       [
         start_position,
@@ -168,10 +176,15 @@ class CollaborationTest < Minitest::Spec
     already_visited_catch_events = {}
     already_visited_catch_events_again = {} # FIXME: well, yeah.
 
+    # DISCUSS: We could probably figure out "binary" paths automatically? That would
+    #          imply we start from a public resume and discover the path?
     run_multiple_times = {
       # suspend after Notify approver in lifecycle
-      # it's not entirely correct but we're "clicking" the [notify_approver] button again, this time to get rejected.
-      Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_notify_approver}").task => {ctx_merge: {decision: false}}
+      # We're "clicking" the [Notify_approver] button again, this time to get rejected.
+      Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_notify_approver}").task => {ctx_merge: {decision: false}},
+
+      # Click [UI Create] again, with invalid data.
+      Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_create}").task => {ctx_merge: {create: false}}, # lifecycle create is supposed to fail.
     }
 
     while todo_resumes.any?
@@ -313,7 +326,7 @@ class CollaborationTest < Minitest::Spec
 
     assert_equal configuration.lane_positions.values.inspect, %([#<Trailblazer::Workflow::Event::Suspend resumes=["catch-before-#{update_id}", "catch-before-#{notify_id}"] type=:suspend semantic=[:suspend, "suspend-Gateway_0fnbg3r"]>, \
 #<Trailblazer::Workflow::Event::Suspend resumes=["catch-before-#{ui_update_form}", "catch-before-#{ui_notify_approver}"] type=:suspend semantic=[:suspend, "suspend-Gateway_0kknfje"]>])
-    assert_equal ctx.inspect, %({:seq=>[:create, :create]})
+    assert_equal ctx.inspect, %({:seq=>[:ui_create, :create]})
     # we can actually see the last signal and its semantic is {[:suspend, "suspend-Gateway_0kknfje"]}
     assert_equal configuration.signal.inspect, %(#<Trailblazer::Workflow::Event::Suspend resumes=["catch-before-Activity_1165bw9", "catch-before-Activity_1dt5di5"] type=:suspend semantic=[:suspend, "suspend-Gateway_0kknfje"]>)
   end
