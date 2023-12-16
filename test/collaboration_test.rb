@@ -67,7 +67,7 @@ class CollaborationTest < Minitest::Spec
     article_moderation_intermediate = ctx[:intermediates]["<ui> author workflow"]
     # pp article_moderation_intermediate
 
-    implementing = Trailblazer::Activity::Testing.def_steps(:create_form, :ui_create, :update_form, :update, :notify_approver, :reject, :approve, :revise, :publish, :archive, :delete, :delete_form, :cancel, :revise_form,
+    implementing = Trailblazer::Activity::Testing.def_steps(:create_form, :ui_create, :update_form, :ui_update, :notify_approver, :reject, :approve, :revise, :publish, :archive, :delete, :delete_form, :cancel, :revise_form,
       :create_form_with_errors, :update_form_with_errors, :revise_form_with_errors)
 
     lane_activity_ui = Trailblazer::Workflow::Collaboration.Lane(
@@ -76,6 +76,7 @@ class CollaborationTest < Minitest::Spec
       "Create form" => implementing.method(:create_form),
       "Create" => implementing.method(:ui_create),
       "Update form" => implementing.method(:update_form),
+      "Update" => implementing.method(:ui_update),
       "Notify approver" => implementing.method(:notify_approver),
       "Publish" => implementing.method(:publish),
       "Delete" => implementing.method(:delete),
@@ -83,7 +84,6 @@ class CollaborationTest < Minitest::Spec
       "Cancel" => implementing.method(:cancel),
       "Revise" => implementing.method(:revise),
       "Revise form" => implementing.method(:revise_form),
-      "Update" => implementing.method(:update),
       "Create form with errors" => implementing.method(:create_form_with_errors),
       "Update form with errors" => implementing.method(:update_form_with_errors),
       "Revise form with errors" => implementing.method(:revise_form_with_errors),
@@ -163,7 +163,7 @@ class CollaborationTest < Minitest::Spec
 #    catch multiple times, with different input data.
 #    DISCUSS: could we figure out the two different suspend termini that way, to make it easier for users to define
 #    which outcome is "success"?
-    todo_resumes = [
+    resumes_to_invoke = [
       [
         start_position,
         extended_initial_lane_positions,
@@ -172,6 +172,7 @@ class CollaborationTest < Minitest::Spec
     ]
 
     states = []
+    additional_state_data = {}
 
     already_visited_catch_events = {}
     already_visited_catch_events_again = {} # FIXME: well, yeah.
@@ -185,17 +186,21 @@ class CollaborationTest < Minitest::Spec
 
       # Click [UI Create] again, with invalid data.
       Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_create}").task => {ctx_merge: {create: false}}, # lifecycle create is supposed to fail.
+
+      # Click [UI Update] again, with invalid data.
+      Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_update}").task => {ctx_merge: {update: false}}, # lifecycle create is supposed to fail.
     }
 
-    while todo_resumes.any?
-      (start_position, lane_positions, ctx_merge) = todo_resumes.shift
+
+    while resumes_to_invoke.any?
+      (start_position, lane_positions, ctx_merge) = resumes_to_invoke.shift
       puts "~~~~~~~~~"
 
       ctx = {seq: []}.merge(ctx_merge)
       start_task = start_position.to_h[:task]
       if (do_again_config = run_multiple_times[start_task]) && !already_visited_catch_events_again[start_task] # TODO: do this by keying by resume event and ctx variable(s).
 
-        todo_resumes << [
+        resumes_to_invoke << [
           start_position,
           lane_positions, # same positions as the original situation.
           do_again_config[:ctx_merge]
@@ -205,7 +210,10 @@ class CollaborationTest < Minitest::Spec
       end
 
       # register new state.
-      states << [lane_positions, start_position]
+      # Note that we do that before anything is invoked.
+      states << state = [lane_positions, start_position]
+
+      state_data = [ctx.inspect]
 
       configuration, (ctx, flow) = Trailblazer::Workflow::Collaboration::Synchronous.advance(
         schema,
@@ -218,6 +226,9 @@ class CollaborationTest < Minitest::Spec
         message_flow: extended_message_flow,
       )
 
+      state_data << ctx.inspect # context after. DISCUSS: use tracing?
+
+      additional_state_data[state.object_id] = state_data
 
       # figure out possible next resumes/catchs:
       last_lane        = configuration.last_lane
@@ -233,7 +244,7 @@ class CollaborationTest < Minitest::Spec
         resume_event = Trailblazer::Activity::Introspect.Nodes(last_lane, id: resume_event_id).task
 
         unless already_visited_catch_events[resume_event]
-          todo_resumes << [
+          resumes_to_invoke << [
             Trailblazer::Workflow::Collaboration::Position.new(last_lane, resume_event),
             configuration.lane_positions,
             {}
@@ -247,8 +258,13 @@ class CollaborationTest < Minitest::Spec
     # here, we only have the resume/catch events.
     # pp states
 
-    def render_states(states, lanes:)
-      rows = states.collect do |lane_positions, triggered_resume_event|
+    # {states} is compile-time relevant
+    #  {additional_state_data} is runtime
+
+    def render_states(states, lanes:, additional_state_data:)
+      rows = states.collect do |state|
+
+        lane_positions, triggered_resume_event = state
 
         # Go through each lane.
         row = lane_positions.flat_map do |activity, suspend|
@@ -271,15 +287,25 @@ class CollaborationTest < Minitest::Spec
           ]
         end
 
-        row = Hash[*row.compact]
+        ctx_before, ctx_after = additional_state_data[state.object_id]
+        # raise data.inspect
+
+        row = Hash[*row.compact, "ctx before", ctx_before, "ctx after", ctx_after]
       end
-      .uniq # remove me if you want to see all reached configurations
+      # .uniq # remove me if you want to see all reached configurations
 
 
-      puts Hirb::Helpers::Table.render(rows, fields: ["UI", "UI suspend", "lifecycle", "lifecycle suspend"], max_width: 999)
+      puts Hirb::Helpers::Table.render(rows, fields: [
+        "UI",
+        # "UI suspend",
+        "lifecycle",
+        # "lifecycle suspend",
+        "ctx before",
+        "ctx after",
+      ], max_width: 999)
     end
 
-    render_states(states, lanes: {lane_activity => "lifecycle", lane_activity_ui => "UI", approver_activity => "approver"})
+    render_states(states, lanes: {lane_activity => "lifecycle", lane_activity_ui => "UI", approver_activity => "approver"}, additional_state_data: additional_state_data)
 
 
 
