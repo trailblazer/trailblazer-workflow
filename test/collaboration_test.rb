@@ -40,6 +40,32 @@ class CollaborationTest < Minitest::Spec
     archive_id = "Activity_1hgscu3"
     success_id = "Event_1p8873y"
 
+    task_map = {
+      "ui_create_form" => "Activity_0wc2mcq", # TODO: this is from pro-rails tests.
+      "ui_create" => "Activity_1psp91r",
+      "ui_create_valid" => "Event_0km79t5",
+      "ui_create_invalid" => "Event_0co8ygx",
+      "ui_update_form" => 'Activity_1165bw9',
+      "ui_update" => "Activity_0j78uzd",
+      "ui_update_valid" => "Event_1vf88fn",
+      "ui_update_invalid" => "Event_1nt0djb",
+      "ui_notify_approver" => "Activity_1dt5di5",
+      "ui_accepted" => "Event_1npw1tg",
+      "ui_delete_form" => "Activity_0ha7224",
+      "ui_delete" => "Activity_15nnysv",
+      "ui_cancel" => "Activity_1uhozy1",
+      "ui_publish" => "Activity_0bsjggk",
+      "ui_archive" => "Activity_0fy41qq",
+      "ui_revise_form" => "Activity_0zsock2",
+      "ui_revise" => "Activity_1wiumzv",
+      "ui_revise_valid" => "Event_1bz3ivj",
+      "ui_revise_invalid" => "Event_1wly6jj",
+      "ui_revise_form_with_errors" => "Activity_19m1lnz",
+      "ui_create_form_with_errors" => "Activity_08p0cun",
+      "ui_update_form_with_errors" => "Activity_00kfo8w",
+      "ui_rejected" => "Event_1vb197y",
+    }
+
 
     moderation_json = File.read("test/fixtures/v1/moderation.json")
     signal, (ctx, _) = Trailblazer::Workflow::Generate.invoke([{json_document: moderation_json}, {}])
@@ -191,7 +217,6 @@ class CollaborationTest < Minitest::Spec
       Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_update}").task => {ctx_merge: {update: false}}, # lifecycle create is supposed to fail.
     }
 
-
     while resumes_to_invoke.any?
       (start_position, lane_positions, ctx_merge) = resumes_to_invoke.shift
       puts "~~~~~~~~~"
@@ -255,16 +280,16 @@ class CollaborationTest < Minitest::Spec
       end
     end
 
-    # here, we only have the resume/catch events.
-    # pp states
-
     # {states} is compile-time relevant
     #  {additional_state_data} is runtime
 
-    def render_states(states, lanes:, additional_state_data:)
+    # DISCUSS: {states} should probably be named {reached_states} as some states appear multiple times in the list.
+    def render_states(states, lanes:, additional_state_data:, task_map:)
       rows = states.collect do |state|
 
-        lane_positions, triggered_resume_event = state
+        lane_positions, start_position = state
+
+        triggered_catch_event_id = Trailblazer::Activity::Introspect.Nodes(start_position.activity, task: start_position.task).id
 
         # Go through each lane.
         row = lane_positions.flat_map do |activity, suspend|
@@ -283,14 +308,22 @@ class CollaborationTest < Minitest::Spec
             resumes.inspect,
 
             "#{lanes[activity]} suspend",
-            suspend.to_h[:semantic][1]
+            suspend.to_h[:semantic][1],
           ]
         end
 
         ctx_before, ctx_after = additional_state_data[state.object_id]
         # raise data.inspect
 
-        row = Hash[*row.compact, "ctx before", ctx_before, "ctx after", ctx_after]
+        triggered_catch_event_label = nil
+        task_map.invert.each do |id, label|
+          if triggered_catch_event_id =~ /#{id}$/
+            triggered_catch_event_label = "--> #{label}" and break
+          end
+        end
+
+
+        row = Hash[*row.compact, "ctx before", ctx_before, "ctx after", ctx_after, "triggered catch", triggered_catch_event_label]
       end
       # .uniq # remove me if you want to see all reached configurations
 
@@ -299,14 +332,15 @@ class CollaborationTest < Minitest::Spec
         "UI",
         # "UI suspend",
         "lifecycle",
+        "triggered catch",
         # "lifecycle suspend",
         "ctx before",
         "ctx after",
-      ], max_width: 999)
+      ], max_width: 186) # 186 for laptop 13"
     end
 
-    render_states(states, lanes: {lane_activity => "lifecycle", lane_activity_ui => "UI", approver_activity => "approver"}, additional_state_data: additional_state_data)
-
+    render_states(states, lanes: {lane_activity => "lifecycle", lane_activity_ui => "UI", approver_activity => "approver"}, additional_state_data: additional_state_data, task_map: task_map)
+raise "figure out how to build a generated state table"
 
 
 
