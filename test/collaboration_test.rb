@@ -285,18 +285,24 @@ class CollaborationTest < Minitest::Spec
 
     # DISCUSS: {states} should probably be named {reached_states} as some states appear multiple times in the list.
     def render_states(states, lanes:, additional_state_data:, task_map:)
-      rows = states.collect do |state|
+      present_states = Trailblazer::Workflow::State::Discovery.generate_from(states) # returns rows with [{activity, suspend, resumes}]
 
-        lane_positions, start_position = state
+      rows = present_states.collect do |state| # state = {start_position, lane_states: [{activity, suspend, resumes}]}
+        # raise state.inspect
+
+        start_position, lane_positions, discovery_state_fixme = state.to_a
 
         triggered_catch_event_id = Trailblazer::Activity::Introspect.Nodes(start_position.activity, task: start_position.task).id
 
         # Go through each lane.
-        row = lane_positions.flat_map do |activity, suspend|
-          next if suspend.to_h["resumes"].nil?
+        row = lane_positions.flat_map do |lane_position|
+          next if lane_position.nil? # FIXME: why do we have that?
 
-          resumes = suspend.to_h["resumes"].collect do |catch_event_id|
-            catch_event = Trailblazer::Activity::Introspect.Nodes(activity, id: catch_event_id).task
+          activity, suspend, resumes = lane_position[:activity], lane_position[:suspend], lane_position[:resumes]
+          # next if suspend.to_h["resumes"].nil?
+
+          resumes_labels = resumes.collect do |catch_event|
+
             task_after_catch = activity.to_h[:circuit].to_h[:map][catch_event][Trailblazer::Activity::Right]
             # raise task_after_catch.inspect
 
@@ -305,14 +311,14 @@ class CollaborationTest < Minitest::Spec
 
           [
             lanes[activity],
-            resumes.inspect,
+            resumes_labels.inspect,
 
             "#{lanes[activity]} suspend",
             suspend.to_h[:semantic][1],
           ]
         end
 
-        ctx_before, ctx_after = additional_state_data[state.object_id]
+        ctx_before, ctx_after = additional_state_data[discovery_state_fixme.object_id]
         # raise data.inspect
 
         triggered_catch_event_label = nil
@@ -325,7 +331,7 @@ class CollaborationTest < Minitest::Spec
 
         row = Hash[*row.compact, "ctx before", ctx_before, "ctx after", ctx_after, "triggered catch", triggered_catch_event_label]
       end
-      # .uniq # remove me if you want to see all reached configurations
+      # .uniq # comment me if you want to see all reached configurations
 
 
       puts Hirb::Helpers::Table.render(rows, fields: [
