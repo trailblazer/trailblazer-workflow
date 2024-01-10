@@ -301,6 +301,7 @@ class CollaborationTest < Minitest::Spec
           activity, suspend, resumes = lane_position[:activity], lane_position[:suspend], lane_position[:resumes]
           # next if suspend.to_h["resumes"].nil?
 
+        # Compute the task name that follows a particular catch event.
           resumes_labels = resumes.collect do |catch_event|
 
             task_after_catch = activity.to_h[:circuit].to_h[:map][catch_event][Trailblazer::Activity::Right]
@@ -335,10 +336,10 @@ class CollaborationTest < Minitest::Spec
 
 
       puts Hirb::Helpers::Table.render(rows, fields: [
+        "triggered catch",
         "UI",
         # "UI suspend",
         "lifecycle",
-        "triggered catch",
         # "lifecycle suspend",
         "ctx before",
         "ctx after",
@@ -346,11 +347,410 @@ class CollaborationTest < Minitest::Spec
     end
 
     render_states(states, lanes: {lane_activity => "lifecycle", lane_activity_ui => "UI", approver_activity => "approver"}, additional_state_data: additional_state_data, task_map: task_map)
-raise "figure out how to build a generated state table"
+# raise "figure out how to build a generated state table"
+
+
+
+    testing_json = Trailblazer::Workflow::State::Discovery::Testing.render_json(
+      states,
+      lanes: {lane_activity => "lifecycle", lane_activity_ui => "UI", approver_activity => "approver"},
+      initial_lane_positions: extended_initial_lane_positions, # DISCUSS: so we know what not to find via Introspect.
+      task_map: task_map,
+      additional_state_data: additional_state_data,
+    )
+
+
+    testing_json = JSON.pretty_generate(testing_json)
+    # puts testing_json
+    assert_equal testing_json, %([
+  {
+    "start_position": [
+      "UI",
+      "catch-before-Activity_0wc2mcq"
+    ],
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          null
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          null
+        ]
+      },
+      {
+        "tuple": [
+          "approver",
+          null
+        ]
+      }
+    ]
+  },
+  {
+    "start_position": [
+      "UI",
+      "catch-before-Activity_1psp91r"
+    ],
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          null
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_14h0q7a"
+        ],
+        "comment": null
+      },
+      {
+        "tuple": [
+          "approver",
+          null
+        ]
+      }
+    ]
+  },
+  {
+    "start_position": [
+      "UI",
+      "catch-before-Activity_1psp91r"
+    ],
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          null
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_14h0q7a"
+        ],
+        "comment": null
+      },
+      {
+        "tuple": [
+          "approver",
+          null
+        ]
+      }
+    ]
+  },
+  {
+    "start_position": [
+      "UI",
+      "catch-before-Activity_1165bw9"
+    ],
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_0fnbg3r"
+        ],
+        "comment": null
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_0kknfje"
+        ],
+        "comment": null
+      },
+      {
+        "tuple": [
+          "approver",
+          null
+        ]
+      }
+    ]
+  },
+  {
+    "start_position": [
+      "UI",
+      "catch-before-Activity_1dt5di5"
+    ],
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_0fnbg3r"
+        ],
+        "comment": null
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_0kknfje"
+        ],
+        "comment": null
+      },
+      {
+        "tuple": [
+          "approver",
+          null
+        ]
+      }
+    ]
+  },
+  {
+    "start_position": [
+      "UI",
+      "catch-before-Activity_0j78uzd"
+    ],
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_0fnbg3r"
+        ],
+        "comment": null
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_0nxerxv"
+        ],
+        "comment": null
+      },
+      {
+        "tuple": [
+          "approver",
+          null
+        ]
+      }
+    ]
+  },
+  {
+    "start_position": [
+      "UI",
+      "catch-before-Activity_1dt5di5"
+    ],
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_0fnbg3r"
+        ],
+        "comment": null
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_0kknfje"
+        ],
+        "comment": null
+      },
+      {
+        "tuple": [
+          "approver",
+          null
+        ]
+      }
+    ]
+  },
+  {
+    "start_position": [
+      "UI",
+      "catch-before-Activity_0ha7224"
+    ],
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_1hp2ssj"
+        ],
+        "comment": null
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_1sq41iq"
+        ],
+        "comment": null
+      },
+      null
+    ]
+  },
+  {
+    "start_position": [
+      "UI",
+      "catch-before-Activity_0bsjggk"
+    ],
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_1hp2ssj"
+        ],
+        "comment": null
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_1sq41iq"
+        ],
+        "comment": null
+      },
+      null
+    ]
+  },
+  {
+    "start_position": [
+      "UI",
+      "catch-before-Activity_0j78uzd"
+    ],
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_0fnbg3r"
+        ],
+        "comment": null
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_0nxerxv"
+        ],
+        "comment": null
+      },
+      {
+        "tuple": [
+          "approver",
+          null
+        ]
+      }
+    ]
+  },
+  {
+    "start_position": [
+      "UI",
+      "catch-before-Activity_0zsock2"
+    ],
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_01p7uj7"
+        ],
+        "comment": null
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-gw-to-catch-before-Activity_0zsock2"
+        ],
+        "comment": "--> ui_revise_form"
+      },
+      null
+    ]
+  },
+  {
+    "start_position": [
+      "UI",
+      "catch-before-Activity_15nnysv"
+    ],
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_1hp2ssj"
+        ],
+        "comment": null
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_100g9dn"
+        ],
+        "comment": null
+      },
+      null
+    ]
+  },
+  {
+    "start_position": [
+      "UI",
+      "catch-before-Activity_1uhozy1"
+    ],
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_1hp2ssj"
+        ],
+        "comment": null
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_100g9dn"
+        ],
+        "comment": null
+      },
+      null
+    ]
+  },
+  {
+    "start_position": [
+      "UI",
+      "catch-before-Activity_0fy41qq"
+    ],
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-gw-to-catch-before-Activity_1hgscu3"
+        ],
+        "comment": null
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-gw-to-catch-before-Activity_0fy41qq"
+        ],
+        "comment": "--> ui_archive"
+      },
+      null
+    ]
+  },
+  {
+    "start_position": [
+      "UI",
+      "catch-before-Activity_1wiumzv"
+    ],
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_01p7uj7"
+        ],
+        "comment": null
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_1xs96ik"
+        ],
+        "comment": null
+      },
+      null
+    ]
+  }
+])
 
 
 
     initial_lane_positions = Trailblazer::Workflow::Collaboration::Synchronous.initial_lane_positions(schema_hash[:lanes].values)
+
+
 
     # TODO: do this in the State layer.
     start_task = Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_create_form}").task # catch-before-Activity_0wc2mcq

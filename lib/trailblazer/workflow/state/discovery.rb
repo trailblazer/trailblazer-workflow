@@ -6,6 +6,9 @@ module Trailblazer
       # {states} are lane positions: [activity, suspend] tuples.
       module Discovery
         module Present
+          # Maintains the following fields
+          # start_position: where we started
+          # lane_positions: where the workflow stopped, for each lane.
           State = Struct.new(:start_position, :lane_states, :state_from_discovery_fixme) do # FIXME: state_from_discovery_fixme is the "runtime Discovery state"
             # def to_a
             #   return start_position, lane_states
@@ -13,6 +16,7 @@ module Trailblazer
           end
         end
 
+        # Enrich each Discovery state with the possible resume events
         def self.generate_from(states)
           rows = states.collect do |state|
 
