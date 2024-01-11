@@ -302,6 +302,7 @@ class CollaborationTest < Minitest::Spec
           # next if suspend.to_h["resumes"].nil?
 
         # Compute the task name that follows a particular catch event.
+        # TODO: use Testing's code here.
           resumes_labels = resumes.collect do |catch_event|
 
             task_after_catch = activity.to_h[:circuit].to_h[:map][catch_event][Trailblazer::Activity::Right]
@@ -361,7 +362,7 @@ class CollaborationTest < Minitest::Spec
 
 
     testing_json = JSON.pretty_generate(testing_json)
-    # puts testing_json
+    puts testing_json
     assert_equal testing_json, %([
   {
     "start_position": [
@@ -406,7 +407,9 @@ class CollaborationTest < Minitest::Spec
           "UI",
           "suspend-Gateway_14h0q7a"
         ],
-        "comment": null
+        "comment": [
+          "Create"
+        ]
       },
       {
         "tuple": [
@@ -433,7 +436,9 @@ class CollaborationTest < Minitest::Spec
           "UI",
           "suspend-Gateway_14h0q7a"
         ],
-        "comment": null
+        "comment": [
+          "Create"
+        ]
       },
       {
         "tuple": [
@@ -454,14 +459,20 @@ class CollaborationTest < Minitest::Spec
           "lifecycle",
           "suspend-Gateway_0fnbg3r"
         ],
-        "comment": null
+        "comment": [
+          "Update",
+          "Notify approver"
+        ]
       },
       {
         "tuple": [
           "UI",
           "suspend-Gateway_0kknfje"
         ],
-        "comment": null
+        "comment": [
+          "Update form",
+          "Notify approver"
+        ]
       },
       {
         "tuple": [
@@ -482,14 +493,20 @@ class CollaborationTest < Minitest::Spec
           "lifecycle",
           "suspend-Gateway_0fnbg3r"
         ],
-        "comment": null
+        "comment": [
+          "Update",
+          "Notify approver"
+        ]
       },
       {
         "tuple": [
           "UI",
           "suspend-Gateway_0kknfje"
         ],
-        "comment": null
+        "comment": [
+          "Update form",
+          "Notify approver"
+        ]
       },
       {
         "tuple": [
@@ -510,14 +527,19 @@ class CollaborationTest < Minitest::Spec
           "lifecycle",
           "suspend-Gateway_0fnbg3r"
         ],
-        "comment": null
+        "comment": [
+          "Update",
+          "Notify approver"
+        ]
       },
       {
         "tuple": [
           "UI",
           "suspend-Gateway_0nxerxv"
         ],
-        "comment": null
+        "comment": [
+          "Update"
+        ]
       },
       {
         "tuple": [
@@ -538,14 +560,20 @@ class CollaborationTest < Minitest::Spec
           "lifecycle",
           "suspend-Gateway_0fnbg3r"
         ],
-        "comment": null
+        "comment": [
+          "Update",
+          "Notify approver"
+        ]
       },
       {
         "tuple": [
           "UI",
           "suspend-Gateway_0kknfje"
         ],
-        "comment": null
+        "comment": [
+          "Update form",
+          "Notify approver"
+        ]
       },
       {
         "tuple": [
@@ -566,14 +594,22 @@ class CollaborationTest < Minitest::Spec
           "lifecycle",
           "suspend-Gateway_1hp2ssj"
         ],
-        "comment": null
+        "comment": [
+          "Publish",
+          "Delete",
+          "Update"
+        ]
       },
       {
         "tuple": [
           "UI",
           "suspend-Gateway_1sq41iq"
         ],
-        "comment": null
+        "comment": [
+          "Update form",
+          "Delete? form",
+          "Publish"
+        ]
       },
       null
     ]
@@ -589,14 +625,22 @@ class CollaborationTest < Minitest::Spec
           "lifecycle",
           "suspend-Gateway_1hp2ssj"
         ],
-        "comment": null
+        "comment": [
+          "Publish",
+          "Delete",
+          "Update"
+        ]
       },
       {
         "tuple": [
           "UI",
           "suspend-Gateway_1sq41iq"
         ],
-        "comment": null
+        "comment": [
+          "Update form",
+          "Delete? form",
+          "Publish"
+        ]
       },
       null
     ]
@@ -612,14 +656,19 @@ class CollaborationTest < Minitest::Spec
           "lifecycle",
           "suspend-Gateway_0fnbg3r"
         ],
-        "comment": null
+        "comment": [
+          "Update",
+          "Notify approver"
+        ]
       },
       {
         "tuple": [
           "UI",
           "suspend-Gateway_0nxerxv"
         ],
-        "comment": null
+        "comment": [
+          "Update"
+        ]
       },
       {
         "tuple": [
@@ -640,14 +689,18 @@ class CollaborationTest < Minitest::Spec
           "lifecycle",
           "suspend-Gateway_01p7uj7"
         ],
-        "comment": null
+        "comment": [
+          "Revise"
+        ]
       },
       {
         "tuple": [
           "UI",
           "suspend-gw-to-catch-before-Activity_0zsock2"
         ],
-        "comment": "--> ui_revise_form"
+        "comment": [
+          "Revise form"
+        ]
       },
       null
     ]
@@ -663,14 +716,21 @@ class CollaborationTest < Minitest::Spec
           "lifecycle",
           "suspend-Gateway_1hp2ssj"
         ],
-        "comment": null
+        "comment": [
+          "Publish",
+          "Delete",
+          "Update"
+        ]
       },
       {
         "tuple": [
           "UI",
           "suspend-Gateway_100g9dn"
         ],
-        "comment": null
+        "comment": [
+          "Delete",
+          "Cancel"
+        ]
       },
       null
     ]
@@ -686,14 +746,21 @@ class CollaborationTest < Minitest::Spec
           "lifecycle",
           "suspend-Gateway_1hp2ssj"
         ],
-        "comment": null
+        "comment": [
+          "Publish",
+          "Delete",
+          "Update"
+        ]
       },
       {
         "tuple": [
           "UI",
           "suspend-Gateway_100g9dn"
         ],
-        "comment": null
+        "comment": [
+          "Delete",
+          "Cancel"
+        ]
       },
       null
     ]
@@ -709,14 +776,18 @@ class CollaborationTest < Minitest::Spec
           "lifecycle",
           "suspend-gw-to-catch-before-Activity_1hgscu3"
         ],
-        "comment": null
+        "comment": [
+          "Archive"
+        ]
       },
       {
         "tuple": [
           "UI",
           "suspend-gw-to-catch-before-Activity_0fy41qq"
         ],
-        "comment": "--> ui_archive"
+        "comment": [
+          "Archive"
+        ]
       },
       null
     ]
@@ -732,14 +803,18 @@ class CollaborationTest < Minitest::Spec
           "lifecycle",
           "suspend-Gateway_01p7uj7"
         ],
-        "comment": null
+        "comment": [
+          "Revise"
+        ]
       },
       {
         "tuple": [
           "UI",
           "suspend-Gateway_1xs96ik"
         ],
-        "comment": null
+        "comment": [
+          "Revise"
+        ]
       },
       null
     ]

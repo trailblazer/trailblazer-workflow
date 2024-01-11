@@ -36,17 +36,37 @@ module Trailblazer
                     tuple: [lanes[lane_position[:activity]], nil], # FIXME: to indicate this is a virtual "task".
                   }
                 else
-                  position_tuple = id_tuple_for(lanes, lane_position[:activity], lane_position[:suspend])
-                  _, task_id = position_tuple
+                  position_tuple = id_tuple_for(lanes, lane_position[:activity], lane_position[:suspend]) # usually, this is a suspend.
 
-                  comment = nil
-                  task_map.invert.each do |id, label|
-                    if task_id =~ /#{id}$/
-                      comment = "--> #{label}" and break
-                    end
+                # Compute the task name that follows a particular catch event.
+                  activity = lane_position[:activity]
+                  resumes = lane_position[:resumes]#.to_h["resumes"]
+
+                  resumes_label = resumes.collect do |catch_event|
+                    puts "@@@@@ #{catch_event.inspect}"
+
+                    task_after_catch = activity.to_h[:circuit].to_h[:map][catch_event][Trailblazer::Activity::Right]
+                    # raise task_after_catch.inspect
+
+                    Trailblazer::Activity::Introspect.Nodes(activity, task: task_after_catch).data[:label] || task_after_catch
                   end
 
-                  {tuple: position_tuple, comment: comment}
+
+
+                  # _, task_id = position_tuple
+
+
+                  comment = resumes_label
+                  # task_map.invert.each do |id, label|
+                  #   if task_id =~ /#{id}$/
+                  #     comment = "--> #{label}" and break
+                  #   end
+                  # end
+
+                  {
+                    tuple: position_tuple,
+                    comment: comment
+                  }
                 end
 
               end
