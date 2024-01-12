@@ -236,7 +236,7 @@ class CollaborationTest < Minitest::Spec
 
       # register new state.
       # Note that we do that before anything is invoked.
-      states << state = [lane_positions, start_position]
+      states << state = [lane_positions, start_position] # FIXME: we need to add {configuration} here!
 
       state_data = [ctx.inspect]
 
@@ -251,9 +251,14 @@ class CollaborationTest < Minitest::Spec
         message_flow: extended_message_flow,
       )
 
+    # 1. optional feature: tracing
       state_data << ctx.inspect # context after. DISCUSS: use tracing?
-
       additional_state_data[state.object_id] = state_data
+
+    # 2. optional feature: remember stop configuration so we can use that in a test.
+      # raise configuration.inspect
+      suspend_configuration = configuration
+      additional_state_data[[state.object_id, :suspend_configuration]] = suspend_configuration
 
       # figure out possible next resumes/catchs:
       last_lane        = configuration.last_lane
@@ -362,38 +367,12 @@ class CollaborationTest < Minitest::Spec
 
 
     testing_json = JSON.pretty_generate(testing_json)
-    puts testing_json
+    # puts testing_json
     assert_equal testing_json, %([
   {
     "start_position": [
       "UI",
       "catch-before-Activity_0wc2mcq"
-    ],
-    "expected_lane_positions": [
-      {
-        "tuple": [
-          "lifecycle",
-          null
-        ]
-      },
-      {
-        "tuple": [
-          "UI",
-          null
-        ]
-      },
-      {
-        "tuple": [
-          "approver",
-          null
-        ]
-      }
-    ]
-  },
-  {
-    "start_position": [
-      "UI",
-      "catch-before-Activity_1psp91r"
     ],
     "expected_lane_positions": [
       {
@@ -428,7 +407,44 @@ class CollaborationTest < Minitest::Spec
       {
         "tuple": [
           "lifecycle",
+          "suspend-Gateway_0fnbg3r"
+        ],
+        "comment": [
+          "Update",
+          "Notify approver"
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_0kknfje"
+        ],
+        "comment": [
+          "Update form",
+          "Notify approver"
+        ]
+      },
+      {
+        "tuple": [
+          "approver",
           null
+        ]
+      }
+    ]
+  },
+  {
+    "start_position": [
+      "UI",
+      "catch-before-Activity_1psp91r"
+    ],
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-gw-to-catch-before-Activity_0wwfenp"
+        ],
+        "comment": [
+          "Create"
         ]
       },
       {
@@ -467,74 +483,6 @@ class CollaborationTest < Minitest::Spec
       {
         "tuple": [
           "UI",
-          "suspend-Gateway_0kknfje"
-        ],
-        "comment": [
-          "Update form",
-          "Notify approver"
-        ]
-      },
-      {
-        "tuple": [
-          "approver",
-          null
-        ]
-      }
-    ]
-  },
-  {
-    "start_position": [
-      "UI",
-      "catch-before-Activity_1dt5di5"
-    ],
-    "expected_lane_positions": [
-      {
-        "tuple": [
-          "lifecycle",
-          "suspend-Gateway_0fnbg3r"
-        ],
-        "comment": [
-          "Update",
-          "Notify approver"
-        ]
-      },
-      {
-        "tuple": [
-          "UI",
-          "suspend-Gateway_0kknfje"
-        ],
-        "comment": [
-          "Update form",
-          "Notify approver"
-        ]
-      },
-      {
-        "tuple": [
-          "approver",
-          null
-        ]
-      }
-    ]
-  },
-  {
-    "start_position": [
-      "UI",
-      "catch-before-Activity_0j78uzd"
-    ],
-    "expected_lane_positions": [
-      {
-        "tuple": [
-          "lifecycle",
-          "suspend-Gateway_0fnbg3r"
-        ],
-        "comment": [
-          "Update",
-          "Notify approver"
-        ]
-      },
-      {
-        "tuple": [
-          "UI",
           "suspend-Gateway_0nxerxv"
         ],
         "comment": [
@@ -553,40 +501,6 @@ class CollaborationTest < Minitest::Spec
     "start_position": [
       "UI",
       "catch-before-Activity_1dt5di5"
-    ],
-    "expected_lane_positions": [
-      {
-        "tuple": [
-          "lifecycle",
-          "suspend-Gateway_0fnbg3r"
-        ],
-        "comment": [
-          "Update",
-          "Notify approver"
-        ]
-      },
-      {
-        "tuple": [
-          "UI",
-          "suspend-Gateway_0kknfje"
-        ],
-        "comment": [
-          "Update form",
-          "Notify approver"
-        ]
-      },
-      {
-        "tuple": [
-          "approver",
-          null
-        ]
-      }
-    ]
-  },
-  {
-    "start_position": [
-      "UI",
-      "catch-before-Activity_0ha7224"
     ],
     "expected_lane_positions": [
       {
@@ -617,7 +531,68 @@ class CollaborationTest < Minitest::Spec
   {
     "start_position": [
       "UI",
-      "catch-before-Activity_0bsjggk"
+      "catch-before-Activity_0j78uzd"
+    ],
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_1wzosup"
+        ],
+        "comment": [
+          "Notify approver",
+          "Update"
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_1g3fhu2"
+        ],
+        "comment": [
+          "Update form",
+          "Notify approver"
+        ]
+      },
+      {
+        "tuple": [
+          "approver",
+          null
+        ]
+      }
+    ]
+  },
+  {
+    "start_position": [
+      "UI",
+      "catch-before-Activity_1dt5di5"
+    ],
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_01p7uj7"
+        ],
+        "comment": [
+          "Revise"
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-gw-to-catch-before-Activity_0zsock2"
+        ],
+        "comment": [
+          "Revise form"
+        ]
+      },
+      null
+    ]
+  },
+  {
+    "start_position": [
+      "UI",
+      "catch-before-Activity_0ha7224"
     ],
     "expected_lane_positions": [
       {
@@ -634,12 +609,38 @@ class CollaborationTest < Minitest::Spec
       {
         "tuple": [
           "UI",
-          "suspend-Gateway_1sq41iq"
+          "suspend-Gateway_100g9dn"
         ],
         "comment": [
-          "Update form",
-          "Delete? form",
-          "Publish"
+          "Delete",
+          "Cancel"
+        ]
+      },
+      null
+    ]
+  },
+  {
+    "start_position": [
+      "UI",
+      "catch-before-Activity_0bsjggk"
+    ],
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-gw-to-catch-before-Activity_1hgscu3"
+        ],
+        "comment": [
+          "Archive"
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-gw-to-catch-before-Activity_0fy41qq"
+        ],
+        "comment": [
+          "Archive"
         ]
       },
       null
@@ -696,10 +697,10 @@ class CollaborationTest < Minitest::Spec
       {
         "tuple": [
           "UI",
-          "suspend-gw-to-catch-before-Activity_0zsock2"
+          "suspend-Gateway_1xs96ik"
         ],
         "comment": [
-          "Revise form"
+          "Revise"
         ]
       },
       null
@@ -711,27 +712,8 @@ class CollaborationTest < Minitest::Spec
       "catch-before-Activity_15nnysv"
     ],
     "expected_lane_positions": [
-      {
-        "tuple": [
-          "lifecycle",
-          "suspend-Gateway_1hp2ssj"
-        ],
-        "comment": [
-          "Publish",
-          "Delete",
-          "Update"
-        ]
-      },
-      {
-        "tuple": [
-          "UI",
-          "suspend-Gateway_100g9dn"
-        ],
-        "comment": [
-          "Delete",
-          "Cancel"
-        ]
-      },
+      null,
+      null,
       null
     ]
   },
@@ -755,11 +737,12 @@ class CollaborationTest < Minitest::Spec
       {
         "tuple": [
           "UI",
-          "suspend-Gateway_100g9dn"
+          "suspend-Gateway_1sq41iq"
         ],
         "comment": [
-          "Delete",
-          "Cancel"
+          "Update form",
+          "Delete? form",
+          "Publish"
         ]
       },
       null
@@ -771,24 +754,8 @@ class CollaborationTest < Minitest::Spec
       "catch-before-Activity_0fy41qq"
     ],
     "expected_lane_positions": [
-      {
-        "tuple": [
-          "lifecycle",
-          "suspend-gw-to-catch-before-Activity_1hgscu3"
-        ],
-        "comment": [
-          "Archive"
-        ]
-      },
-      {
-        "tuple": [
-          "UI",
-          "suspend-gw-to-catch-before-Activity_0fy41qq"
-        ],
-        "comment": [
-          "Archive"
-        ]
-      },
+      null,
+      null,
       null
     ]
   },
@@ -801,19 +768,21 @@ class CollaborationTest < Minitest::Spec
       {
         "tuple": [
           "lifecycle",
-          "suspend-Gateway_01p7uj7"
+          "suspend-Gateway_1kl7pnm"
         ],
         "comment": [
-          "Revise"
+          "Revise",
+          "Notify approver"
         ]
       },
       {
         "tuple": [
           "UI",
-          "suspend-Gateway_1xs96ik"
+          "suspend-Gateway_1g3fhu2"
         ],
         "comment": [
-          "Revise"
+          "Update form",
+          "Notify approver"
         ]
       },
       null

@@ -28,13 +28,7 @@ module Trailblazer
             row = lane_positions.flat_map do |activity, suspend|
               next if suspend.to_h["resumes"].nil?
 
-              resumes = suspend.to_h["resumes"].collect do |catch_event_id|
-                catch_event = Trailblazer::Activity::Introspect.Nodes(activity, id: catch_event_id).task
-                # task_after_catch = activity.to_h[:circuit].to_h[:map][catch_event][Trailblazer::Activity::Right]
-                # # raise task_after_catch.inspect
-
-                # Trailblazer::Activity::Introspect.Nodes(activity, task: task_after_catch).data[:label] || task_after_catch
-              end
+              resumes = resumes_from_suspend(activity, suspend)
 
               # [
               #   lanes[activity],
@@ -53,7 +47,17 @@ module Trailblazer
 
             Present::State.new(start_position, row, state)
           end
+        end
 
+        # Compute real catch events from the ID for a particular resume.
+        def self.resumes_from_suspend(activity, suspend)
+          suspend.to_h["resumes"].collect do |catch_event_id|
+            _catch_event = Trailblazer::Activity::Introspect.Nodes(activity, id: catch_event_id).task
+            # task_after_catch = activity.to_h[:circuit].to_h[:map][catch_event][Trailblazer::Activity::Right]
+            # # raise task_after_catch.inspect
+
+            # Trailblazer::Activity::Introspect.Nodes(activity, task: task_after_catch).data[:label] || task_after_catch
+          end
         end
       end # Discovery
     end
