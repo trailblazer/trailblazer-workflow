@@ -45,9 +45,7 @@ module Trailblazer
                   resumes = Discovery.resumes_from_suspend(activity, suspend)
 
                   resumes_label = resumes.collect do |catch_event|
-                    task_after_catch = activity.to_h[:circuit].to_h[:map][catch_event][Trailblazer::Activity::Right]
-
-                    Trailblazer::Activity::Introspect.Nodes(activity, task: task_after_catch).data[:label] || task_after_catch
+                    find_next_task_label(activity, catch_event)
                   end
 
 
@@ -66,15 +64,24 @@ module Trailblazer
 
               end
 
-
               {
-                start_position: [activity_id, triggered_catch_event_id],
+                start_position: {
+                  tuple: [activity_id, triggered_catch_event_id],
+                  comment: find_next_task_label(start_position.activity, start_position.task)
+                },
                 expected_lane_positions: expected_lane_positions,
               }
             end
 
           end
-        end
+
+          # Find the next connected task, usually outgoing from a catch event.
+          def self.find_next_task_label(activity, catch_event)
+            task_after_catch = activity.to_h[:circuit].to_h[:map][catch_event][Trailblazer::Activity::Right]
+
+            Trailblazer::Activity::Introspect.Nodes(activity, task: task_after_catch).data[:label] || task_after_catch
+          end
+        end # Testing
       end
     end
   end
