@@ -367,8 +367,618 @@ class CollaborationTest < Minitest::Spec
 
 
     testing_json = JSON.pretty_generate(testing_json)
-    puts testing_json
-    assert_equal testing_json, %()
+    # puts testing_json
+    assert_equal testing_json, %([
+  {
+    "start_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_0wc2mcq"
+      ],
+      "comment": "Create form"
+    },
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          null
+        ],
+        "comment": [
+          "initial_lane_positions",
+          "lifecycle"
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_14h0q7a"
+        ],
+        "comment": [
+          "Create"
+        ]
+      },
+      {
+        "tuple": [
+          "approver",
+          null
+        ],
+        "comment": [
+          "initial_lane_positions",
+          "approver"
+        ]
+      }
+    ]
+  },
+  {
+    "start_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_1psp91r"
+      ],
+      "comment": "Create"
+    },
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_0fnbg3r"
+        ],
+        "comment": [
+          "Update",
+          "Notify approver"
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_0kknfje"
+        ],
+        "comment": [
+          "Update form",
+          "Notify approver"
+        ]
+      },
+      {
+        "tuple": [
+          "approver",
+          null
+        ],
+        "comment": [
+          "initial_lane_positions",
+          "approver"
+        ]
+      }
+    ]
+  },
+  {
+    "start_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_1psp91r"
+      ],
+      "comment": "Create"
+    },
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-gw-to-catch-before-Activity_0wwfenp"
+        ],
+        "comment": [
+          "Create"
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_14h0q7a"
+        ],
+        "comment": [
+          "Create"
+        ]
+      },
+      {
+        "tuple": [
+          "approver",
+          null
+        ],
+        "comment": [
+          "initial_lane_positions",
+          "approver"
+        ]
+      }
+    ]
+  },
+  {
+    "start_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_1165bw9"
+      ],
+      "comment": "Update form"
+    },
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_0fnbg3r"
+        ],
+        "comment": [
+          "Update",
+          "Notify approver"
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_0nxerxv"
+        ],
+        "comment": [
+          "Update"
+        ]
+      },
+      {
+        "tuple": [
+          "approver",
+          null
+        ],
+        "comment": [
+          "initial_lane_positions",
+          "approver"
+        ]
+      }
+    ]
+  },
+  {
+    "start_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_1dt5di5"
+      ],
+      "comment": "Notify approver"
+    },
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_1hp2ssj"
+        ],
+        "comment": [
+          "Publish",
+          "Delete",
+          "Update"
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_1sq41iq"
+        ],
+        "comment": [
+          "Update form",
+          "Delete? form",
+          "Publish"
+        ]
+      },
+      {
+        "tuple": [
+          "approver",
+          "End.failure"
+        ],
+        "comment": [
+          "terminus",
+          "failure"
+        ]
+      }
+    ]
+  },
+  {
+    "start_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_0j78uzd"
+      ],
+      "comment": "Update"
+    },
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_1wzosup"
+        ],
+        "comment": [
+          "Notify approver",
+          "Update"
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_1g3fhu2"
+        ],
+        "comment": [
+          "Update form",
+          "Notify approver"
+        ]
+      },
+      {
+        "tuple": [
+          "approver",
+          null
+        ],
+        "comment": [
+          "initial_lane_positions",
+          "approver"
+        ]
+      }
+    ]
+  },
+  {
+    "start_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_1dt5di5"
+      ],
+      "comment": "Notify approver"
+    },
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_01p7uj7"
+        ],
+        "comment": [
+          "Revise"
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-gw-to-catch-before-Activity_0zsock2"
+        ],
+        "comment": [
+          "Revise form"
+        ]
+      },
+      {
+        "tuple": [
+          "approver",
+          "End.success"
+        ],
+        "comment": [
+          "terminus",
+          "success"
+        ]
+      }
+    ]
+  },
+  {
+    "start_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_0ha7224"
+      ],
+      "comment": "Delete? form"
+    },
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_1hp2ssj"
+        ],
+        "comment": [
+          "Publish",
+          "Delete",
+          "Update"
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_100g9dn"
+        ],
+        "comment": [
+          "Delete",
+          "Cancel"
+        ]
+      },
+      {
+        "tuple": [
+          "approver",
+          "End.failure"
+        ],
+        "comment": [
+          "terminus",
+          "failure"
+        ]
+      }
+    ]
+  },
+  {
+    "start_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_0bsjggk"
+      ],
+      "comment": "Publish"
+    },
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-gw-to-catch-before-Activity_1hgscu3"
+        ],
+        "comment": [
+          "Archive"
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-gw-to-catch-before-Activity_0fy41qq"
+        ],
+        "comment": [
+          "Archive"
+        ]
+      },
+      {
+        "tuple": [
+          "approver",
+          "End.failure"
+        ],
+        "comment": [
+          "terminus",
+          "failure"
+        ]
+      }
+    ]
+  },
+  {
+    "start_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_0j78uzd"
+      ],
+      "comment": "Update"
+    },
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_0fnbg3r"
+        ],
+        "comment": [
+          "Update",
+          "Notify approver"
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_0nxerxv"
+        ],
+        "comment": [
+          "Update"
+        ]
+      },
+      {
+        "tuple": [
+          "approver",
+          null
+        ],
+        "comment": [
+          "initial_lane_positions",
+          "approver"
+        ]
+      }
+    ]
+  },
+  {
+    "start_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_0zsock2"
+      ],
+      "comment": "Revise form"
+    },
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_01p7uj7"
+        ],
+        "comment": [
+          "Revise"
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_1xs96ik"
+        ],
+        "comment": [
+          "Revise"
+        ]
+      },
+      {
+        "tuple": [
+          "approver",
+          "End.success"
+        ],
+        "comment": [
+          "terminus",
+          "success"
+        ]
+      }
+    ]
+  },
+  {
+    "start_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_15nnysv"
+      ],
+      "comment": "Delete"
+    },
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "Event_1p8873y"
+        ],
+        "comment": [
+          "terminus",
+          "success"
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "Event_0h6yhq6"
+        ],
+        "comment": [
+          "terminus",
+          "success"
+        ]
+      },
+      {
+        "tuple": [
+          "approver",
+          "End.failure"
+        ],
+        "comment": [
+          "terminus",
+          "failure"
+        ]
+      }
+    ]
+  },
+  {
+    "start_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_1uhozy1"
+      ],
+      "comment": "Cancel"
+    },
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_1hp2ssj"
+        ],
+        "comment": [
+          "Publish",
+          "Delete",
+          "Update"
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_1sq41iq"
+        ],
+        "comment": [
+          "Update form",
+          "Delete? form",
+          "Publish"
+        ]
+      },
+      {
+        "tuple": [
+          "approver",
+          "End.failure"
+        ],
+        "comment": [
+          "terminus",
+          "failure"
+        ]
+      }
+    ]
+  },
+  {
+    "start_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_0fy41qq"
+      ],
+      "comment": "Archive"
+    },
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "Event_1p8873y"
+        ],
+        "comment": [
+          "terminus",
+          "success"
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "Event_0h6yhq6"
+        ],
+        "comment": [
+          "terminus",
+          "success"
+        ]
+      },
+      {
+        "tuple": [
+          "approver",
+          "End.failure"
+        ],
+        "comment": [
+          "terminus",
+          "failure"
+        ]
+      }
+    ]
+  },
+  {
+    "start_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_1wiumzv"
+      ],
+      "comment": "Revise"
+    },
+    "expected_lane_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_1kl7pnm"
+        ],
+        "comment": [
+          "Revise",
+          "Notify approver"
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_1g3fhu2"
+        ],
+        "comment": [
+          "Update form",
+          "Notify approver"
+        ]
+      },
+      {
+        "tuple": [
+          "approver",
+          "End.success"
+        ],
+        "comment": [
+          "terminus",
+          "success"
+        ]
+      }
+    ]
+  }
+])
 
 
 
