@@ -3,70 +3,7 @@ require "test_helper"
 # TODO: how can we prevent users from triggering lifecycle.Create? only UI events allowed?
 #
 class CollaborationTest < Minitest::Spec
-  it "what" do
-    ui_create_form = "Activity_0wc2mcq" # TODO: this is from pro-rails tests.
-    ui_create = "Activity_1psp91r"
-    ui_create_valid = "Event_0km79t5"
-    ui_create_invalid = "Event_0co8ygx"
-    ui_update_form = 'Activity_1165bw9'
-    ui_update = "Activity_0j78uzd"
-    ui_update_valid = "Event_1vf88fn"
-    ui_update_invalid = "Event_1nt0djb"
-    ui_notify_approver = "Activity_1dt5di5"
-    ui_accepted = "Event_1npw1tg"
-    ui_delete_form = "Activity_0ha7224"
-    ui_delete = "Activity_15nnysv"
-    ui_cancel = "Activity_1uhozy1"
-    ui_publish = "Activity_0bsjggk"
-    ui_archive = "Activity_0fy41qq"
-    ui_revise_form = "Activity_0zsock2"
-    ui_revise = "Activity_1wiumzv"
-    ui_revise_valid = "Event_1bz3ivj"
-    ui_revise_invalid = "Event_1wly6jj"
-    ui_revise_form_with_errors = "Activity_19m1lnz"
-    ui_create_form_with_errors = "Activity_08p0cun"
-    ui_update_form_with_errors = "Activity_00kfo8w"
-    ui_rejected = "Event_1vb197y"
-
-    # FIXME: redundant with {lane_test}.
-    create_id = "Activity_0wwfenp"
-    update_id = "Activity_0q9p56e"
-    notify_id = "Activity_0wr78cv"
-    reject_id = "Activity_0d9yewp"
-    approve_id = "Activity_1qrkaz0"
-    revise_id = "Activity_18qv6ob"
-    publish_id = "Activity_1bjelgv"
-    delete_id = "Activity_0cc4us9"
-    archive_id = "Activity_1hgscu3"
-    success_id = "Event_1p8873y"
-
-    task_map = {
-      "ui_create_form" => "Activity_0wc2mcq", # TODO: this is from pro-rails tests.
-      "ui_create" => "Activity_1psp91r",
-      "ui_create_valid" => "Event_0km79t5",
-      "ui_create_invalid" => "Event_0co8ygx",
-      "ui_update_form" => 'Activity_1165bw9',
-      "ui_update" => "Activity_0j78uzd",
-      "ui_update_valid" => "Event_1vf88fn",
-      "ui_update_invalid" => "Event_1nt0djb",
-      "ui_notify_approver" => "Activity_1dt5di5",
-      "ui_accepted" => "Event_1npw1tg",
-      "ui_delete_form" => "Activity_0ha7224",
-      "ui_delete" => "Activity_15nnysv",
-      "ui_cancel" => "Activity_1uhozy1",
-      "ui_publish" => "Activity_0bsjggk",
-      "ui_archive" => "Activity_0fy41qq",
-      "ui_revise_form" => "Activity_0zsock2",
-      "ui_revise" => "Activity_1wiumzv",
-      "ui_revise_valid" => "Event_1bz3ivj",
-      "ui_revise_invalid" => "Event_1wly6jj",
-      "ui_revise_form_with_errors" => "Activity_19m1lnz",
-      "ui_create_form_with_errors" => "Activity_08p0cun",
-      "ui_update_form_with_errors" => "Activity_00kfo8w",
-      "ui_rejected" => "Event_1vb197y",
-    }
-
-
+  def build_schema()
     moderation_json = File.read("test/fixtures/v1/moderation.json")
     signal, (ctx, _) = Trailblazer::Workflow::Generate.invoke([{json_document: moderation_json}, {}])
 
@@ -137,6 +74,75 @@ class CollaborationTest < Minitest::Spec
       message_flow: message_flow,
     )
 
+    return schema, lane_activity, lane_activity_ui, message_flow
+  end
+
+
+  it "what" do
+    ui_create_form = "Activity_0wc2mcq" # TODO: this is from pro-rails tests.
+    ui_create = "Activity_1psp91r"
+    ui_create_valid = "Event_0km79t5"
+    ui_create_invalid = "Event_0co8ygx"
+    ui_update_form = 'Activity_1165bw9'
+    ui_update = "Activity_0j78uzd"
+    ui_update_valid = "Event_1vf88fn"
+    ui_update_invalid = "Event_1nt0djb"
+    ui_notify_approver = "Activity_1dt5di5"
+    ui_accepted = "Event_1npw1tg"
+    ui_delete_form = "Activity_0ha7224"
+    ui_delete = "Activity_15nnysv"
+    ui_cancel = "Activity_1uhozy1"
+    ui_publish = "Activity_0bsjggk"
+    ui_archive = "Activity_0fy41qq"
+    ui_revise_form = "Activity_0zsock2"
+    ui_revise = "Activity_1wiumzv"
+    ui_revise_valid = "Event_1bz3ivj"
+    ui_revise_invalid = "Event_1wly6jj"
+    ui_revise_form_with_errors = "Activity_19m1lnz"
+    ui_create_form_with_errors = "Activity_08p0cun"
+    ui_update_form_with_errors = "Activity_00kfo8w"
+    ui_rejected = "Event_1vb197y"
+
+    # FIXME: redundant with {lane_test}.
+    create_id = "Activity_0wwfenp"
+    update_id = "Activity_0q9p56e"
+    notify_id = "Activity_0wr78cv"
+    reject_id = "Activity_0d9yewp"
+    approve_id = "Activity_1qrkaz0"
+    revise_id = "Activity_18qv6ob"
+    publish_id = "Activity_1bjelgv"
+    delete_id = "Activity_0cc4us9"
+    archive_id = "Activity_1hgscu3"
+    success_id = "Event_1p8873y"
+
+    task_map = {
+      "ui_create_form" => "Activity_0wc2mcq", # TODO: this is from pro-rails tests.
+      "ui_create" => "Activity_1psp91r",
+      "ui_create_valid" => "Event_0km79t5",
+      "ui_create_invalid" => "Event_0co8ygx",
+      "ui_update_form" => 'Activity_1165bw9',
+      "ui_update" => "Activity_0j78uzd",
+      "ui_update_valid" => "Event_1vf88fn",
+      "ui_update_invalid" => "Event_1nt0djb",
+      "ui_notify_approver" => "Activity_1dt5di5",
+      "ui_accepted" => "Event_1npw1tg",
+      "ui_delete_form" => "Activity_0ha7224",
+      "ui_delete" => "Activity_15nnysv",
+      "ui_cancel" => "Activity_1uhozy1",
+      "ui_publish" => "Activity_0bsjggk",
+      "ui_archive" => "Activity_0fy41qq",
+      "ui_revise_form" => "Activity_0zsock2",
+      "ui_revise" => "Activity_1wiumzv",
+      "ui_revise_valid" => "Event_1bz3ivj",
+      "ui_revise_invalid" => "Event_1wly6jj",
+      "ui_revise_form_with_errors" => "Activity_19m1lnz",
+      "ui_create_form_with_errors" => "Activity_08p0cun",
+      "ui_update_form_with_errors" => "Activity_00kfo8w",
+      "ui_rejected" => "Event_1vb197y",
+    }
+
+
+    schema, lane_activity, lane_activity_ui, message_flow = build_schema()
     schema_hash = schema.to_h
 
     # raise schema_hash.keys.inspect
