@@ -32,29 +32,29 @@ module Trailblazer
                 activity, suspend = lane_position
 
 
-                if initial_lane_positions.invert[suspend]
+                if initial_lane_positions.invert[suspend] # an initial position, "virtual"
                   {
                     tuple: [lanes[activity], nil], # FIXME: to indicate this is a virtual "task".
+                    comment: ["initial_lane_positions", lanes[activity]],
                   }
                 else
-                  next if suspend.to_h["resumes"].nil? # FIXME: for termini.
+                  position_tuple = id_tuple_for(lanes, activity, suspend) # usually, this is a suspend. sometimes a terminus {End}.
+                  comment = nil
 
-                  position_tuple = id_tuple_for(lanes, activity, suspend) # usually, this is a suspend.
+                  if suspend.to_h["resumes"].nil? # FIXME: for termini.
+                    comment = [:terminus, suspend.to_h[:semantic]]
+                  else
+                  # Compute the task name that follows a particular catch event.
+                    resumes = Discovery.resumes_from_suspend(activity, suspend)
 
-                # Compute the task name that follows a particular catch event.
-                  resumes = Discovery.resumes_from_suspend(activity, suspend)
+                    resumes_label = resumes.collect do |catch_event|
+                      find_next_task_label(activity, catch_event)
+                    end
 
-                  resumes_label = resumes.collect do |catch_event|
-                    find_next_task_label(activity, catch_event)
+
+                    comment = resumes_label
+
                   end
-
-
-                  comment = resumes_label
-                  # task_map.invert.each do |id, label|
-                  #   if task_id =~ /#{id}$/
-                  #     comment = "--> #{label}" and break
-                  #   end
-                  # end
 
                   {
                     tuple: position_tuple,
