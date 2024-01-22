@@ -77,8 +77,23 @@ class CollaborationTest < Minitest::Spec
     return schema, lane_activity, lane_activity_ui, message_flow
   end
 
+  it "Collaboration::StateTable generating" do # FIXME: move me
+    skip "extract me from below"
+    schema, lane_activity, lane_activity_ui, message_flow = build_schema()
 
-  it "what" do
+    state_table = Trailblazer::Workflow::State::Discovery.generate_state_table
+
+  end
+
+  it "Collaboration::StateTable interface that already knows the lane positions" do
+    schema, lane_activity, lane_activity_ui, message_flow = build_schema()
+
+    state_table = todo
+
+    collaboration_state_table_interface.(schema, state_table, event: "ui_create_form", process_model_id: nil)
+  end
+
+  it "low level {Collaboration.advance} API" do
     ui_create_form = "Activity_0wc2mcq" # TODO: this is from pro-rails tests.
     ui_create = "Activity_1psp91r"
     ui_create_valid = "Event_0km79t5"
@@ -178,7 +193,9 @@ class CollaborationTest < Minitest::Spec
       decision_is_reject_throw => [lane_activity, Trailblazer::Activity::Introspect.Nodes(lane_activity, id: "catch-before-#{reject_id}").task],
     )
 
-    initial_lane_positions = Trailblazer::Workflow::Collaboration::Synchronous.initial_lane_positions(schema_hash[:lanes].values)
+    # initial_lane_positions = Trailblazer::Workflow::Collaboration::Synchronous.initial_lane_positions(schema_hash[:lanes].values) # TODO: remove me!
+    initial_lane_positions = Trailblazer::Workflow::Collaboration::Synchronous.initial_lane_positions(schema_hash[:lanes])
+
     # TODO: do this in the State layer.
     start_task = Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_create_form}").task # catch-before-Activity_0wc2mcq
     start_position = Trailblazer::Workflow::Collaboration::Position.new(lane_activity_ui, start_task)
@@ -358,8 +375,13 @@ class CollaborationTest < Minitest::Spec
       ], max_width: 186) # 186 for laptop 13"
     end
 
-    render_states(states, lanes: {lane_activity => "lifecycle", lane_activity_ui => "UI", approver_activity => "approver"}, additional_state_data: additional_state_data, task_map: task_map)
+    render_states(states, lanes: ___lanes___ = {lane_activity => "lifecycle", lane_activity_ui => "UI", approver_activity => "approver"}, additional_state_data: additional_state_data, task_map: task_map)
 # raise "figure out how to build a generated state table"
+
+
+    state_table = Trailblazer::Workflow::State::Discovery.generate_state_table(states, lanes: ___lanes___, initial_lane_positions: initial_lane_positions)
+
+
 
 
 

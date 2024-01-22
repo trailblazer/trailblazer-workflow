@@ -16,6 +16,71 @@ module Trailblazer
           end
         end
 
+        def self.id_tuple_for(lanes, activity, task)
+          activity_id = lanes[activity]
+          task_id = Trailblazer::Activity::Introspect.Nodes(activity, task: task).id
+
+          return activity_id, task_id
+        end
+
+        def self.generate_state_table(discovery_states, lanes:, initial_lane_positions:)
+          state_table = discovery_states.collect do |state| # state = {start_position, lane_states: [{activity, suspend, resumes}]}
+
+            # what we want:
+            # event_name => [activity, task], [lane_positions]
+            # [start_position]
+
+            lane_positions, start_position = state.to_a
+            # puts "@@@@@ #{start_position.inspect}"
+            # puts "@@@@@ #{lane_positions.inspect}"
+
+            # raise start_position.inspect
+
+            # We start from here:
+            triggered_catch_event_id = Trailblazer::Activity::Introspect.Nodes(start_position.activity, task: start_position.task).id
+
+            event_name = find_next_task_label(start_position.activity, start_position.task)
+            # catch_event =
+
+            # Go through each lane.
+            lane_position_tuples = lane_positions.flat_map do |lane_position|
+              next if lane_position.nil? # FIXME: why do we have that?
+
+
+              Testing.serialize_lane_position(lane_position, lanes: lanes, initial_lane_positions: initial_lane_positions)
+            end
+
+            {
+              event_name: event_name,
+              start_position: { # the catch event we start from.
+                tuple: id_tuple_for(lanes, start_position.activity, start_position.task),
+                comment: serialize_comment(event_name),
+              },
+              lane_positions: lane_position_tuples
+            }
+
+          end
+
+          pp state_table
+          raise
+
+        end
+
+        # Find the next connected task, usually outgoing from a catch event.
+        def self.find_next_task_label(activity, catch_event)
+          task_after_catch = activity.to_h[:circuit].to_h[:map][catch_event][Trailblazer::Activity::Right]
+
+          Trailblazer::Activity::Introspect.Nodes(activity, task: task_after_catch).data[:label] || task_after_catch
+        end
+
+        def self.serialize_comment(event_name)
+          ["before", event_name]
+        end
+
+        def self.render_state_table
+
+        end
+
         # Enrich each Discovery state with the possible resume events
         def self.generate_from(states)
           rows = states.collect do |state|

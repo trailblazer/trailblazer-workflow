@@ -41,13 +41,31 @@ module Trailblazer
 
         # @private
         # Returns a fake Suspend event that maintains the actual start events in its {:resume_events}.
-        def initial_lane_positions(lanes)
+        def ___FIXME_2BRM_initial_lane_positions(lanes)
           lanes.collect do |activity|
             catch_id = Trailblazer::Activity::Introspect.Nodes(activity, task: activity.to_h[:circuit].to_h[:start_task]).id # DISCUSS: store IDs or the actual catch event in {:resumes}?
 
             [
               activity,
               {"resumes" => [catch_id], semantic: [:suspend, "from initial_lane_positions"]} # We deliberately have *one* position per lane, we're Synchronous. # TODO: use a real {Event::Suspend} here.
+            ]
+          end
+          .to_h
+        end
+
+        def initial_lane_positions(lanes)
+          lanes.collect do |lane_id, activity|
+            # start_catch_event_task = activity.to_h[:circuit].to_h[:start_task]
+            # FIXME: in the next pro version, the "start suspend" will be here instead of its catch event.
+            start_catch_event_id = Trailblazer::Activity::Introspect.Nodes(activity, task: activity.to_h[:circuit].to_h[:start_task]).id # DISCUSS: store IDs or the actual catch event in {:resumes}?
+
+            # FIXME: set the suspend that leads to the "start catch event" as the circuit's start_task, then we don't need this here.
+            # Find the suspend that resumes the actual start_catch_event
+            suspend_task, _ = activity.to_h[:circuit].to_h[:map].find { |task, _| task.is_a?(Trailblazer::Workflow::Event::Suspend) && task.to_h["resumes"].include?(start_catch_event_id) }
+
+            [
+              activity,
+              suspend_task # We deliberately have *one* position per lane, we're Synchronous.
             ]
           end
           .to_h
