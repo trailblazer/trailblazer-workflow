@@ -379,9 +379,30 @@ class CollaborationTest < Minitest::Spec
 # raise "figure out how to build a generated state table"
 
 
-    state_table = Trailblazer::Workflow::State::Discovery.generate_state_table(states, lanes: ___lanes___, initial_lane_positions: initial_lane_positions)
+    state_table = Trailblazer::Workflow::State::Discovery.generate_state_table(states, lanes: ___lanes___)
+    # TODO: test the actual state table.
 
-
+    cli_state_table = Trailblazer::Workflow::State::Discovery.render_cli_state_table(state_table)
+    assert_equal cli_state_table, %(+-------------------+--------------------------------+-------------------------+------------------------------------+---------------------------------------------------------------+
+| event name        | triggered catch event          | lifecycle               | UI                                 | approver                                                      |
++-------------------+--------------------------------+-------------------------+------------------------------------+---------------------------------------------------------------+
+| "Create form"     | UI / (?) --> [Create form]     | Create                  | Create form                        | #<Trailblazer::Workflow::Event::Throw semantic="xxx_approve"> |
+| "Create"          | UI / (?) --> [Create]          | Create                  | Create                             | #<Trailblazer::Workflow::Event::Throw semantic="xxx_approve"> |
+| "Create"          | UI / (?) --> [Create]          | Create                  | Create                             | #<Trailblazer::Workflow::Event::Throw semantic="xxx_approve"> |
+| "Update form"     | UI / (?) --> [Update form]     | Update, Notify approver | Update form, Notify approver       | #<Trailblazer::Workflow::Event::Throw semantic="xxx_approve"> |
+| "Notify approver" | UI / (?) --> [Notify approver] | Update, Notify approver | Update form, Notify approver       | #<Trailblazer::Workflow::Event::Throw semantic="xxx_approve"> |
+| "Update"          | UI / (?) --> [Update]          | Update, Notify approver | Update                             | #<Trailblazer::Workflow::Event::Throw semantic="xxx_approve"> |
+| "Notify approver" | UI / (?) --> [Notify approver] | Update, Notify approver | Update form, Notify approver       | #<Trailblazer::Workflow::Event::Throw semantic="xxx_approve"> |
+| "Delete? form"    | UI / (?) --> [Delete? form]    | Publish, Delete, Update | Update form, Delete? form, Publish | terminus, failure                                             |
+| "Publish"         | UI / (?) --> [Publish]         | Publish, Delete, Update | Update form, Delete? form, Publish | terminus, failure                                             |
+| "Update"          | UI / (?) --> [Update]          | Update, Notify approver | Update                             | #<Trailblazer::Workflow::Event::Throw semantic="xxx_approve"> |
+| "Revise form"     | UI / (?) --> [Revise form]     | Revise                  | Revise form                        | terminus, success                                             |
+| "Delete"          | UI / (?) --> [Delete]          | Publish, Delete, Update | Delete, Cancel                     | terminus, failure                                             |
+| "Cancel"          | UI / (?) --> [Cancel]          | Publish, Delete, Update | Delete, Cancel                     | terminus, failure                                             |
+| "Archive"         | UI / (?) --> [Archive]         | Archive                 | Archive                            | terminus, failure                                             |
+| "Revise"          | UI / (?) --> [Revise]          | Revise                  | Revise                             | terminus, success                                             |
++-------------------+--------------------------------+-------------------------+------------------------------------+---------------------------------------------------------------+
+15 rows in set)
 
 
 

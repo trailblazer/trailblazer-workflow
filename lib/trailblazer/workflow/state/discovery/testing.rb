@@ -39,7 +39,7 @@ module Trailblazer
           end
 
           # A lane position is always a {Suspend} (or a terminus).
-          def self.serialize_lane_position(lane_position, lanes:, initial_lane_positions:)
+          def self.serialize_lane_position(lane_position, lanes:)
             activity, suspend = lane_position.to_a
 
             position_tuple = Discovery.id_tuple_for(lanes, activity, suspend) # usually, this is a suspend. sometimes a terminus {End}.
@@ -57,11 +57,12 @@ module Trailblazer
 
               comment = resumes_label
 
-              {
-                tuple: position_tuple,
-                comment: comment
-              }
             end
+
+            {
+              tuple: position_tuple,
+              comment: comment
+            }
           end
 
         end # Testing

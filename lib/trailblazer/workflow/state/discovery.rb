@@ -23,7 +23,7 @@ module Trailblazer
           return activity_id, task_id
         end
 
-        def self.generate_state_table(discovery_states, lanes:, initial_lane_positions:)
+        def self.generate_state_table(discovery_states, lanes:)
           state_table = discovery_states.collect do |state| # state = {start_position, lane_states: [{activity, suspend, resumes}]}
 
             # what we want:
@@ -31,8 +31,6 @@ module Trailblazer
             # [start_position]
 
             lane_positions, start_position = state.to_a
-            # puts "@@@@@ #{start_position.inspect}"
-            # puts "@@@@@ #{lane_positions.inspect}"
 
             # raise start_position.inspect
 
@@ -47,7 +45,7 @@ module Trailblazer
               next if lane_position.nil? # FIXME: why do we have that?
 
 
-              Testing.serialize_lane_position(lane_position, lanes: lanes, initial_lane_positions: initial_lane_positions)
+              Testing.serialize_lane_position(lane_position, lanes: lanes)
             end
 
             {
@@ -61,9 +59,41 @@ module Trailblazer
 
           end
 
-          pp state_table
-          raise
+          state_table
+        end
 
+        def self.render_cli_state_table(state_table)
+          rows = state_table.collect do |row|
+            start_lane_id, start_lane_task_id = row[:start_position][:tuple]
+
+            lane_positions = row[:lane_positions].flat_map do |lane_position|
+              lane_id, suspend_id = lane_position[:tuple]
+              comment = lane_position[:comment]
+
+              [
+                lane_id,
+                comment
+              ]
+            end
+
+            Hash[
+              "event name",
+              row[:event_name].inspect,
+
+              "triggered catch event",
+              "#{start_lane_id} / (?) --> [#{row[:start_position][:comment][1]}]",
+
+              *lane_positions
+            ]
+          end
+
+          lane_ids = state_table[0][:lane_positions].collect { |lane_position| lane_position[:tuple][0] }
+
+          Hirb::Helpers::Table.render(rows, fields: [
+            "event name",
+            "triggered catch event",
+            *lane_ids,
+          ], max_width: 186) # 186 for laptop 13"
         end
 
         # Find the next connected task, usually outgoing from a catch event.
