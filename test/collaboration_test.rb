@@ -380,10 +380,13 @@ class CollaborationTest < Minitest::Spec
 
 
     state_table = Trailblazer::Workflow::State::Discovery.generate_state_table(states, lanes: ___lanes___)
-    # TODO: test the actual state table.
 
+# currently, from this table we can read the discovery process, what states were discovered and what start lane positions those states imply.
+# we still have redundant states here, as the discovery algorithm was instructed to invoke several events multiple times.
     cli_state_table = Trailblazer::Workflow::State::Discovery.render_cli_state_table(state_table)
-    assert_equal cli_state_table, %(+-------------------+--------------------------------+-------------------------+------------------------------------+---------------------------------------------------------------+
+    # puts cli_state_table
+    assert_equal cli_state_table,
+%(+-------------------+--------------------------------+-------------------------+------------------------------------+---------------------------------------------------------------+
 | event name        | triggered catch event          | lifecycle               | UI                                 | approver                                                      |
 +-------------------+--------------------------------+-------------------------+------------------------------------+---------------------------------------------------------------+
 | "Create form"     | UI / (?) --> [Create form]     | Create                  | Create form                        | #<Trailblazer::Workflow::Event::Throw semantic="xxx_approve"> |
@@ -404,6 +407,47 @@ class CollaborationTest < Minitest::Spec
 +-------------------+--------------------------------+-------------------------+------------------------------------+---------------------------------------------------------------+
 15 rows in set)
 
+    cli_state_table_with_ids = Trailblazer::Workflow::State::Discovery.render_cli_state_table(state_table, render_ids: true)
+    puts cli_state_table_with_ids
+    # FIXME: we still have wrong formatting for ID rows with CLI coloring.
+    assert_equal cli_state_table_with_ids,
+%(+-------------------+----------------------------------------+---------------------------------+--------------------------------------------+--------------------------------------------+
+| event name        | triggered catch event                  | lifecycle                       | UI                                         | approver                                   |
++-------------------+----------------------------------------+---------------------------------+--------------------------------------------+--------------------------------------------+
+| \"Create form\"     | UI / (?) --> [Create form]             | [\"Create\"]                      | [\"Create form\"]                            | [#<Trailblazer::Workflow::Event::Throw ... |
+|                   | \e[34mcatch-before-Activity_0wc2mcq\e[0m |                                 |                                            |                                            |
+| \"Create\"          | UI / (?) --> [Create]                  | [\"Create\"]                      | [\"Create\"]                                 | [#<Trailblazer::Workflow::Event::Throw ... |
+|                   | \e[34mcatch-before-Activity_1psp91r\e[0m |                                 |                                            |                                            |
+| \"Create\"          | UI / (?) --> [Create]                  | [\"Create\"]                      | [\"Create\"]                                 | [#<Trailblazer::Workflow::Event::Throw ... |
+|                   | \e[34mcatch-before-Activity_1psp91r\e[0m |                                 |                                            |                                            |
+| \"Update form\"     | UI / (?) --> [Update form]             | [\"Update\", \"Notify approver\"]   | [\"Update form\", \"Notify approver\"]         | [#<Trailblazer::Workflow::Event::Throw ... |
+|                   | \e[34mcatch-before-Activity_1165bw9\e[0m |                                 |                                            |                                            |
+| \"Notify approver\" | UI / (?) --> [Notify approver]         | [\"Update\", \"Notify approver\"]   | [\"Update form\", \"Notify approver\"]         | [#<Trailblazer::Workflow::Event::Throw ... |
+|                   | \e[34mcatch-before-Activity_1dt5di5\e[0m |                                 |                                            |                                            |
+| \"Update\"          | UI / (?) --> [Update]                  | [\"Update\", \"Notify approver\"]   | [\"Update\"]                                 | [#<Trailblazer::Workflow::Event::Throw ... |
+|                   | \e[34mcatch-before-Activity_0j78uzd\e[0m |                                 |                                            |                                            |
+| \"Notify approver\" | UI / (?) --> [Notify approver]         | [\"Update\", \"Notify approver\"]   | [\"Update form\", \"Notify approver\"]         | [#<Trailblazer::Workflow::Event::Throw ... |
+|                   | \e[34mcatch-before-Activity_1dt5di5\e[0m |                                 |                                            |                                            |
+| \"Delete? form\"    | UI / (?) --> [Delete? form]            | [\"Publish\", \"Delete\", \"Update\"] | [\"Update form\", \"Delete? form\", \"Publish\"] | [:terminus, :failure]                      |
+|                   | \e[34mcatch-before-Activity_0ha7224\e[0m |                                 |                                            |                                            |
+| \"Publish\"         | UI / (?) --> [Publish]                 | [\"Publish\", \"Delete\", \"Update\"] | [\"Update form\", \"Delete? form\", \"Publish\"] | [:terminus, :failure]                      |
+|                   | \e[34mcatch-before-Activity_0bsjggk\e[0m |                                 |                                            |                                            |
+| \"Update\"          | UI / (?) --> [Update]                  | [\"Update\", \"Notify approver\"]   | [\"Update\"]                                 | [#<Trailblazer::Workflow::Event::Throw ... |
+|                   | \e[34mcatch-before-Activity_0j78uzd\e[0m |                                 |                                            |                                            |
+| \"Revise form\"     | UI / (?) --> [Revise form]             | [\"Revise\"]                      | [\"Revise form\"]                            | [:terminus, :success]                      |
+|                   | \e[34mcatch-before-Activity_0zsock2\e[0m |                                 |                                            |                                            |
+| \"Delete\"          | UI / (?) --> [Delete]                  | [\"Publish\", \"Delete\", \"Update\"] | [\"Delete\", \"Cancel\"]                       | [:terminus, :failure]                      |
+|                   | \e[34mcatch-before-Activity_15nnysv\e[0m |                                 |                                            |                                            |
+| \"Cancel\"          | UI / (?) --> [Cancel]                  | [\"Publish\", \"Delete\", \"Update\"] | [\"Delete\", \"Cancel\"]                       | [:terminus, :failure]                      |
+|                   | \e[34mcatch-before-Activity_1uhozy1\e[0m |                                 |                                            |                                            |
+| \"Archive\"         | UI / (?) --> [Archive]                 | [\"Archive\"]                     | [\"Archive\"]                                | [:terminus, :failure]                      |
+|                   | \e[34mcatch-before-Activity_0fy41qq\e[0m |                                 |                                            |                                            |
+| \"Revise\"          | UI / (?) --> [Revise]                  | [\"Revise\"]                      | [\"Revise\"]                                 | [:terminus, :success]                      |
+|                   | \e[34mcatch-before-Activity_1wiumzv\e[0m |                                 |                                            |                                            |
++-------------------+----------------------------------------+---------------------------------+--------------------------------------------+--------------------------------------------+
+30 rows in set)
+
+raise "introduce 'suggested state name' column"
 
 
     testing_json = Trailblazer::Workflow::State::Discovery::Testing.render_json(

@@ -62,8 +62,8 @@ module Trailblazer
           state_table
         end
 
-        def self.render_cli_state_table(state_table)
-          rows = state_table.collect do |row|
+        def self.render_cli_state_table(state_table, render_ids: false)
+          rows = state_table.flat_map do |row|
             start_lane_id, start_lane_task_id = row[:start_position][:tuple]
 
             lane_positions = row[:lane_positions].flat_map do |lane_position|
@@ -76,7 +76,8 @@ module Trailblazer
               ]
             end
 
-            Hash[
+            # The resulting hash represents one row.
+            state_row = Hash[
               "event name",
               row[:event_name].inspect,
 
@@ -85,15 +86,36 @@ module Trailblazer
 
               *lane_positions
             ]
+
+            rows = [
+              state_row,
+            ]
+
+            # FIXME: use developer for coloring.
+            # def bg_gray(str);        "\e[47m#{str}\e[0m" end
+
+          # TODO: optional feature, extract!
+            if render_ids
+              id_row = Hash[
+                "triggered catch event",
+                "\e[34m#{row[:start_position][:tuple][1]}\e[0m",
+              ]
+
+              rows << id_row
+            end
+
+            rows
           end
 
           lane_ids = state_table[0][:lane_positions].collect { |lane_position| lane_position[:tuple][0] }
 
           Hirb::Helpers::Table.render(rows, fields: [
-            "event name",
-            "triggered catch event",
-            *lane_ids,
-          ], max_width: 186) # 186 for laptop 13"
+              "event name",
+              "triggered catch event",
+              *lane_ids,
+            ],
+            max_width: 186,
+          ) # 186 for laptop 13"
         end
 
         # Find the next connected task, usually outgoing from a catch event.
