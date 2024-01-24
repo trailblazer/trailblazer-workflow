@@ -414,35 +414,35 @@ class CollaborationTest < Minitest::Spec
 %(+-------------------+----------------------------------------+---------------------------------+--------------------------------------------+--------------------------------------------+
 | event name        | triggered catch event                  | lifecycle                       | UI                                         | approver                                   |
 +-------------------+----------------------------------------+---------------------------------+--------------------------------------------+--------------------------------------------+
-| \"Create form\"     | UI / (?) --> [Create form]             | [\"Create\"]                      | [\"Create form\"]                            | [#<Trailblazer::Workflow::Event::Throw ... |
+| "Create form"     | UI / (?) --> [Create form]             | ["Create"]                      | ["Create form"]                            | [#<Trailblazer::Workflow::Event::Throw ... |
 |                   | \e[34mcatch-before-Activity_0wc2mcq\e[0m |                                 |                                            |                                            |
-| \"Create\"          | UI / (?) --> [Create]                  | [\"Create\"]                      | [\"Create\"]                                 | [#<Trailblazer::Workflow::Event::Throw ... |
+| "Create"          | UI / (?) --> [Create]                  | ["Create"]                      | ["Create"]                                 | [#<Trailblazer::Workflow::Event::Throw ... |
 |                   | \e[34mcatch-before-Activity_1psp91r\e[0m |                                 |                                            |                                            |
-| \"Create\"          | UI / (?) --> [Create]                  | [\"Create\"]                      | [\"Create\"]                                 | [#<Trailblazer::Workflow::Event::Throw ... |
+| "Create"          | UI / (?) --> [Create]                  | ["Create"]                      | ["Create"]                                 | [#<Trailblazer::Workflow::Event::Throw ... |
 |                   | \e[34mcatch-before-Activity_1psp91r\e[0m |                                 |                                            |                                            |
-| \"Update form\"     | UI / (?) --> [Update form]             | [\"Update\", \"Notify approver\"]   | [\"Update form\", \"Notify approver\"]         | [#<Trailblazer::Workflow::Event::Throw ... |
+| "Update form"     | UI / (?) --> [Update form]             | ["Update", "Notify approver"]   | ["Update form", "Notify approver"]         | [#<Trailblazer::Workflow::Event::Throw ... |
 |                   | \e[34mcatch-before-Activity_1165bw9\e[0m |                                 |                                            |                                            |
-| \"Notify approver\" | UI / (?) --> [Notify approver]         | [\"Update\", \"Notify approver\"]   | [\"Update form\", \"Notify approver\"]         | [#<Trailblazer::Workflow::Event::Throw ... |
+| "Notify approver" | UI / (?) --> [Notify approver]         | ["Update", "Notify approver"]   | ["Update form", "Notify approver"]         | [#<Trailblazer::Workflow::Event::Throw ... |
 |                   | \e[34mcatch-before-Activity_1dt5di5\e[0m |                                 |                                            |                                            |
-| \"Update\"          | UI / (?) --> [Update]                  | [\"Update\", \"Notify approver\"]   | [\"Update\"]                                 | [#<Trailblazer::Workflow::Event::Throw ... |
+| "Update"          | UI / (?) --> [Update]                  | ["Update", "Notify approver"]   | ["Update"]                                 | [#<Trailblazer::Workflow::Event::Throw ... |
 |                   | \e[34mcatch-before-Activity_0j78uzd\e[0m |                                 |                                            |                                            |
-| \"Notify approver\" | UI / (?) --> [Notify approver]         | [\"Update\", \"Notify approver\"]   | [\"Update form\", \"Notify approver\"]         | [#<Trailblazer::Workflow::Event::Throw ... |
+| "Notify approver" | UI / (?) --> [Notify approver]         | ["Update", "Notify approver"]   | ["Update form", "Notify approver"]         | [#<Trailblazer::Workflow::Event::Throw ... |
 |                   | \e[34mcatch-before-Activity_1dt5di5\e[0m |                                 |                                            |                                            |
-| \"Delete? form\"    | UI / (?) --> [Delete? form]            | [\"Publish\", \"Delete\", \"Update\"] | [\"Update form\", \"Delete? form\", \"Publish\"] | [:terminus, :failure]                      |
+| "Delete? form"    | UI / (?) --> [Delete? form]            | ["Publish", "Delete", "Update"] | ["Update form", "Delete? form", "Publish"] | [:terminus, :failure]                      |
 |                   | \e[34mcatch-before-Activity_0ha7224\e[0m |                                 |                                            |                                            |
-| \"Publish\"         | UI / (?) --> [Publish]                 | [\"Publish\", \"Delete\", \"Update\"] | [\"Update form\", \"Delete? form\", \"Publish\"] | [:terminus, :failure]                      |
+| "Publish"         | UI / (?) --> [Publish]                 | ["Publish", "Delete", "Update"] | ["Update form", "Delete? form", "Publish"] | [:terminus, :failure]                      |
 |                   | \e[34mcatch-before-Activity_0bsjggk\e[0m |                                 |                                            |                                            |
-| \"Update\"          | UI / (?) --> [Update]                  | [\"Update\", \"Notify approver\"]   | [\"Update\"]                                 | [#<Trailblazer::Workflow::Event::Throw ... |
+| "Update"          | UI / (?) --> [Update]                  | ["Update", "Notify approver"]   | ["Update"]                                 | [#<Trailblazer::Workflow::Event::Throw ... |
 |                   | \e[34mcatch-before-Activity_0j78uzd\e[0m |                                 |                                            |                                            |
-| \"Revise form\"     | UI / (?) --> [Revise form]             | [\"Revise\"]                      | [\"Revise form\"]                            | [:terminus, :success]                      |
+| "Revise form"     | UI / (?) --> [Revise form]             | ["Revise"]                      | ["Revise form"]                            | [:terminus, :success]                      |
 |                   | \e[34mcatch-before-Activity_0zsock2\e[0m |                                 |                                            |                                            |
-| \"Delete\"          | UI / (?) --> [Delete]                  | [\"Publish\", \"Delete\", \"Update\"] | [\"Delete\", \"Cancel\"]                       | [:terminus, :failure]                      |
+| "Delete"          | UI / (?) --> [Delete]                  | ["Publish", "Delete", "Update"] | ["Delete", "Cancel"]                       | [:terminus, :failure]                      |
 |                   | \e[34mcatch-before-Activity_15nnysv\e[0m |                                 |                                            |                                            |
-| \"Cancel\"          | UI / (?) --> [Cancel]                  | [\"Publish\", \"Delete\", \"Update\"] | [\"Delete\", \"Cancel\"]                       | [:terminus, :failure]                      |
+| "Cancel"          | UI / (?) --> [Cancel]                  | ["Publish", "Delete", "Update"] | ["Delete", "Cancel"]                       | [:terminus, :failure]                      |
 |                   | \e[34mcatch-before-Activity_1uhozy1\e[0m |                                 |                                            |                                            |
-| \"Archive\"         | UI / (?) --> [Archive]                 | [\"Archive\"]                     | [\"Archive\"]                                | [:terminus, :failure]                      |
+| "Archive"         | UI / (?) --> [Archive]                 | ["Archive"]                     | ["Archive"]                                | [:terminus, :failure]                      |
 |                   | \e[34mcatch-before-Activity_0fy41qq\e[0m |                                 |                                            |                                            |
-| \"Revise\"          | UI / (?) --> [Revise]                  | [\"Revise\"]                      | [\"Revise\"]                                 | [:terminus, :success]                      |
+| "Revise"          | UI / (?) --> [Revise]                  | ["Revise"]                      | ["Revise"]                                 | [:terminus, :success]                      |
 |                   | \e[34mcatch-before-Activity_1wiumzv\e[0m |                                 |                                            |                                            |
 +-------------------+----------------------------------------+---------------------------------+--------------------------------------------+--------------------------------------------+
 30 rows in set)
