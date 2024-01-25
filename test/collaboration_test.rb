@@ -411,40 +411,79 @@ class CollaborationTest < Minitest::Spec
     puts cli_state_table_with_ids
     # FIXME: we still have wrong formatting for ID rows with CLI coloring.
     assert_equal cli_state_table_with_ids,
-%(+-------------------+----------------------------------------+---------------------------------+--------------------------------------------+--------------------------------------------+
-| event name        | triggered catch event                  | lifecycle                       | UI                                         | approver                                   |
-+-------------------+----------------------------------------+---------------------------------+--------------------------------------------+--------------------------------------------+
-| "Create form"     | UI / (?) --> [Create form]             | ["Create"]                      | ["Create form"]                            | [#<Trailblazer::Workflow::Event::Throw ... |
-|                   | \e[34mcatch-before-Activity_0wc2mcq\e[0m |                                 |                                            |                                            |
-| "Create"          | UI / (?) --> [Create]                  | ["Create"]                      | ["Create"]                                 | [#<Trailblazer::Workflow::Event::Throw ... |
-|                   | \e[34mcatch-before-Activity_1psp91r\e[0m |                                 |                                            |                                            |
-| "Create"          | UI / (?) --> [Create]                  | ["Create"]                      | ["Create"]                                 | [#<Trailblazer::Workflow::Event::Throw ... |
-|                   | \e[34mcatch-before-Activity_1psp91r\e[0m |                                 |                                            |                                            |
-| "Update form"     | UI / (?) --> [Update form]             | ["Update", "Notify approver"]   | ["Update form", "Notify approver"]         | [#<Trailblazer::Workflow::Event::Throw ... |
-|                   | \e[34mcatch-before-Activity_1165bw9\e[0m |                                 |                                            |                                            |
-| "Notify approver" | UI / (?) --> [Notify approver]         | ["Update", "Notify approver"]   | ["Update form", "Notify approver"]         | [#<Trailblazer::Workflow::Event::Throw ... |
-|                   | \e[34mcatch-before-Activity_1dt5di5\e[0m |                                 |                                            |                                            |
-| "Update"          | UI / (?) --> [Update]                  | ["Update", "Notify approver"]   | ["Update"]                                 | [#<Trailblazer::Workflow::Event::Throw ... |
-|                   | \e[34mcatch-before-Activity_0j78uzd\e[0m |                                 |                                            |                                            |
-| "Notify approver" | UI / (?) --> [Notify approver]         | ["Update", "Notify approver"]   | ["Update form", "Notify approver"]         | [#<Trailblazer::Workflow::Event::Throw ... |
-|                   | \e[34mcatch-before-Activity_1dt5di5\e[0m |                                 |                                            |                                            |
-| "Delete? form"    | UI / (?) --> [Delete? form]            | ["Publish", "Delete", "Update"] | ["Update form", "Delete? form", "Publish"] | [:terminus, :failure]                      |
-|                   | \e[34mcatch-before-Activity_0ha7224\e[0m |                                 |                                            |                                            |
-| "Publish"         | UI / (?) --> [Publish]                 | ["Publish", "Delete", "Update"] | ["Update form", "Delete? form", "Publish"] | [:terminus, :failure]                      |
-|                   | \e[34mcatch-before-Activity_0bsjggk\e[0m |                                 |                                            |                                            |
-| "Update"          | UI / (?) --> [Update]                  | ["Update", "Notify approver"]   | ["Update"]                                 | [#<Trailblazer::Workflow::Event::Throw ... |
-|                   | \e[34mcatch-before-Activity_0j78uzd\e[0m |                                 |                                            |                                            |
-| "Revise form"     | UI / (?) --> [Revise form]             | ["Revise"]                      | ["Revise form"]                            | [:terminus, :success]                      |
-|                   | \e[34mcatch-before-Activity_0zsock2\e[0m |                                 |                                            |                                            |
-| "Delete"          | UI / (?) --> [Delete]                  | ["Publish", "Delete", "Update"] | ["Delete", "Cancel"]                       | [:terminus, :failure]                      |
-|                   | \e[34mcatch-before-Activity_15nnysv\e[0m |                                 |                                            |                                            |
-| "Cancel"          | UI / (?) --> [Cancel]                  | ["Publish", "Delete", "Update"] | ["Delete", "Cancel"]                       | [:terminus, :failure]                      |
-|                   | \e[34mcatch-before-Activity_1uhozy1\e[0m |                                 |                                            |                                            |
-| "Archive"         | UI / (?) --> [Archive]                 | ["Archive"]                     | ["Archive"]                                | [:terminus, :failure]                      |
-|                   | \e[34mcatch-before-Activity_0fy41qq\e[0m |                                 |                                            |                                            |
-| "Revise"          | UI / (?) --> [Revise]                  | ["Revise"]                      | ["Revise"]                                 | [:terminus, :success]                      |
-|                   | \e[34mcatch-before-Activity_1wiumzv\e[0m |                                 |                                            |                                            |
-+-------------------+----------------------------------------+---------------------------------+--------------------------------------------+--------------------------------------------+
+%(+-------------------+----------------------------------------+----------------------------------------+----------------------------------------+----------------------------------------+
+| event name        | triggered catch event                  | lifecycle                              | UI                                     | approver                               |
++-------------------+----------------------------------------+----------------------------------------+----------------------------------------+----------------------------------------+
+| \"Create form\"     | UI / (?) --> [Create form]             | [\"Create\"]                             | [\"Create form\"]                        | [#<Trailblazer::Workflow::Event::Th... |
+|                   | \e[34mcatch-before-Activity_0wc2mcq\e[0m | suspend-gw-to-catch-before-Activity... | suspend-gw-to-catch-before-Activity... | #<Trailblazer::Workflow::Event::Sus... |
+| \"Create\"          | UI / (?) --> [Create]                  | [\"Create\"]                             | [\"Create\"]                             | [#<Trailblazer::Workflow::Event::Th... |
+|                   | \e[34mcatch-before-Activity_1psp91r\e[0m | suspend-gw-to-catch-before-Activity... | suspend-Gateway_14h0q7a                | #<Trailblazer::Workflow::Event::Sus... |
+| \"Create\"          | UI / (?) --> [Create]                  | [\"Create\"]                             | [\"Create\"]                             | [#<Trailblazer::Workflow::Event::Th... |
+|                   | \e[34mcatch-before-Activity_1psp91r\e[0m | suspend-gw-to-catch-before-Activity... | suspend-Gateway_14h0q7a                | #<Trailblazer::Workflow::Event::Sus... |
+| \"Update form\"     | UI / (?) --> [Update form]             | [\"Update\", \"Notify approver\"]          | [\"Update form\", \"Notify approver\"]     | [#<Trailblazer::Workflow::Event::Th... |
+|                   | \e[34mcatch-before-Activity_1165bw9\e[0m | suspend-Gateway_0fnbg3r                | suspend-Gateway_0kknfje                | #<Trailblazer::Workflow::Event::Sus... |
+| \"Notify approver\" | UI / (?) --> [Notify approver]         | [\"Update\", \"Notify approver\"]          | [\"Update form\", \"Notify approver\"]     | [#<Trailblazer::Workflow::Event::Th... |
+|                   | \e[34mcatch-before-Activity_1dt5di5\e[0m | suspend-Gateway_0fnbg3r                | suspend-Gateway_0kknfje                | #<Trailblazer::Workflow::Event::Sus... |
+| \"Update\"          | UI / (?) --> [Update]                  | [\"Update\", \"Notify approver\"]          | [\"Update\"]                             | [#<Trailblazer::Workflow::Event::Th... |
+|                   | \e[34mcatch-before-Activity_0j78uzd\e[0m | suspend-Gateway_0fnbg3r                | suspend-Gateway_0nxerxv                | #<Trailblazer::Workflow::Event::Sus... |
+| \"Notify approver\" | UI / (?) --> [Notify approver]         | [\"Update\", \"Notify approver\"]          | [\"Update form\", \"Notify approver\"]     | [#<Trailblazer::Workflow::Event::Th... |
+|                   | \e[34mcatch-before-Activity_1dt5di5\e[0m | suspend-Gateway_0fnbg3r                | suspend-Gateway_0kknfje                | #<Trailblazer::Workflow::Event::Sus... |
+| \"Delete? form\"    | UI / (?) --> [Delete? form]            | [\"Publish\", \"Delete\", \"Update\"]        | [\"Update form\", \"Delete? form\", \"Pu... | [:terminus, :failure]                  |
+|                   | \e[34mcatch-before-Activity_0ha7224\e[0m | suspend-Gateway_1hp2ssj                | suspend-Gateway_1sq41iq                | End.failure                            |
+| \"Publish\"         | UI / (?) --> [Publish]                 | [\"Publish\", \"Delete\", \"Update\"]        | [\"Update form\", \"Delete? form\", \"Pu... | [:terminus, :failure]                  |
+|                   | \e[34mcatch-before-Activity_0bsjggk\e[0m | suspend-Gateway_1hp2ssj                | suspend-Gateway_1sq41iq                | End.failure                            |
+| \"Update\"          | UI / (?) --> [Update]                  | [\"Update\", \"Notify approver\"]          | [\"Update\"]                             | [#<Trailblazer::Workflow::Event::Th... |
+|                   | \e[34mcatch-before-Activity_0j78uzd\e[0m | suspend-Gateway_0fnbg3r                | suspend-Gateway_0nxerxv                | #<Trailblazer::Workflow::Event::Sus... |
+| \"Revise form\"     | UI / (?) --> [Revise form]             | [\"Revise\"]                             | [\"Revise form\"]                        | [:terminus, :success]                  |
+|                   | \e[34mcatch-before-Activity_0zsock2\e[0m | suspend-Gateway_01p7uj7                | suspend-gw-to-catch-before-Activity... | End.success                            |
+| \"Delete\"          | UI / (?) --> [Delete]                  | [\"Publish\", \"Delete\", \"Update\"]        | [\"Delete\", \"Cancel\"]                   | [:terminus, :failure]                  |
+|                   | \e[34mcatch-before-Activity_15nnysv\e[0m | suspend-Gateway_1hp2ssj                | suspend-Gateway_100g9dn                | End.failure                            |
+| \"Cancel\"          | UI / (?) --> [Cancel]                  | [\"Publish\", \"Delete\", \"Update\"]        | [\"Delete\", \"Cancel\"]                   | [:terminus, :failure]                  |
+|                   | \e[34mcatch-before-Activity_1uhozy1\e[0m | suspend-Gateway_1hp2ssj                | suspend-Gateway_100g9dn                | End.failure                            |
+| \"Archive\"         | UI / (?) --> [Archive]                 | [\"Archive\"]                            | [\"Archive\"]                            | [:terminus, :failure]                  |
+|                   | \e[34mcatch-before-Activity_0fy41qq\e[0m | suspend-gw-to-catch-before-Activity... | suspend-gw-to-catch-before-Activity... | End.failure                            |
+| \"Revise\"          | UI / (?) --> [Revise]                  | [\"Revise\"]                             | [\"Revise\"]                             | [:terminus, :success]                  |
+|                   | \e[34mcatch-before-Activity_1wiumzv\e[0m | suspend-Gateway_01p7uj7                | suspend-Gateway_1xs96ik                | End.success                            |
++-------------------+----------------------------------------+----------------------------------------+----------------------------------------+----------------------------------------+
+30 rows in set)
+
+cli_state_table_with_ids = Trailblazer::Workflow::State::Discovery.render_cli_state_table(state_table, render_ids: true, hide_lanes: ["approver"])
+puts cli_state_table_with_ids
+assert_equal cli_state_table_with_ids,
+%(+-------------------+----------------------------------------+---------------------------------------------+---------------------------------------------+
+| event name        | triggered catch event                  | lifecycle                                   | UI                                          |
++-------------------+----------------------------------------+---------------------------------------------+---------------------------------------------+
+| "Create form"     | UI / (?) --> [Create form]             | ["Create"]                                  | ["Create form"]                             |
+|                   | \e[34mcatch-before-Activity_0wc2mcq\e[0m | suspend-gw-to-catch-before-Activity_0wwfenp | suspend-gw-to-catch-before-Activity_0wc2mcq |
+| "Create"          | UI / (?) --> [Create]                  | ["Create"]                                  | ["Create"]                                  |
+|                   | \e[34mcatch-before-Activity_1psp91r\e[0m | suspend-gw-to-catch-before-Activity_0wwfenp | suspend-Gateway_14h0q7a                     |
+| "Create"          | UI / (?) --> [Create]                  | ["Create"]                                  | ["Create"]                                  |
+|                   | \e[34mcatch-before-Activity_1psp91r\e[0m | suspend-gw-to-catch-before-Activity_0wwfenp | suspend-Gateway_14h0q7a                     |
+| "Update form"     | UI / (?) --> [Update form]             | ["Update", "Notify approver"]               | ["Update form", "Notify approver"]          |
+|                   | \e[34mcatch-before-Activity_1165bw9\e[0m | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0kknfje                     |
+| "Notify approver" | UI / (?) --> [Notify approver]         | ["Update", "Notify approver"]               | ["Update form", "Notify approver"]          |
+|                   | \e[34mcatch-before-Activity_1dt5di5\e[0m | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0kknfje                     |
+| "Update"          | UI / (?) --> [Update]                  | ["Update", "Notify approver"]               | ["Update"]                                  |
+|                   | \e[34mcatch-before-Activity_0j78uzd\e[0m | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0nxerxv                     |
+| "Notify approver" | UI / (?) --> [Notify approver]         | ["Update", "Notify approver"]               | ["Update form", "Notify approver"]          |
+|                   | \e[34mcatch-before-Activity_1dt5di5\e[0m | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0kknfje                     |
+| "Delete? form"    | UI / (?) --> [Delete? form]            | ["Publish", "Delete", "Update"]             | ["Update form", "Delete? form", "Publish"]  |
+|                   | \e[34mcatch-before-Activity_0ha7224\e[0m | suspend-Gateway_1hp2ssj                     | suspend-Gateway_1sq41iq                     |
+| "Publish"         | UI / (?) --> [Publish]                 | ["Publish", "Delete", "Update"]             | ["Update form", "Delete? form", "Publish"]  |
+|                   | \e[34mcatch-before-Activity_0bsjggk\e[0m | suspend-Gateway_1hp2ssj                     | suspend-Gateway_1sq41iq                     |
+| "Update"          | UI / (?) --> [Update]                  | ["Update", "Notify approver"]               | ["Update"]                                  |
+|                   | \e[34mcatch-before-Activity_0j78uzd\e[0m | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0nxerxv                     |
+| "Revise form"     | UI / (?) --> [Revise form]             | ["Revise"]                                  | ["Revise form"]                             |
+|                   | \e[34mcatch-before-Activity_0zsock2\e[0m | suspend-Gateway_01p7uj7                     | suspend-gw-to-catch-before-Activity_0zsock2 |
+| "Delete"          | UI / (?) --> [Delete]                  | ["Publish", "Delete", "Update"]             | ["Delete", "Cancel"]                        |
+|                   | \e[34mcatch-before-Activity_15nnysv\e[0m | suspend-Gateway_1hp2ssj                     | suspend-Gateway_100g9dn                     |
+| "Cancel"          | UI / (?) --> [Cancel]                  | ["Publish", "Delete", "Update"]             | ["Delete", "Cancel"]                        |
+|                   | \e[34mcatch-before-Activity_1uhozy1\e[0m | suspend-Gateway_1hp2ssj                     | suspend-Gateway_100g9dn                     |
+| "Archive"         | UI / (?) --> [Archive]                 | ["Archive"]                                 | ["Archive"]                                 |
+|                   | \e[34mcatch-before-Activity_0fy41qq\e[0m | suspend-gw-to-catch-before-Activity_1hgscu3 | suspend-gw-to-catch-before-Activity_0fy41qq |
+| "Revise"          | UI / (?) --> [Revise]                  | ["Revise"]                                  | ["Revise"]                                  |
+|                   | \e[34mcatch-before-Activity_1wiumzv\e[0m | suspend-Gateway_01p7uj7                     | suspend-Gateway_1xs96ik                     |
++-------------------+----------------------------------------+---------------------------------------------+---------------------------------------------+
 30 rows in set)
 
 raise "introduce 'suggested state name' column"

@@ -62,7 +62,7 @@ module Trailblazer
           state_table
         end
 
-        def self.render_cli_state_table(state_table, render_ids: false)
+        def self.render_cli_state_table(state_table, render_ids: false, hide_lanes: [])
           rows = state_table.flat_map do |row|
             start_lane_id, start_lane_task_id = row[:start_position][:tuple]
 
@@ -96,18 +96,30 @@ module Trailblazer
 
           # TODO: optional feature, extract!
             if render_ids
+              lane_position_ids = row[:lane_positions].flat_map do |lane_position|
+                tuple = lane_position[:tuple]
+
+                # [tuple[0], "\e[34m#{tuple[1]}\e[0m"] # FIXME: when entry is shortened by Hirb, the stop byte gets lost.
+                tuple
+              end
+
               id_row = Hash[
                 "triggered catch event",
                 "\e[34m#{row[:start_position][:tuple][1]}\e[0m",
+
+                *lane_position_ids, # TODO: this adds the remaining IDs.
               ]
 
               rows << id_row
             end
 
+
             rows
           end
 
           lane_ids = state_table[0][:lane_positions].collect { |lane_position| lane_position[:tuple][0] }
+
+          lane_ids = lane_ids - hide_lanes # TODO: extract, new feature.
 
           Hirb::Helpers::Table.render(rows, fields: [
               "event name",
