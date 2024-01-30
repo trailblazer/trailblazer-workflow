@@ -62,8 +62,69 @@ module Trailblazer
           state_table
         end
 
-        def self.render_cli_state_table(state_table, render_ids: false, hide_lanes: [])
-          rows = state_table.flat_map do |row|
+        # Each row represents a configuration of suspends aka "state".
+        # The state knows its possible resume events.
+        #   does the state know which state fields belong to it?
+        def self.render_cli_state_table(discovery_state_table)
+          start_position_to_catch = {}
+
+          # Key by lane_positions, which represent a state.
+          # State (lane_positions) => [events (start position)]
+          states = {}
+
+          discovery_state_table.each do |row|
+            configuration = row[:lane_positions]
+
+            events = states[configuration]
+            events = [] if events.nil?
+
+            events << row[:start_position]
+
+            states[configuration] = events
+          end
+
+
+          # render
+          cli_rows = states.flat_map do |configuration, events|
+            suggested_state_name = events
+              .collect { |event| event[:comment][1] }
+              .uniq
+              .join("/")
+
+            suggested_state_name = "> #{suggested_state_name}"
+              .inspect
+
+
+            triggerable_events = events
+              .collect { |event| readable_name_for_catch_event(event).inspect }
+              .uniq
+              .join(", ")
+
+
+            Hash[
+              "state name",
+              suggested_state_name,
+
+              "triggerable events",
+              triggerable_events
+            ]
+          end
+
+          Hirb::Helpers::Table.render(cli_rows, fields: [
+              "state name",
+              "triggerable events",
+              # *lane_ids,
+            ],
+            max_width: 186,
+          ) # 186 for laptop 13"
+        end
+
+        def self.readable_name_for_catch_event(position)
+          "#{position[:tuple][0]} / (?) --> [#{position[:comment][1]}]"
+        end
+
+        def self.render_cli_event_table(discovery_state_table, render_ids: false, hide_lanes: [])
+          rows = discovery_state_table.flat_map do |row|
             start_lane_id, start_lane_task_id = row[:start_position][:tuple]
 
             lane_positions = row[:lane_positions].flat_map do |lane_position|
@@ -82,7 +143,7 @@ module Trailblazer
               row[:event_name].inspect,
 
               "triggered catch event",
-              "#{start_lane_id} / (?) --> [#{row[:start_position][:comment][1]}]",
+              readable_name_for_catch_event(row[:start_position]),
 
               *lane_positions
             ]
@@ -117,7 +178,7 @@ module Trailblazer
             rows
           end
 
-          lane_ids = state_table[0][:lane_positions].collect { |lane_position| lane_position[:tuple][0] }
+          lane_ids = discovery_state_table[0][:lane_positions].collect { |lane_position| lane_position[:tuple][0] }
 
           lane_ids = lane_ids - hide_lanes # TODO: extract, new feature.
 

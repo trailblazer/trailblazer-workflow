@@ -378,12 +378,32 @@ class CollaborationTest < Minitest::Spec
     render_states(states, lanes: ___lanes___ = {lane_activity => "lifecycle", lane_activity_ui => "UI", approver_activity => "approver"}, additional_state_data: additional_state_data, task_map: task_map)
 # raise "figure out how to build a generated state table"
 
-
+    # DISCUSS: technically, this is an event table, not a state table.
     state_table = Trailblazer::Workflow::State::Discovery.generate_state_table(states, lanes: ___lanes___)
+
+
+    cli_state_table = Trailblazer::Workflow::State::Discovery.render_cli_state_table(state_table)
+    puts cli_state_table
+    assert_equal cli_state_table,
+%(+---------------------------------+----------------------------------------------------------------+
+| state name                      | triggerable events                                             |
++---------------------------------+----------------------------------------------------------------+
+| "> Create form"                 | "UI / (?) --> [Create form]"                                   |
+| "> Create"                      | "UI / (?) --> [Create]"                                        |
+| "> Update form/Notify approver" | "UI / (?) --> [Update form]", "UI / (?) --> [Notify approver]" |
+| "> Update"                      | "UI / (?) --> [Update]"                                        |
+| "> Delete? form/Publish"        | "UI / (?) --> [Delete? form]", "UI / (?) --> [Publish]"        |
+| "> Revise form"                 | "UI / (?) --> [Revise form]"                                   |
+| "> Delete/Cancel"               | "UI / (?) --> [Delete]", "UI / (?) --> [Cancel]"               |
+| "> Archive"                     | "UI / (?) --> [Archive]"                                       |
+| "> Revise"                      | "UI / (?) --> [Revise]"                                        |
++---------------------------------+----------------------------------------------------------------+
+9 rows in set)
+
 
 # currently, from this table we can read the discovery process, what states were discovered and what start lane positions those states imply.
 # we still have redundant states here, as the discovery algorithm was instructed to invoke several events multiple times.
-    cli_state_table = Trailblazer::Workflow::State::Discovery.render_cli_state_table(state_table)
+    cli_state_table = Trailblazer::Workflow::State::Discovery.render_cli_event_table(state_table)
     # puts cli_state_table
     assert_equal cli_state_table,
 %(+-------------------+--------------------------------+-------------------------+------------------------------------+---------------------------------------------------------------+
@@ -407,7 +427,7 @@ class CollaborationTest < Minitest::Spec
 +-------------------+--------------------------------+-------------------------+------------------------------------+---------------------------------------------------------------+
 15 rows in set)
 
-    cli_state_table_with_ids = Trailblazer::Workflow::State::Discovery.render_cli_state_table(state_table, render_ids: true)
+    cli_state_table_with_ids = Trailblazer::Workflow::State::Discovery.render_cli_event_table(state_table, render_ids: true)
     puts cli_state_table_with_ids
     # FIXME: we still have wrong formatting for ID rows with CLI coloring.
     assert_equal cli_state_table_with_ids,
@@ -447,7 +467,7 @@ class CollaborationTest < Minitest::Spec
 +-------------------+----------------------------------------+----------------------------------------+----------------------------------------+----------------------------------------+
 30 rows in set)
 
-cli_state_table_with_ids = Trailblazer::Workflow::State::Discovery.render_cli_state_table(state_table, render_ids: true, hide_lanes: ["approver"])
+cli_state_table_with_ids = Trailblazer::Workflow::State::Discovery.render_cli_event_table(state_table, render_ids: true, hide_lanes: ["approver"])
 puts cli_state_table_with_ids
 assert_equal cli_state_table_with_ids,
 %(+-------------------+----------------------------------------+---------------------------------------------+---------------------------------------------+
@@ -488,7 +508,18 @@ assert_equal cli_state_table_with_ids,
 
 raise "introduce 'suggested state name' column"
 
+=begin
+Create            process_model.nil?
+Notify_approver   state == :created || :updated || :revised
+                  state == "ready_for_review"
+Update            state == :created || :updated FIXME: or :revised?
+Publish           state == :accepted
+Revise            state == :rejected
 
+Every configuration has one (or several) names, e.g. "created" and "updated"
+
+This event is possible because process_model is in configuration ABC ("state")
+=end
     testing_json = Trailblazer::Workflow::State::Discovery::Testing.render_json(
       states,
       lanes: {lane_activity => "lifecycle", lane_activity_ui => "UI", approver_activity => "approver"},
