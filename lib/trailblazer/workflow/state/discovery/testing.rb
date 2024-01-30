@@ -3,19 +3,22 @@ module Trailblazer
     class State
       module Discovery
         module Testing
+          # DISCUSS: In the Testing JSON, we want
+          #   1. start event, start configuration, input => expected suspend configuration
+          #   2. a "comment" table above that which draws out the same in readable format.
           def self.render_json(states, lanes:, additional_state_data:, initial_lane_positions:, task_map:)
             present_states = Trailblazer::Workflow::State::Discovery.generate_from(states) # returns rows with [{activity, suspend, resumes}]
 
+# FIXME: we're actually going through events here, not states!
             rows = present_states.collect do |state| # state = {start_position, lane_states: [{activity, suspend, resumes}]}
 
-              start_position, lane_positions, discovery_state_fixme = state.to_a
+              start_position, start_configuration, discovery_state_fixme = state.to_a   # DISCUSS: do we need the "present_state" from {#generate_from}?
 
               # "serialize" start task
               activity_id, triggered_catch_event_id = Discovery.id_tuple_for(lanes, start_position.activity, start_position.task)
 
               # {suspend_configuration} are the lane positions after we started running from {start_position}.
               suspend_configuration = additional_state_data[[state.state_from_discovery_fixme.object_id, :suspend_configuration]]
-
 
               # Go through each lane and define the expected positions after running from the start position.
               expected_lane_positions = suspend_configuration.lane_positions.collect do |lane_position|
@@ -24,15 +27,26 @@ module Trailblazer
                 # puts lane_position[:suspend]  # DISCUSS: introduce State::Position? this comes from {#generate_from}.
 
 
-                serialize_lane_position(lane_position, lanes: lanes, initial_lane_positions: initial_lane_positions)
-
+                serialize_lane_position(lane_position, lanes: lanes)
               end
+
+              serialized_start_configuration = start_configuration.collect do |position|
+                next if position.nil? # FIXME: what the hecke is this?
+
+                puts "@@@@@ #{position.inspect}"
+                position = position.values # FIXME: {Position} interface
+
+                serialize_lane_position(position, lanes: lanes)
+              end
+
+              serialized_start_configuration = serialized_start_configuration.compact # FIXME: what the hecke is this?
 
               {
                 start_position: {
                   tuple: [activity_id, triggered_catch_event_id],
                   comment: Discovery.find_next_task_label(start_position.activity, start_position.task)
                 },
+                start_configuration: serialized_start_configuration,
                 expected_lane_positions: expected_lane_positions,
               }
             end
