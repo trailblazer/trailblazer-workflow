@@ -120,7 +120,7 @@ module Trailblazer
         end
 
         def self.readable_name_for_catch_event(position)
-          "#{position[:tuple][0]} / (?) --> [#{position[:comment][1]}]"
+          "#{position[:tuple][0]} / (✉)➔[#{position[:comment][1]}]"
         end
 
         def self.render_cli_event_table(discovery_state_table, render_ids: false, hide_lanes: [])

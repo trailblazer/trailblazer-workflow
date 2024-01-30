@@ -43,12 +43,32 @@ module Trailblazer
               {
                 start_position: {
                   tuple: [activity_id, triggered_catch_event_id],
-                  comment: Discovery.find_next_task_label(start_position.activity, start_position.task)
+                  comment: ["before", Discovery.find_next_task_label(start_position.activity, start_position.task)]
                 },
                 start_configuration: serialized_start_configuration,
                 expected_lane_positions: expected_lane_positions,
               }
             end
+          end
+
+          def self.render_comment_header(structure)
+            cli_rows = structure.collect do |testing_row| # row = :start_position, :start_configuration, :expected_lane_positions
+              triggered_catch_event_label = Discovery.readable_name_for_catch_event(testing_row[:start_position])
+
+              Hash[
+                "triggered catch",
+                triggered_catch_event_label,
+
+              ]
+            end
+
+
+            Hirb::Helpers::Table.render(cli_rows, fields: [
+              "triggered catch",
+              # *lane_ids,
+            ],
+            max_width: 186,
+          ) # 186 for laptop 13"
           end
 
           # A lane position is always a {Suspend} (or a terminus).
