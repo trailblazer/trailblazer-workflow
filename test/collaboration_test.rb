@@ -519,13 +519,14 @@ Every configuration has one (or several) names, e.g. "created" and "updated"
 
 This event is possible because process_model is in configuration ABC ("state")
 =end
-    testing_json = Trailblazer::Workflow::State::Discovery::Testing.render_json(
+    testing_json = Trailblazer::Workflow::State::Discovery::Testing.render_structure(
       states,
       lanes: {lane_activity => "lifecycle", lane_activity_ui => "UI", approver_activity => "approver"},
-      initial_lane_positions: extended_initial_lane_positions, # DISCUSS: so we know what not to find via Introspect.
       task_map: task_map,
       additional_state_data: additional_state_data,
     )
+
+
 
 
     testing_json = JSON.pretty_generate(testing_json)

@@ -6,7 +6,7 @@ module Trailblazer
           # DISCUSS: In the Testing JSON, we want
           #   1. start event, start configuration, input => expected suspend configuration
           #   2. a "comment" table above that which draws out the same in readable format.
-          def self.render_json(states, lanes:, additional_state_data:, initial_lane_positions:, task_map:)
+          def self.render_structure(states, lanes:, additional_state_data:, task_map:)
             present_states = Trailblazer::Workflow::State::Discovery.generate_from(states) # returns rows with [{activity, suspend, resumes}]
 
 # FIXME: we're actually going through events here, not states!
@@ -33,7 +33,6 @@ module Trailblazer
               serialized_start_configuration = start_configuration.collect do |position|
                 next if position.nil? # FIXME: what the hecke is this?
 
-                puts "@@@@@ #{position.inspect}"
                 position = position.values # FIXME: {Position} interface
 
                 serialize_lane_position(position, lanes: lanes)
