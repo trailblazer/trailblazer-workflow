@@ -51,21 +51,32 @@ module Trailblazer
             end
           end
 
+          # Render the "test plan" in readable form.
           def self.render_comment_header(structure)
             cli_rows = structure.collect do |testing_row| # row = :start_position, :start_configuration, :expected_lane_positions
               triggered_catch_event_label = Discovery.readable_name_for_catch_event(testing_row[:start_position])
+
+              start_configuration_cols = testing_row[:start_configuration].collect do |lane_position|
+                content = "#{Discovery.readable_name_for_catch_event(lane_position)}"
+              end.join(", ")
 
               Hash[
                 "triggered catch",
                 triggered_catch_event_label,
 
+                "input ctx",
+                nil,
+
+                # *start_configuration_cols
+                "start configuration",
+                start_configuration_cols
               ]
             end
 
 
             Hirb::Helpers::Table.render(cli_rows, fields: [
               "triggered catch",
-              # *lane_ids,
+              "start configuration",
             ],
             max_width: 186,
           ) # 186 for laptop 13"
@@ -88,13 +99,13 @@ module Trailblazer
                 Discovery.find_next_task_label(activity, catch_event)
               end
 
-              comment = resumes_label
+              comment = Discovery.serialize_comment(resumes_label)
 
             end
 
             {
               tuple: position_tuple,
-              comment: comment
+              comment: comment,
             }
           end
 

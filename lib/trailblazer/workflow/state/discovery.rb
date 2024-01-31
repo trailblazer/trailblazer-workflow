@@ -129,7 +129,7 @@ module Trailblazer
 
             lane_positions = row[:lane_positions].flat_map do |lane_position|
               lane_id, suspend_id = lane_position[:tuple]
-              comment = lane_position[:comment]
+              comment = lane_position[:comment][1]
 
               [
                 lane_id,

@@ -17,7 +17,10 @@
           "suspend-gw-to-catch-before-Activity_0wwfenp"
         ],
         "comment": [
-          "Create"
+          "before",
+          [
+            "Create"
+          ]
         ]
       },
       {
@@ -26,7 +29,10 @@
           "suspend-gw-to-catch-before-Activity_0wc2mcq"
         ],
         "comment": [
-          "Create form"
+          "before",
+          [
+            "Create form"
+          ]
         ]
       },
       {
@@ -35,7 +41,10 @@
           "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
         ],
         "comment": [
-          "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          "before",
+          [
+            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          ]
         ]
       }
     ],
@@ -46,7 +55,10 @@
           "suspend-gw-to-catch-before-Activity_0wwfenp"
         ],
         "comment": [
-          "Create"
+          "before",
+          [
+            "Create"
+          ]
         ]
       },
       {
@@ -55,7 +67,10 @@
           "suspend-Gateway_14h0q7a"
         ],
         "comment": [
-          "Create"
+          "before",
+          [
+            "Create"
+          ]
         ]
       },
       {
@@ -64,7 +79,10 @@
           "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
         ],
         "comment": [
-          "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          "before",
+          [
+            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          ]
         ]
       }
     ]
@@ -87,7 +105,10 @@
           "suspend-gw-to-catch-before-Activity_0wwfenp"
         ],
         "comment": [
-          "Create"
+          "before",
+          [
+            "Create"
+          ]
         ]
       },
       {
@@ -96,7 +117,10 @@
           "suspend-Gateway_14h0q7a"
         ],
         "comment": [
-          "Create"
+          "before",
+          [
+            "Create"
+          ]
         ]
       },
       {
@@ -105,7 +129,10 @@
           "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
         ],
         "comment": [
-          "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          "before",
+          [
+            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          ]
         ]
       }
     ],
@@ -116,8 +143,11 @@
           "suspend-Gateway_0fnbg3r"
         ],
         "comment": [
-          "Update",
-          "Notify approver"
+          "before",
+          [
+            "Update",
+            "Notify approver"
+          ]
         ]
       },
       {
@@ -126,8 +156,11 @@
           "suspend-Gateway_0kknfje"
         ],
         "comment": [
-          "Update form",
-          "Notify approver"
+          "before",
+          [
+            "Update form",
+            "Notify approver"
+          ]
         ]
       },
       {
@@ -136,7 +169,10 @@
           "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
         ],
         "comment": [
-          "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          "before",
+          [
+            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          ]
         ]
       }
     ]
@@ -159,7 +195,10 @@
           "suspend-gw-to-catch-before-Activity_0wwfenp"
         ],
         "comment": [
-          "Create"
+          "before",
+          [
+            "Create"
+          ]
         ]
       },
       {
@@ -168,7 +207,10 @@
           "suspend-Gateway_14h0q7a"
         ],
         "comment": [
-          "Create"
+          "before",
+          [
+            "Create"
+          ]
         ]
       },
       {
@@ -177,7 +219,10 @@
           "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
         ],
         "comment": [
-          "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          "before",
+          [
+            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          ]
         ]
       }
     ],
@@ -188,7 +233,10 @@
           "suspend-gw-to-catch-before-Activity_0wwfenp"
         ],
         "comment": [
-          "Create"
+          "before",
+          [
+            "Create"
+          ]
         ]
       },
       {
@@ -197,7 +245,10 @@
           "suspend-Gateway_14h0q7a"
         ],
         "comment": [
-          "Create"
+          "before",
+          [
+            "Create"
+          ]
         ]
       },
       {
@@ -206,7 +257,10 @@
           "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
         ],
         "comment": [
-          "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          "before",
+          [
+            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          ]
         ]
       }
     ]
@@ -229,8 +283,11 @@
           "suspend-Gateway_0fnbg3r"
         ],
         "comment": [
-          "Update",
-          "Notify approver"
+          "before",
+          [
+            "Update",
+            "Notify approver"
+          ]
         ]
       },
       {
@@ -239,8 +296,11 @@
           "suspend-Gateway_0kknfje"
         ],
         "comment": [
-          "Update form",
-          "Notify approver"
+          "before",
+          [
+            "Update form",
+            "Notify approver"
+          ]
         ]
       },
       {
@@ -249,7 +309,10 @@
           "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
         ],
         "comment": [
-          "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          "before",
+          [
+            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          ]
         ]
       }
     ],
@@ -260,8 +323,11 @@
           "suspend-Gateway_0fnbg3r"
         ],
         "comment": [
-          "Update",
-          "Notify approver"
+          "before",
+          [
+            "Update",
+            "Notify approver"
+          ]
         ]
       },
       {
@@ -270,7 +336,10 @@
           "suspend-Gateway_0nxerxv"
         ],
         "comment": [
-          "Update"
+          "before",
+          [
+            "Update"
+          ]
         ]
       },
       {
@@ -279,7 +348,10 @@
           "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
         ],
         "comment": [
-          "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          "before",
+          [
+            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          ]
         ]
       }
     ]
@@ -302,8 +374,11 @@
           "suspend-Gateway_0fnbg3r"
         ],
         "comment": [
-          "Update",
-          "Notify approver"
+          "before",
+          [
+            "Update",
+            "Notify approver"
+          ]
         ]
       },
       {
@@ -312,8 +387,11 @@
           "suspend-Gateway_0kknfje"
         ],
         "comment": [
-          "Update form",
-          "Notify approver"
+          "before",
+          [
+            "Update form",
+            "Notify approver"
+          ]
         ]
       },
       {
@@ -322,7 +400,10 @@
           "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
         ],
         "comment": [
-          "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          "before",
+          [
+            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          ]
         ]
       }
     ],
@@ -333,9 +414,12 @@
           "suspend-Gateway_1hp2ssj"
         ],
         "comment": [
-          "Publish",
-          "Delete",
-          "Update"
+          "before",
+          [
+            "Publish",
+            "Delete",
+            "Update"
+          ]
         ]
       },
       {
@@ -344,9 +428,12 @@
           "suspend-Gateway_1sq41iq"
         ],
         "comment": [
-          "Update form",
-          "Delete? form",
-          "Publish"
+          "before",
+          [
+            "Update form",
+            "Delete? form",
+            "Publish"
+          ]
         ]
       },
       {
@@ -379,8 +466,11 @@
           "suspend-Gateway_0fnbg3r"
         ],
         "comment": [
-          "Update",
-          "Notify approver"
+          "before",
+          [
+            "Update",
+            "Notify approver"
+          ]
         ]
       },
       {
@@ -389,7 +479,10 @@
           "suspend-Gateway_0nxerxv"
         ],
         "comment": [
-          "Update"
+          "before",
+          [
+            "Update"
+          ]
         ]
       },
       {
@@ -398,7 +491,10 @@
           "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
         ],
         "comment": [
-          "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          "before",
+          [
+            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          ]
         ]
       }
     ],
@@ -409,8 +505,11 @@
           "suspend-Gateway_1wzosup"
         ],
         "comment": [
-          "Notify approver",
-          "Update"
+          "before",
+          [
+            "Notify approver",
+            "Update"
+          ]
         ]
       },
       {
@@ -419,8 +518,11 @@
           "suspend-Gateway_1g3fhu2"
         ],
         "comment": [
-          "Update form",
-          "Notify approver"
+          "before",
+          [
+            "Update form",
+            "Notify approver"
+          ]
         ]
       },
       {
@@ -429,7 +531,10 @@
           "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
         ],
         "comment": [
-          "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          "before",
+          [
+            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          ]
         ]
       }
     ]
@@ -452,8 +557,11 @@
           "suspend-Gateway_0fnbg3r"
         ],
         "comment": [
-          "Update",
-          "Notify approver"
+          "before",
+          [
+            "Update",
+            "Notify approver"
+          ]
         ]
       },
       {
@@ -462,8 +570,11 @@
           "suspend-Gateway_0kknfje"
         ],
         "comment": [
-          "Update form",
-          "Notify approver"
+          "before",
+          [
+            "Update form",
+            "Notify approver"
+          ]
         ]
       },
       {
@@ -472,7 +583,10 @@
           "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
         ],
         "comment": [
-          "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          "before",
+          [
+            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          ]
         ]
       }
     ],
@@ -483,7 +597,10 @@
           "suspend-Gateway_01p7uj7"
         ],
         "comment": [
-          "Revise"
+          "before",
+          [
+            "Revise"
+          ]
         ]
       },
       {
@@ -492,7 +609,10 @@
           "suspend-gw-to-catch-before-Activity_0zsock2"
         ],
         "comment": [
-          "Revise form"
+          "before",
+          [
+            "Revise form"
+          ]
         ]
       },
       {
@@ -525,9 +645,12 @@
           "suspend-Gateway_1hp2ssj"
         ],
         "comment": [
-          "Publish",
-          "Delete",
-          "Update"
+          "before",
+          [
+            "Publish",
+            "Delete",
+            "Update"
+          ]
         ]
       },
       {
@@ -536,9 +659,12 @@
           "suspend-Gateway_1sq41iq"
         ],
         "comment": [
-          "Update form",
-          "Delete? form",
-          "Publish"
+          "before",
+          [
+            "Update form",
+            "Delete? form",
+            "Publish"
+          ]
         ]
       }
     ],
@@ -549,9 +675,12 @@
           "suspend-Gateway_1hp2ssj"
         ],
         "comment": [
-          "Publish",
-          "Delete",
-          "Update"
+          "before",
+          [
+            "Publish",
+            "Delete",
+            "Update"
+          ]
         ]
       },
       {
@@ -560,8 +689,11 @@
           "suspend-Gateway_100g9dn"
         ],
         "comment": [
-          "Delete",
-          "Cancel"
+          "before",
+          [
+            "Delete",
+            "Cancel"
+          ]
         ]
       },
       {
@@ -594,9 +726,12 @@
           "suspend-Gateway_1hp2ssj"
         ],
         "comment": [
-          "Publish",
-          "Delete",
-          "Update"
+          "before",
+          [
+            "Publish",
+            "Delete",
+            "Update"
+          ]
         ]
       },
       {
@@ -605,9 +740,12 @@
           "suspend-Gateway_1sq41iq"
         ],
         "comment": [
-          "Update form",
-          "Delete? form",
-          "Publish"
+          "before",
+          [
+            "Update form",
+            "Delete? form",
+            "Publish"
+          ]
         ]
       }
     ],
@@ -618,7 +756,10 @@
           "suspend-gw-to-catch-before-Activity_1hgscu3"
         ],
         "comment": [
-          "Archive"
+          "before",
+          [
+            "Archive"
+          ]
         ]
       },
       {
@@ -627,7 +768,10 @@
           "suspend-gw-to-catch-before-Activity_0fy41qq"
         ],
         "comment": [
-          "Archive"
+          "before",
+          [
+            "Archive"
+          ]
         ]
       },
       {
@@ -660,8 +804,11 @@
           "suspend-Gateway_0fnbg3r"
         ],
         "comment": [
-          "Update",
-          "Notify approver"
+          "before",
+          [
+            "Update",
+            "Notify approver"
+          ]
         ]
       },
       {
@@ -670,7 +817,10 @@
           "suspend-Gateway_0nxerxv"
         ],
         "comment": [
-          "Update"
+          "before",
+          [
+            "Update"
+          ]
         ]
       },
       {
@@ -679,7 +829,10 @@
           "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
         ],
         "comment": [
-          "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          "before",
+          [
+            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          ]
         ]
       }
     ],
@@ -690,8 +843,11 @@
           "suspend-Gateway_0fnbg3r"
         ],
         "comment": [
-          "Update",
-          "Notify approver"
+          "before",
+          [
+            "Update",
+            "Notify approver"
+          ]
         ]
       },
       {
@@ -700,7 +856,10 @@
           "suspend-Gateway_0nxerxv"
         ],
         "comment": [
-          "Update"
+          "before",
+          [
+            "Update"
+          ]
         ]
       },
       {
@@ -709,7 +868,10 @@
           "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
         ],
         "comment": [
-          "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          "before",
+          [
+            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          ]
         ]
       }
     ]
@@ -732,7 +894,10 @@
           "suspend-Gateway_01p7uj7"
         ],
         "comment": [
-          "Revise"
+          "before",
+          [
+            "Revise"
+          ]
         ]
       },
       {
@@ -741,7 +906,10 @@
           "suspend-gw-to-catch-before-Activity_0zsock2"
         ],
         "comment": [
-          "Revise form"
+          "before",
+          [
+            "Revise form"
+          ]
         ]
       }
     ],
@@ -752,7 +920,10 @@
           "suspend-Gateway_01p7uj7"
         ],
         "comment": [
-          "Revise"
+          "before",
+          [
+            "Revise"
+          ]
         ]
       },
       {
@@ -761,7 +932,10 @@
           "suspend-Gateway_1xs96ik"
         ],
         "comment": [
-          "Revise"
+          "before",
+          [
+            "Revise"
+          ]
         ]
       },
       {
@@ -794,9 +968,12 @@
           "suspend-Gateway_1hp2ssj"
         ],
         "comment": [
-          "Publish",
-          "Delete",
-          "Update"
+          "before",
+          [
+            "Publish",
+            "Delete",
+            "Update"
+          ]
         ]
       },
       {
@@ -805,8 +982,11 @@
           "suspend-Gateway_100g9dn"
         ],
         "comment": [
-          "Delete",
-          "Cancel"
+          "before",
+          [
+            "Delete",
+            "Cancel"
+          ]
         ]
       }
     ],
@@ -861,9 +1041,12 @@
           "suspend-Gateway_1hp2ssj"
         ],
         "comment": [
-          "Publish",
-          "Delete",
-          "Update"
+          "before",
+          [
+            "Publish",
+            "Delete",
+            "Update"
+          ]
         ]
       },
       {
@@ -872,8 +1055,11 @@
           "suspend-Gateway_100g9dn"
         ],
         "comment": [
-          "Delete",
-          "Cancel"
+          "before",
+          [
+            "Delete",
+            "Cancel"
+          ]
         ]
       }
     ],
@@ -884,9 +1070,12 @@
           "suspend-Gateway_1hp2ssj"
         ],
         "comment": [
-          "Publish",
-          "Delete",
-          "Update"
+          "before",
+          [
+            "Publish",
+            "Delete",
+            "Update"
+          ]
         ]
       },
       {
@@ -895,9 +1084,12 @@
           "suspend-Gateway_1sq41iq"
         ],
         "comment": [
-          "Update form",
-          "Delete? form",
-          "Publish"
+          "before",
+          [
+            "Update form",
+            "Delete? form",
+            "Publish"
+          ]
         ]
       },
       {
@@ -930,7 +1122,10 @@
           "suspend-gw-to-catch-before-Activity_1hgscu3"
         ],
         "comment": [
-          "Archive"
+          "before",
+          [
+            "Archive"
+          ]
         ]
       },
       {
@@ -939,7 +1134,10 @@
           "suspend-gw-to-catch-before-Activity_0fy41qq"
         ],
         "comment": [
-          "Archive"
+          "before",
+          [
+            "Archive"
+          ]
         ]
       }
     ],
@@ -994,7 +1192,10 @@
           "suspend-Gateway_01p7uj7"
         ],
         "comment": [
-          "Revise"
+          "before",
+          [
+            "Revise"
+          ]
         ]
       },
       {
@@ -1003,7 +1204,10 @@
           "suspend-Gateway_1xs96ik"
         ],
         "comment": [
-          "Revise"
+          "before",
+          [
+            "Revise"
+          ]
         ]
       }
     ],
@@ -1014,8 +1218,11 @@
           "suspend-Gateway_1kl7pnm"
         ],
         "comment": [
-          "Revise",
-          "Notify approver"
+          "before",
+          [
+            "Revise",
+            "Notify approver"
+          ]
         ]
       },
       {
@@ -1024,8 +1231,11 @@
           "suspend-Gateway_1g3fhu2"
         ],
         "comment": [
-          "Update form",
-          "Notify approver"
+          "before",
+          [
+            "Update form",
+            "Notify approver"
+          ]
         ]
       },
       {
