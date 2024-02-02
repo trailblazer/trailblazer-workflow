@@ -57,7 +57,7 @@ module Trailblazer
               triggered_catch_event_label = Discovery.readable_name_for_catch_event(testing_row[:start_position])
 
               start_configuration_cols = testing_row[:start_configuration].collect do |lane_position|
-                content = "#{Discovery.readable_name_for_catch_event(lane_position)}"
+                content = "#{Discovery.readable_name_for_resume_event(lane_position)}"
               end.join(", ")
 
               Hash[

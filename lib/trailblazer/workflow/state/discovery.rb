@@ -123,6 +123,15 @@ module Trailblazer
           "#{position[:tuple][0]}: (✉)➔[#{position[:comment][1]}]"
         end
 
+        def self.readable_name_for_resume_event(position)
+          resume_labels = position[:comment][1]
+
+          catch_events = resume_labels.collect { |catch_label| "(✉)#{catch_label}" }
+            .join(" ")
+
+          "#{position[:tuple][0]}: ➔[#{catch_events}]"
+        end
+
         def self.render_cli_event_table(discovery_state_table, render_ids: false, hide_lanes: [])
           rows = discovery_state_table.flat_map do |row|
             start_lane_id, start_lane_task_id = row[:start_position][:tuple]
