@@ -60,6 +60,10 @@ module Trailblazer
                 content = "#{Discovery.readable_name_for_resume_event(lane_position)}"
               end.join(", ")
 
+              expected_lane_positions = testing_row[:expected_lane_positions].collect do |lane_position|
+                content = "#{readable_name_for_resume_event_or_terminus(lane_position)}"
+              end.join(", ")
+
               Hash[
                 "triggered catch",
                 triggered_catch_event_label,
@@ -67,9 +71,11 @@ module Trailblazer
                 "input ctx",
                 nil,
 
-                # *start_configuration_cols
                 "start configuration",
-                start_configuration_cols
+                start_configuration_cols,
+
+                "expected lane positions",
+                expected_lane_positions
               ]
             end
 
@@ -77,6 +83,7 @@ module Trailblazer
             Hirb::Helpers::Table.render(cli_rows, fields: [
               "triggered catch",
               "start configuration",
+              "expected lane positions",
             ],
             max_width: 186,
           ) # 186 for laptop 13"
@@ -107,6 +114,15 @@ module Trailblazer
               tuple: position_tuple,
               comment: comment,
             }
+          end
+
+          def self.readable_name_for_resume_event_or_terminus(position)
+            if position[:comment][0] ==  :terminus
+              terminus_label = "End.#{position[:comment][1]}"
+              return "#{position[:tuple][0]}: ◉#{terminus_label}"
+            end
+
+            Discovery.readable_name_for_resume_event(position)
           end
 
         end # Testing

@@ -119,17 +119,20 @@ module Trailblazer
           ) # 186 for laptop 13"
         end
 
-        def self.readable_name_for_catch_event(position)
-          "#{position[:tuple][0]}: (✉)➔[#{position[:comment][1]}]"
+        def self.readable_name_for_catch_event(position, envelope_icon: false)
+          envelope_icon = "(✉)➔" # TODO: implement {envelope_icon} flag.
+          envelope_icon = "▶"
+
+          "#{position[:tuple][0]}: #{envelope_icon}[#{position[:comment][1]}]"
         end
 
         def self.readable_name_for_resume_event(position)
           resume_labels = position[:comment][1]
 
-          catch_events = resume_labels.collect { |catch_label| "(✉)#{catch_label}" }
+          catch_events = resume_labels.collect { |catch_label| "▶#{catch_label}" }
             .join(" ")
 
-          "#{position[:tuple][0]}: ➔[#{catch_events}]"
+          "#{position[:tuple][0]}: [#{catch_events}]"
         end
 
         def self.render_cli_event_table(discovery_state_table, render_ids: false, hide_lanes: [])
