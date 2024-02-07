@@ -127,7 +127,7 @@ module Trailblazer
           lane_label = "#{lane_name}:"
           lane_label = lane_icons[lane_name] if lane_icons.key?(lane_name)
 
-          "#{lane_label} #{envelope_icon}[#{position[:comment][1]}]"
+          "#{lane_label} #{envelope_icon}#{position[:comment][1]}"
         end
 
         def self.readable_name_for_resume_event(position, tuple: false, lane_icons: {})
