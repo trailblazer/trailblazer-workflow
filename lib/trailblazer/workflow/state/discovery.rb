@@ -126,11 +126,13 @@ module Trailblazer
           "#{position[:tuple][0]}: #{envelope_icon}[#{position[:comment][1]}]"
         end
 
-        def self.readable_name_for_resume_event(position)
+        def self.readable_name_for_resume_event(position, tuple: false)
           resume_labels = position[:comment][1]
 
           catch_events = resume_labels.collect { |catch_label| "▶#{catch_label}" }
             .join(" ")
+
+          return [position[:tuple][0], catch_events] if tuple
 
           "#{position[:tuple][0]}: [#{catch_events}]"
         end

@@ -56,9 +56,14 @@ module Trailblazer
             cli_rows = structure.collect do |testing_row| # row = :start_position, :start_configuration, :expected_lane_positions
               triggered_catch_event_label = Discovery.readable_name_for_catch_event(testing_row[:start_position])
 
+              # TODO: remove
               start_configuration_cols = testing_row[:start_configuration].collect do |lane_position|
-                content = "#{Discovery.readable_name_for_resume_event(lane_position)}"
+                content = Discovery.readable_name_for_resume_event(lane_position)
               end.join(", ")
+
+              start_configuration = testing_row[:start_configuration].collect do |lane_position|
+                Discovery.readable_name_for_resume_event(lane_position, tuple: true)
+              end
 
               expected_lane_positions = testing_row[:expected_lane_positions].collect do |lane_position|
                 content = "#{readable_name_for_resume_event_or_terminus(lane_position)}"
@@ -71,8 +76,13 @@ module Trailblazer
                 "input ctx",
                 nil,
 
+                #  TODO: remove
                 "start configuration",
                 start_configuration_cols,
+
+                :start_configuration,
+                start_configuration,
+
 
                 "expected lane positions",
                 expected_lane_positions
@@ -80,13 +90,45 @@ module Trailblazer
             end
 
 
+            cli_rows = format_start_positions_for(cli_rows, column_name: :start_configuration)
+
             Hirb::Helpers::Table.render(cli_rows, fields: [
               "triggered catch",
-              "start configuration",
+              :start_configuration_formatted,
               "expected lane positions",
             ],
             max_width: 186,
           ) # 186 for laptop 13"
+          end
+
+          def self.format_start_positions_for(rows, column_name:)
+            # pp rows
+
+            columns = {}
+
+            rows.each do |row|
+              row[column_name].each do |lane_label, catch_label|
+                columns[lane_label] ||= []
+                columns[lane_label] << catch_label.length
+              end
+            end
+
+            columns_2_length = columns.collect { |lane_label, lengths| [lane_label, lengths.sort.last] }.to_h
+
+            # TODO: always same col order!!!
+            rows = rows.collect do |row|
+              columns = row[column_name].collect do |lane_label, catch_label|
+                col_length = columns_2_length[lane_label]
+
+                "#{lane_label}: " + catch_label.ljust(col_length, " ")
+              end
+
+              content = columns.join(" | ")
+
+              row = row.merge(:start_configuration_formatted => content)
+            end
+
+            rows
           end
 
           # A lane position is always a {Suspend} (or a terminus).
