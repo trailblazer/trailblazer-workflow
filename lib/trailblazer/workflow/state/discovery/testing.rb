@@ -52,22 +52,17 @@ module Trailblazer
           end
 
           # Render the "test plan" in readable form.
-          def self.render_comment_header(structure)
+          def self.render_comment_header(structure, lane_icons:)
             cli_rows = structure.collect do |testing_row| # row = :start_position, :start_configuration, :expected_lane_positions
-              triggered_catch_event_label = Discovery.readable_name_for_catch_event(testing_row[:start_position])
-
-              # TODO: remove
-              start_configuration_cols = testing_row[:start_configuration].collect do |lane_position|
-                content = Discovery.readable_name_for_resume_event(lane_position)
-              end.join(", ")
+              triggered_catch_event_label = Discovery.readable_name_for_catch_event(testing_row[:start_position], lane_icons: lane_icons)
 
               start_configuration = testing_row[:start_configuration].collect do |lane_position|
                 Discovery.readable_name_for_resume_event(lane_position, tuple: true)
               end
 
               expected_lane_positions = testing_row[:expected_lane_positions].collect do |lane_position|
-                content = "#{readable_name_for_resume_event_or_terminus(lane_position)}"
-              end.join(", ")
+                readable_name_for_resume_event_or_terminus(lane_position, lane_icons: lane_icons, tuple: true)
+              end
 
               Hash[
                 "triggered catch",
@@ -75,10 +70,6 @@ module Trailblazer
 
                 "input ctx",
                 nil,
-
-                #  TODO: remove
-                "start configuration",
-                start_configuration_cols,
 
                 :start_configuration,
                 start_configuration,
@@ -90,26 +81,29 @@ module Trailblazer
             end
 
 
-            cli_rows = format_start_positions_for(cli_rows, column_name: :start_configuration)
+            cli_rows = format_start_positions_for(cli_rows, column_name: :start_configuration, lane_icons: lane_icons, formatted_col_name: :start_configuration_formatted)
+            cli_rows = format_start_positions_for(cli_rows, column_name: "expected lane positions", lane_icons: lane_icons, formatted_col_name: :expected_lane_positions_formatted)
 
             Hirb::Helpers::Table.render(cli_rows, fields: [
               "triggered catch",
               :start_configuration_formatted,
-              "expected lane positions",
+              :expected_lane_positions_formatted,
             ],
             max_width: 186,
           ) # 186 for laptop 13"
           end
 
-          def self.format_start_positions_for(rows, column_name:)
-            # pp rows
-
+          def self.format_start_positions_for(rows, column_name:, formatted_col_name:, lane_icons:)
+            # Find out the longest entry per lane.
             columns = {}
 
             rows.each do |row|
               row[column_name].each do |lane_label, catch_label|
                 columns[lane_label] ||= []
-                columns[lane_label] << catch_label.length
+
+                length = catch_label ? catch_label.length : 0 # DISCUSS: why can {catch_label} be nil?
+
+                columns[lane_label] << length
               end
             end
 
@@ -119,13 +113,16 @@ module Trailblazer
             rows = rows.collect do |row|
               columns = row[column_name].collect do |lane_label, catch_label|
                 col_length = columns_2_length[lane_label]
+                lane_label = lane_icons[lane_label]
 
-                "#{lane_label}: " + catch_label.ljust(col_length, " ")
+                catch_label = "" if catch_label.nil? # DISCUSS: why can {catch_label} be nil?
+
+                "#{lane_label} " + catch_label.ljust(col_length, " ")
               end
 
-              content = columns.join(" | ")
+              content = columns.join(" ")
 
-              row = row.merge(:start_configuration_formatted => content)
+              row = row.merge(formatted_col_name => content)
             end
 
             rows
@@ -158,13 +155,17 @@ module Trailblazer
             }
           end
 
-          def self.readable_name_for_resume_event_or_terminus(position)
+          def self.readable_name_for_resume_event_or_terminus(position, lane_icons:, tuple: false)
             if position[:comment][0] ==  :terminus
-              terminus_label = "End.#{position[:comment][1]}"
-              return "#{position[:tuple][0]}: ◉#{terminus_label}"
+
+              terminus_label = "◉End.#{position[:comment][1]}"
+              lane_label     = lane_icons[position[:tuple][0]]
+
+              return [position[:tuple][0], terminus_label] if tuple
+              return "#{lane_label} #{terminus_label}"
             end
 
-            Discovery.readable_name_for_resume_event(position)
+            Discovery.readable_name_for_resume_event(position, lane_icons: lane_icons, tuple: tuple)
           end
 
         end # Testing

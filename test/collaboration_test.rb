@@ -530,10 +530,29 @@ This event is possible because process_model is in configuration ABC ("state")
     # File.write "test/discovery_testing_json.json",  testing_json
     assert_equal testing_json, File.read("test/discovery_testing_json.json")
 
-    testing_comment_header = Trailblazer::Workflow::State::Discovery::Testing.render_comment_header(testing_structure)
+    testing_comment_header = Trailblazer::Workflow::State::Discovery::Testing.render_comment_header(testing_structure, lane_icons: {"UI" => "☝", "lifecycle" => "⛾", "approver" => "☑"})
     puts testing_comment_header
     assert_equal testing_comment_header,
-%()
+%(+----------------------+--------------------------------------------------------------------------------+--------------------------------------------------------------------------------+
+| triggered catch      | start_configuration_formatted                                                  | expected_lane_positions_formatted                                              |
++----------------------+--------------------------------------------------------------------------------+--------------------------------------------------------------------------------+
+| ☝ ▶[Create form]     | ⛾ ▶Create                  ☝ ▶Create form                        ☑ ▶#<Trail... | ⛾ ▶Create                  ☝ ▶Create                             ☑ ▶#<Trail... |
+| ☝ ▶[Create]          | ⛾ ▶Create                  ☝ ▶Create                             ☑ ▶#<Trail... | ⛾ ▶Update ▶Notify approver ☝ ▶Update form ▶Notify approver       ☑ ▶#<Trail... |
+| ☝ ▶[Create]          | ⛾ ▶Create                  ☝ ▶Create                             ☑ ▶#<Trail... | ⛾ ▶Create                  ☝ ▶Create                             ☑ ▶#<Trail... |
+| ☝ ▶[Update form]     | ⛾ ▶Update ▶Notify approver ☝ ▶Update form ▶Notify approver       ☑ ▶#<Trail... | ⛾ ▶Update ▶Notify approver ☝ ▶Update                             ☑ ▶#<Trail... |
+| ☝ ▶[Notify approver] | ⛾ ▶Update ▶Notify approver ☝ ▶Update form ▶Notify approver       ☑ ▶#<Trail... | ⛾ ▶Publish ▶Delete ▶Update ☝ ▶Update form ▶Delete? form ▶Publish ☑ ◉End.fai... |
+| ☝ ▶[Update]          | ⛾ ▶Update ▶Notify approver ☝ ▶Update                             ☑ ▶#<Trail... | ⛾ ▶Notify approver ▶Update ☝ ▶Update form ▶Notify approver       ☑ ▶#<Trail... |
+| ☝ ▶[Notify approver] | ⛾ ▶Update ▶Notify approver ☝ ▶Update form ▶Notify approver       ☑ ▶#<Trail... | ⛾ ▶Revise                  ☝ ▶Revise form                        ☑ ◉End.suc... |
+| ☝ ▶[Delete? form]    | ⛾ ▶Publish ▶Delete ▶Update ☝ ▶Update form ▶Delete? form ▶Publish               | ⛾ ▶Publish ▶Delete ▶Update ☝ ▶Delete ▶Cancel                     ☑ ◉End.fai... |
+| ☝ ▶[Publish]         | ⛾ ▶Publish ▶Delete ▶Update ☝ ▶Update form ▶Delete? form ▶Publish               | ⛾ ▶Archive                 ☝ ▶Archive                            ☑ ◉End.fai... |
+| ☝ ▶[Update]          | ⛾ ▶Update ▶Notify approver ☝ ▶Update                             ☑ ▶#<Trail... | ⛾ ▶Update ▶Notify approver ☝ ▶Update                             ☑ ▶#<Trail... |
+| ☝ ▶[Revise form]     | ⛾ ▶Revise                  ☝ ▶Revise form                                      | ⛾ ▶Revise                  ☝ ▶Revise                             ☑ ◉End.suc... |
+| ☝ ▶[Delete]          | ⛾ ▶Publish ▶Delete ▶Update ☝ ▶Delete ▶Cancel                                   | ⛾ ◉End.success             ☝ ◉End.success                        ☑ ◉End.fai... |
+| ☝ ▶[Cancel]          | ⛾ ▶Publish ▶Delete ▶Update ☝ ▶Delete ▶Cancel                                   | ⛾ ▶Publish ▶Delete ▶Update ☝ ▶Update form ▶Delete? form ▶Publish ☑ ◉End.fai... |
+| ☝ ▶[Archive]         | ⛾ ▶Archive                 ☝ ▶Archive                                          | ⛾ ◉End.success             ☝ ◉End.success                        ☑ ◉End.fai... |
+| ☝ ▶[Revise]          | ⛾ ▶Revise                  ☝ ▶Revise                                           | ⛾ ▶Revise ▶Notify approver ☝ ▶Update form ▶Notify approver       ☑ ◉End.suc... |
++----------------------+--------------------------------------------------------------------------------+--------------------------------------------------------------------------------+
+15 rows in set)
 
 
 
