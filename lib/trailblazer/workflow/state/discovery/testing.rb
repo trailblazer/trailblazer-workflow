@@ -47,6 +47,8 @@ module Trailblazer
                 },
                 start_configuration: serialized_start_configuration,
                 expected_lane_positions: expected_lane_positions,
+
+                expected_outcome: additional_state_data[[state.state_from_discovery_fixme.object_id, :outcome]],
               }
             end
           end
@@ -55,6 +57,8 @@ module Trailblazer
           def self.render_comment_header(structure, lane_icons:)
             cli_rows = structure.collect do |testing_row| # row = :start_position, :start_configuration, :expected_lane_positions
               triggered_catch_event_label = Discovery.readable_name_for_catch_event(testing_row[:start_position], lane_icons: lane_icons)
+
+              triggered_catch_event_label += " ⛞" if testing_row[:expected_outcome] == :failure # FIXME: what happens to :symbol after serialization?
 
               start_configuration = testing_row[:start_configuration].collect do |lane_position|
                 Discovery.readable_name_for_resume_event(lane_position, tuple: true)

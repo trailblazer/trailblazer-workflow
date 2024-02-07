@@ -85,7 +85,8 @@
           ]
         ]
       }
-    ]
+    ],
+    "expected_outcome": "success"
   },
   {
     "start_position": {
@@ -175,7 +176,8 @@
           ]
         ]
       }
-    ]
+    ],
+    "expected_outcome": "success"
   },
   {
     "start_position": {
@@ -263,7 +265,8 @@
           ]
         ]
       }
-    ]
+    ],
+    "expected_outcome": "failure"
   },
   {
     "start_position": {
@@ -354,7 +357,8 @@
           ]
         ]
       }
-    ]
+    ],
+    "expected_outcome": "success"
   },
   {
     "start_position": {
@@ -446,7 +450,8 @@
           "failure"
         ]
       }
-    ]
+    ],
+    "expected_outcome": "success"
   },
   {
     "start_position": {
@@ -537,7 +542,8 @@
           ]
         ]
       }
-    ]
+    ],
+    "expected_outcome": "success"
   },
   {
     "start_position": {
@@ -625,7 +631,8 @@
           "success"
         ]
       }
-    ]
+    ],
+    "expected_outcome": "failure"
   },
   {
     "start_position": {
@@ -706,7 +713,8 @@
           "failure"
         ]
       }
-    ]
+    ],
+    "expected_outcome": "success"
   },
   {
     "start_position": {
@@ -784,7 +792,8 @@
           "failure"
         ]
       }
-    ]
+    ],
+    "expected_outcome": "success"
   },
   {
     "start_position": {
@@ -874,7 +883,8 @@
           ]
         ]
       }
-    ]
+    ],
+    "expected_outcome": "failure"
   },
   {
     "start_position": {
@@ -948,7 +958,8 @@
           "success"
         ]
       }
-    ]
+    ],
+    "expected_outcome": "success"
   },
   {
     "start_position": {
@@ -1021,7 +1032,8 @@
           "failure"
         ]
       }
-    ]
+    ],
+    "expected_outcome": "success"
   },
   {
     "start_position": {
@@ -1102,7 +1114,8 @@
           "failure"
         ]
       }
-    ]
+    ],
+    "expected_outcome": "success"
   },
   {
     "start_position": {
@@ -1172,7 +1185,8 @@
           "failure"
         ]
       }
-    ]
+    ],
+    "expected_outcome": "success"
   },
   {
     "start_position": {
@@ -1248,6 +1262,7 @@
           "success"
         ]
       }
-    ]
+    ],
+    "expected_outcome": "success"
   }
 ]

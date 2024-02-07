@@ -216,7 +216,8 @@ class CollaborationTest < Minitest::Spec
       [
         start_position,
         extended_initial_lane_positions,
-        {} # ctx_merge
+        {}, # ctx_merge
+        {outcome: :success} # config_payload
       ]
     ]
 
@@ -231,17 +232,17 @@ class CollaborationTest < Minitest::Spec
     run_multiple_times = {
       # suspend after Notify approver in lifecycle
       # We're "clicking" the [Notify_approver] button again, this time to get rejected.
-      Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_notify_approver}").task => {ctx_merge: {decision: false}},
+      Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_notify_approver}").task => {ctx_merge: {decision: false}, config_payload: {outcome: :failure}},
 
       # Click [UI Create] again, with invalid data.
-      Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_create}").task => {ctx_merge: {create: false}}, # lifecycle create is supposed to fail.
+      Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_create}").task => {ctx_merge: {create: false}, config_payload: {outcome: :failure}}, # lifecycle create is supposed to fail.
 
       # Click [UI Update] again, with invalid data.
-      Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_update}").task => {ctx_merge: {update: false}}, # lifecycle create is supposed to fail.
+      Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_update}").task => {ctx_merge: {update: false}, config_payload: {outcome: :failure}}, # lifecycle create is supposed to fail.
     }
 
     while resumes_to_invoke.any?
-      (start_position, lane_positions, ctx_merge) = resumes_to_invoke.shift
+      (start_position, lane_positions, ctx_merge, config_payload) = resumes_to_invoke.shift
       puts "~~~~~~~~~"
 
       ctx = {seq: []}.merge(ctx_merge)
@@ -251,7 +252,8 @@ class CollaborationTest < Minitest::Spec
         resumes_to_invoke << [
           start_position,
           lane_positions, # same positions as the original situation.
-          do_again_config[:ctx_merge]
+          do_again_config[:ctx_merge],
+          do_again_config[:config_payload]
         ]
 
         already_visited_catch_events_again[start_task] = true
@@ -274,9 +276,13 @@ class CollaborationTest < Minitest::Spec
         message_flow: extended_message_flow,
       )
 
+    # 3. optional feature: outcome marking
+      additional_state_data[[state.object_id, :outcome]] = config_payload[:outcome]
+
+
     # 1. optional feature: tracing
       state_data << ctx.inspect # context after. DISCUSS: use tracing?
-      additional_state_data[state.object_id] = state_data
+      additional_state_data[[state.object_id, :ctx]] = state_data
 
     # 2. optional feature: remember stop configuration so we can use that in a test.
       # raise configuration.inspect
@@ -300,7 +306,8 @@ class CollaborationTest < Minitest::Spec
           resumes_to_invoke << [
             Trailblazer::Workflow::Collaboration::Position.new(last_lane, resume_event),
             configuration.lane_positions,
-            {}
+            {},
+            {outcome: :success}
           ]
         end
 
@@ -519,6 +526,8 @@ Every configuration has one (or several) names, e.g. "created" and "updated"
 
 This event is possible because process_model is in configuration ABC ("state")
 =end
+# pp additional_state_data
+
     testing_structure = Trailblazer::Workflow::State::Discovery::Testing.render_structure(
       states,
       lanes: {lane_activity => "lifecycle", lane_activity_ui => "UI", approver_activity => "approver"},
@@ -533,25 +542,25 @@ This event is possible because process_model is in configuration ABC ("state")
     testing_comment_header = Trailblazer::Workflow::State::Discovery::Testing.render_comment_header(testing_structure, lane_icons: {"UI" => "☝", "lifecycle" => "⛾", "approver" => "☑"})
     puts testing_comment_header
     assert_equal testing_comment_header,
-%(+--------------------+---------------------------------------------------------------------------------+---------------------------------------------------------------------------------+
-| triggered catch    | start_configuration_formatted                                                   | expected_lane_positions_formatted                                               |
-+--------------------+---------------------------------------------------------------------------------+---------------------------------------------------------------------------------+
-| ☝ ▶Create form     | ⛾ ▶Create                  ☝ ▶Create form                        ☑ ▶#<Trailb... | ⛾ ▶Create                  ☝ ▶Create                             ☑ ▶#<Trailb... |
-| ☝ ▶Create          | ⛾ ▶Create                  ☝ ▶Create                             ☑ ▶#<Trailb... | ⛾ ▶Update ▶Notify approver ☝ ▶Update form ▶Notify approver       ☑ ▶#<Trailb... |
-| ☝ ▶Create          | ⛾ ▶Create                  ☝ ▶Create                             ☑ ▶#<Trailb... | ⛾ ▶Create                  ☝ ▶Create                             ☑ ▶#<Trailb... |
-| ☝ ▶Update form     | ⛾ ▶Update ▶Notify approver ☝ ▶Update form ▶Notify approver       ☑ ▶#<Trailb... | ⛾ ▶Update ▶Notify approver ☝ ▶Update                             ☑ ▶#<Trailb... |
-| ☝ ▶Notify approver | ⛾ ▶Update ▶Notify approver ☝ ▶Update form ▶Notify approver       ☑ ▶#<Trailb... | ⛾ ▶Publish ▶Delete ▶Update ☝ ▶Update form ▶Delete? form ▶Publish ☑ ◉End.fail... |
-| ☝ ▶Update          | ⛾ ▶Update ▶Notify approver ☝ ▶Update                             ☑ ▶#<Trailb... | ⛾ ▶Notify approver ▶Update ☝ ▶Update form ▶Notify approver       ☑ ▶#<Trailb... |
-| ☝ ▶Notify approver | ⛾ ▶Update ▶Notify approver ☝ ▶Update form ▶Notify approver       ☑ ▶#<Trailb... | ⛾ ▶Revise                  ☝ ▶Revise form                        ☑ ◉End.succ... |
-| ☝ ▶Delete? form    | ⛾ ▶Publish ▶Delete ▶Update ☝ ▶Update form ▶Delete? form ▶Publish                | ⛾ ▶Publish ▶Delete ▶Update ☝ ▶Delete ▶Cancel                     ☑ ◉End.fail... |
-| ☝ ▶Publish         | ⛾ ▶Publish ▶Delete ▶Update ☝ ▶Update form ▶Delete? form ▶Publish                | ⛾ ▶Archive                 ☝ ▶Archive                            ☑ ◉End.fail... |
-| ☝ ▶Update          | ⛾ ▶Update ▶Notify approver ☝ ▶Update                             ☑ ▶#<Trailb... | ⛾ ▶Update ▶Notify approver ☝ ▶Update                             ☑ ▶#<Trailb... |
-| ☝ ▶Revise form     | ⛾ ▶Revise                  ☝ ▶Revise form                                       | ⛾ ▶Revise                  ☝ ▶Revise                             ☑ ◉End.succ... |
-| ☝ ▶Delete          | ⛾ ▶Publish ▶Delete ▶Update ☝ ▶Delete ▶Cancel                                    | ⛾ ◉End.success             ☝ ◉End.success                        ☑ ◉End.fail... |
-| ☝ ▶Cancel          | ⛾ ▶Publish ▶Delete ▶Update ☝ ▶Delete ▶Cancel                                    | ⛾ ▶Publish ▶Delete ▶Update ☝ ▶Update form ▶Delete? form ▶Publish ☑ ◉End.fail... |
-| ☝ ▶Archive         | ⛾ ▶Archive                 ☝ ▶Archive                                           | ⛾ ◉End.success             ☝ ◉End.success                        ☑ ◉End.fail... |
-| ☝ ▶Revise          | ⛾ ▶Revise                  ☝ ▶Revise                                            | ⛾ ▶Revise ▶Notify approver ☝ ▶Update form ▶Notify approver       ☑ ◉End.succ... |
-+--------------------+---------------------------------------------------------------------------------+---------------------------------------------------------------------------------+
+%(+----------------------+--------------------------------------------------------------------------------+--------------------------------------------------------------------------------+
+| triggered catch      | start_configuration_formatted                                                  | expected_lane_positions_formatted                                              |
++----------------------+--------------------------------------------------------------------------------+--------------------------------------------------------------------------------+
+| ☝ ▶Create form       | ⛾ ▶Create                  ☝ ▶Create form                        ☑ ▶#<Trail... | ⛾ ▶Create                  ☝ ▶Create                             ☑ ▶#<Trail... |
+| ☝ ▶Create            | ⛾ ▶Create                  ☝ ▶Create                             ☑ ▶#<Trail... | ⛾ ▶Update ▶Notify approver ☝ ▶Update form ▶Notify approver       ☑ ▶#<Trail... |
+| ☝ ▶Create ⛞          | ⛾ ▶Create                  ☝ ▶Create                             ☑ ▶#<Trail... | ⛾ ▶Create                  ☝ ▶Create                             ☑ ▶#<Trail... |
+| ☝ ▶Update form       | ⛾ ▶Update ▶Notify approver ☝ ▶Update form ▶Notify approver       ☑ ▶#<Trail... | ⛾ ▶Update ▶Notify approver ☝ ▶Update                             ☑ ▶#<Trail... |
+| ☝ ▶Notify approver   | ⛾ ▶Update ▶Notify approver ☝ ▶Update form ▶Notify approver       ☑ ▶#<Trail... | ⛾ ▶Publish ▶Delete ▶Update ☝ ▶Update form ▶Delete? form ▶Publish ☑ ◉End.fai... |
+| ☝ ▶Update            | ⛾ ▶Update ▶Notify approver ☝ ▶Update                             ☑ ▶#<Trail... | ⛾ ▶Notify approver ▶Update ☝ ▶Update form ▶Notify approver       ☑ ▶#<Trail... |
+| ☝ ▶Notify approver ⛞ | ⛾ ▶Update ▶Notify approver ☝ ▶Update form ▶Notify approver       ☑ ▶#<Trail... | ⛾ ▶Revise                  ☝ ▶Revise form                        ☑ ◉End.suc... |
+| ☝ ▶Delete? form      | ⛾ ▶Publish ▶Delete ▶Update ☝ ▶Update form ▶Delete? form ▶Publish               | ⛾ ▶Publish ▶Delete ▶Update ☝ ▶Delete ▶Cancel                     ☑ ◉End.fai... |
+| ☝ ▶Publish           | ⛾ ▶Publish ▶Delete ▶Update ☝ ▶Update form ▶Delete? form ▶Publish               | ⛾ ▶Archive                 ☝ ▶Archive                            ☑ ◉End.fai... |
+| ☝ ▶Update ⛞          | ⛾ ▶Update ▶Notify approver ☝ ▶Update                             ☑ ▶#<Trail... | ⛾ ▶Update ▶Notify approver ☝ ▶Update                             ☑ ▶#<Trail... |
+| ☝ ▶Revise form       | ⛾ ▶Revise                  ☝ ▶Revise form                                      | ⛾ ▶Revise                  ☝ ▶Revise                             ☑ ◉End.suc... |
+| ☝ ▶Delete            | ⛾ ▶Publish ▶Delete ▶Update ☝ ▶Delete ▶Cancel                                   | ⛾ ◉End.success             ☝ ◉End.success                        ☑ ◉End.fai... |
+| ☝ ▶Cancel            | ⛾ ▶Publish ▶Delete ▶Update ☝ ▶Delete ▶Cancel                                   | ⛾ ▶Publish ▶Delete ▶Update ☝ ▶Update form ▶Delete? form ▶Publish ☑ ◉End.fai... |
+| ☝ ▶Archive           | ⛾ ▶Archive                 ☝ ▶Archive                                          | ⛾ ◉End.success             ☝ ◉End.success                        ☑ ◉End.fai... |
+| ☝ ▶Revise            | ⛾ ▶Revise                  ☝ ▶Revise                                           | ⛾ ▶Revise ▶Notify approver ☝ ▶Update form ▶Notify approver       ☑ ◉End.suc... |
++----------------------+--------------------------------------------------------------------------------+--------------------------------------------------------------------------------+
 15 rows in set)
 
 
