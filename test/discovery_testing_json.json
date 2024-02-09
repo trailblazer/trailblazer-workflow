@@ -86,7 +86,8 @@
         ]
       }
     ],
-    "expected_outcome": "success"
+    "expected_outcome": "success",
+    "event_label": "☝ ▶Create form"
   },
   {
     "start_position": {
@@ -177,7 +178,8 @@
         ]
       }
     ],
-    "expected_outcome": "success"
+    "expected_outcome": "success",
+    "event_label": "☝ ▶Create"
   },
   {
     "start_position": {
@@ -266,7 +268,8 @@
         ]
       }
     ],
-    "expected_outcome": "failure"
+    "expected_outcome": "failure",
+    "event_label": "☝ ▶Create ⛞"
   },
   {
     "start_position": {
@@ -358,7 +361,8 @@
         ]
       }
     ],
-    "expected_outcome": "success"
+    "expected_outcome": "success",
+    "event_label": "☝ ▶Update form"
   },
   {
     "start_position": {
@@ -451,7 +455,8 @@
         ]
       }
     ],
-    "expected_outcome": "success"
+    "expected_outcome": "success",
+    "event_label": "☝ ▶Notify approver"
   },
   {
     "start_position": {
@@ -543,7 +548,8 @@
         ]
       }
     ],
-    "expected_outcome": "success"
+    "expected_outcome": "success",
+    "event_label": "☝ ▶Update"
   },
   {
     "start_position": {
@@ -632,7 +638,8 @@
         ]
       }
     ],
-    "expected_outcome": "failure"
+    "expected_outcome": "failure",
+    "event_label": "☝ ▶Notify approver ⛞"
   },
   {
     "start_position": {
@@ -714,7 +721,8 @@
         ]
       }
     ],
-    "expected_outcome": "success"
+    "expected_outcome": "success",
+    "event_label": "☝ ▶Delete? form"
   },
   {
     "start_position": {
@@ -793,7 +801,8 @@
         ]
       }
     ],
-    "expected_outcome": "success"
+    "expected_outcome": "success",
+    "event_label": "☝ ▶Publish"
   },
   {
     "start_position": {
@@ -884,7 +893,8 @@
         ]
       }
     ],
-    "expected_outcome": "failure"
+    "expected_outcome": "failure",
+    "event_label": "☝ ▶Update ⛞"
   },
   {
     "start_position": {
@@ -959,7 +969,8 @@
         ]
       }
     ],
-    "expected_outcome": "success"
+    "expected_outcome": "success",
+    "event_label": "☝ ▶Revise form"
   },
   {
     "start_position": {
@@ -1033,7 +1044,8 @@
         ]
       }
     ],
-    "expected_outcome": "success"
+    "expected_outcome": "success",
+    "event_label": "☝ ▶Delete"
   },
   {
     "start_position": {
@@ -1115,7 +1127,8 @@
         ]
       }
     ],
-    "expected_outcome": "success"
+    "expected_outcome": "success",
+    "event_label": "☝ ▶Cancel"
   },
   {
     "start_position": {
@@ -1186,7 +1199,8 @@
         ]
       }
     ],
-    "expected_outcome": "success"
+    "expected_outcome": "success",
+    "event_label": "☝ ▶Archive"
   },
   {
     "start_position": {
@@ -1263,6 +1277,7 @@
         ]
       }
     ],
-    "expected_outcome": "success"
+    "expected_outcome": "success",
+    "event_label": "☝ ▶Revise"
   }
 ]

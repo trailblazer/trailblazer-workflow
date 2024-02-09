@@ -531,15 +531,17 @@ This event is possible because process_model is in configuration ABC ("state")
     testing_structure = Trailblazer::Workflow::State::Discovery::Testing.render_structure(
       states,
       lanes: {lane_activity => "lifecycle", lane_activity_ui => "UI", approver_activity => "approver"},
-      task_map: task_map,
       additional_state_data: additional_state_data,
+      lane_icons: lane_icons = {"UI" => "☝", "lifecycle" => "⛾", "approver" => "☑"},
     )
 
     testing_json = JSON.pretty_generate(testing_structure)
     # File.write "test/discovery_testing_json.json",  testing_json
     assert_equal testing_json, File.read("test/discovery_testing_json.json")
 
-    testing_comment_header = Trailblazer::Workflow::State::Discovery::Testing.render_comment_header(testing_structure, lane_icons: {"UI" => "☝", "lifecycle" => "⛾", "approver" => "☑"})
+
+    # This rendering can be based on testing_structure from {states} because it always happens directly after a discovery run.
+    testing_comment_header = Trailblazer::Workflow::State::Discovery::Testing.render_comment_header(testing_structure, lane_icons: lane_icons)
     puts testing_comment_header
     assert_equal testing_comment_header,
 %(+----------------------+--------------------------------------------------------------------------------+--------------------------------------------------------------------------------+
@@ -562,6 +564,57 @@ This event is possible because process_model is in configuration ABC ("state")
 | ☝ ▶Revise            | ⛾ ▶Revise                  ☝ ▶Revise                                           | ⛾ ▶Revise ▶Notify approver ☝ ▶Update form ▶Notify approver       ☑ ◉End.suc... |
 +----------------------+--------------------------------------------------------------------------------+--------------------------------------------------------------------------------+
 15 rows in set)
+
+    # TODO: we should be parsing the testing_json into {testing_structure} and generate a test plan from it
+    # test_plan = Test::Plan.build(
+    #   json: testing_json,
+    #   input: {
+    #     "▶Create form" => {params: {}}
+    #     "▶Update ⛞" => {params: {posting: {title: ""}}}
+    #   }
+    #   output: { # this is what we expect
+    #     "▶Update ⛞" => {"contract.default" => ->(*) { errors }}
+    #   }
+    # )
+
+    puts Trailblazer::Workflow::Test::Plan.for( # TODO: this is the 2nd step after parsing {testing_json}.
+      testing_structure,
+
+      input: {
+        "▶Create form" => {params: {}},
+        "▶Update ⛞" => {params: {posting: {title: ""}}},
+      }
+    )
+
+
+lanes = ___lanes___.invert
+
+# test: ☝ ▶Revise
+
+start_tuple = ["UI", "catch-before-Activity_1wiumzv"] # ["before", "Revise"]
+start_position = Trailblazer::Workflow::State::Discovery.position_from_tuple(lanes, *start_tuple)
+
+# current position.
+#DISCUSS: here, we could also ask the State layer for the start configuration, on a different level.
+lane_positions = [Trailblazer::Workflow::State::Discovery.position_from_tuple(lanes, *["lifecycle", "suspend-Gateway_01p7uj7"]), Trailblazer::Workflow::State::Discovery.position_from_tuple(lanes, *["UI", "suspend-Gateway_1xs96ik"])]
+
+configuration, (ctx, flow) = Trailblazer::Workflow::Collaboration::Synchronous.advance(
+  schema,
+  [{seq: []}, {throw: []}],
+  {}, # circuit_options
+
+  start_position: start_position,
+  lane_positions: lane_positions, # current position/"state"
+
+  message_flow: message_flow,
+)
+
+
+
+
+
+
+
 
 
 

@@ -3,10 +3,12 @@ module Trailblazer
     class State
       module Discovery
         module Testing
+          module_function
+
           # DISCUSS: In the Testing JSON, we want
           #   1. start event, start configuration, input => expected suspend configuration
           #   2. a "comment" table above that which draws out the same in readable format.
-          def self.render_structure(states, lanes:, additional_state_data:, task_map:)
+          def self.render_structure(states, lanes:, additional_state_data:, lane_icons:)
             present_states = Trailblazer::Workflow::State::Discovery.generate_from(states) # returns rows with [{activity, suspend, resumes}]
 
 # FIXME: we're actually going through events here, not states!
@@ -40,25 +42,35 @@ module Trailblazer
 
               serialized_start_configuration = serialized_start_configuration.compact # FIXME: what the hecke is this?
 
-              {
-                start_position: {
-                  tuple: [activity_id, triggered_catch_event_id],
+              start_p___FIXME = {
+                  tuple: start=[activity_id, triggered_catch_event_id],
                   comment: ["before", Discovery.find_next_task_label(start_position.activity, start_position.task)]
-                },
+                }
+
+              {
+                start_position: start_p___FIXME,
                 start_configuration: serialized_start_configuration,
                 expected_lane_positions: expected_lane_positions,
 
-                expected_outcome: additional_state_data[[state.state_from_discovery_fixme.object_id, :outcome]],
+                expected_outcome: expected_outcome= additional_state_data[[state.state_from_discovery_fixme.object_id, :outcome]],
+
+                event_label: default_event_label(start_p___FIXME, expected_outcome: expected_outcome, lane_icons: lane_icons)
               }
             end
+          end
+
+          def default_event_label(tuple, expected_outcome:, **options)
+            event_label = Discovery.readable_name_for_catch_event(tuple, **options)
+
+            event_label += " ⛞" if expected_outcome == :failure # FIXME: what happens to :symbol after serialization?
+
+            event_label
           end
 
           # Render the "test plan" in readable form.
           def self.render_comment_header(structure, lane_icons:)
             cli_rows = structure.collect do |testing_row| # row = :start_position, :start_configuration, :expected_lane_positions
-              triggered_catch_event_label = Discovery.readable_name_for_catch_event(testing_row[:start_position], lane_icons: lane_icons)
-
-              triggered_catch_event_label += " ⛞" if testing_row[:expected_outcome] == :failure # FIXME: what happens to :symbol after serialization?
+              triggered_catch_event_label = testing_row[:event_label]
 
               start_configuration = testing_row[:start_configuration].collect do |lane_position|
                 Discovery.readable_name_for_resume_event(lane_position, tuple: true)
@@ -171,6 +183,7 @@ module Trailblazer
 
             Discovery.readable_name_for_resume_event(position, lane_icons: lane_icons, tuple: tuple)
           end
+
 
         end # Testing
       end

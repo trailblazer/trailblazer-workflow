@@ -5,6 +5,19 @@ module Trailblazer
       #
       # {states} are lane positions: [activity, suspend] tuples.
       module Discovery
+        module_function
+
+        # FIXME: move  me somewhere else!
+        # "Deserialize" a {Position} from a serialized tuple.
+        # Opposite of {#id_tuple_for}.
+        def position_from_tuple(lanes, lane_id, task_id)
+          lane_activity = lanes[lane_id]
+          task = Trailblazer::Activity::Introspect.Nodes(lane_activity, id: task_id).task
+
+          Collaboration::Position.new(lane_activity, task)
+        end
+
+
         module Present
           # Maintains the following fields
           # start_position: where we started
