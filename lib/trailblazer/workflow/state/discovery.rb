@@ -54,7 +54,7 @@ module Trailblazer
             # catch_event =
 
             # Go through each lane.
-            lane_position_tuples = lane_positions.flat_map do |lane_position|
+            lane_position_tuples = lane_positions.to_a.collect do |lane_position|
               next if lane_position.nil? # FIXME: why do we have that?
 
 
@@ -246,11 +246,10 @@ module Trailblazer
           rows = states.collect do |state|
 
             lane_positions, start_position = state # DISCUSS: introduce a Discovery::State object?
-
             # triggered_catch_event_id = Trailblazer::Activity::Introspect.Nodes(start_position.activity, task: start_position.task).id
 
             # Go through each lane.
-            row = lane_positions.flat_map do |activity, suspend|
+            row = lane_positions.collect do |activity, suspend|
               next if suspend.to_h["resumes"].nil?
 
               resumes = resumes_from_suspend(activity, suspend)

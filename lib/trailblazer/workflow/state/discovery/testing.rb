@@ -125,9 +125,13 @@ module Trailblazer
 
             columns_2_length = columns.collect { |lane_label, lengths| [lane_label, lengths.sort.last] }.to_h
 
-            # TODO: always same col order!!!
             rows = rows.collect do |row|
-              columns = row[column_name].collect do |lane_label, catch_label|
+              position_columns = Hash[row[column_name]]
+
+              sorted_columns = lane_icons.keys.collect { |name, _| [name, position_columns[name]] }
+
+
+              columns = sorted_columns.collect do |lane_label, catch_label|
                 col_length = columns_2_length[lane_label]
                 lane_label = lane_icons[lane_label]
 

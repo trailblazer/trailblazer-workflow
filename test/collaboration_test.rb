@@ -203,6 +203,8 @@ class CollaborationTest < Minitest::Spec
     extended_initial_lane_positions = initial_lane_positions.merge(
       approver_activity => approver_start_suspend
     )
+    extended_initial_lane_positions = Trailblazer::Workflow::Collaboration::Positions.new(extended_initial_lane_positions.collect { |activity, task| Trailblazer::Workflow::Collaboration::Position.new(activity, task) })
+
 
 # State discovery:
 # The idea is that we collect suspend events and follow up on all their resumes (catch) events.
@@ -382,6 +384,8 @@ class CollaborationTest < Minitest::Spec
       ], max_width: 186) # 186 for laptop 13"
     end
 
+
+
     render_states(states, lanes: ___lanes___ = {lane_activity => "lifecycle", lane_activity_ui => "UI", approver_activity => "approver"}, additional_state_data: additional_state_data, task_map: task_map)
 # raise "figure out how to build a generated state table"
 
@@ -547,21 +551,21 @@ This event is possible because process_model is in configuration ABC ("state")
 %(+----------------------+--------------------------------------------------------------------------------+--------------------------------------------------------------------------------+
 | triggered catch      | start_configuration_formatted                                                  | expected_lane_positions_formatted                                              |
 +----------------------+--------------------------------------------------------------------------------+--------------------------------------------------------------------------------+
-| ☝ ▶Create form       | ⛾ ▶Create                  ☝ ▶Create form                        ☑ ▶#<Trail... | ⛾ ▶Create                  ☝ ▶Create                             ☑ ▶#<Trail... |
-| ☝ ▶Create            | ⛾ ▶Create                  ☝ ▶Create                             ☑ ▶#<Trail... | ⛾ ▶Update ▶Notify approver ☝ ▶Update form ▶Notify approver       ☑ ▶#<Trail... |
-| ☝ ▶Create ⛞          | ⛾ ▶Create                  ☝ ▶Create                             ☑ ▶#<Trail... | ⛾ ▶Create                  ☝ ▶Create                             ☑ ▶#<Trail... |
-| ☝ ▶Update form       | ⛾ ▶Update ▶Notify approver ☝ ▶Update form ▶Notify approver       ☑ ▶#<Trail... | ⛾ ▶Update ▶Notify approver ☝ ▶Update                             ☑ ▶#<Trail... |
-| ☝ ▶Notify approver   | ⛾ ▶Update ▶Notify approver ☝ ▶Update form ▶Notify approver       ☑ ▶#<Trail... | ⛾ ▶Publish ▶Delete ▶Update ☝ ▶Update form ▶Delete? form ▶Publish ☑ ◉End.fai... |
-| ☝ ▶Update            | ⛾ ▶Update ▶Notify approver ☝ ▶Update                             ☑ ▶#<Trail... | ⛾ ▶Notify approver ▶Update ☝ ▶Update form ▶Notify approver       ☑ ▶#<Trail... |
-| ☝ ▶Notify approver ⛞ | ⛾ ▶Update ▶Notify approver ☝ ▶Update form ▶Notify approver       ☑ ▶#<Trail... | ⛾ ▶Revise                  ☝ ▶Revise form                        ☑ ◉End.suc... |
-| ☝ ▶Delete? form      | ⛾ ▶Publish ▶Delete ▶Update ☝ ▶Update form ▶Delete? form ▶Publish               | ⛾ ▶Publish ▶Delete ▶Update ☝ ▶Delete ▶Cancel                     ☑ ◉End.fai... |
-| ☝ ▶Publish           | ⛾ ▶Publish ▶Delete ▶Update ☝ ▶Update form ▶Delete? form ▶Publish               | ⛾ ▶Archive                 ☝ ▶Archive                            ☑ ◉End.fai... |
-| ☝ ▶Update ⛞          | ⛾ ▶Update ▶Notify approver ☝ ▶Update                             ☑ ▶#<Trail... | ⛾ ▶Update ▶Notify approver ☝ ▶Update                             ☑ ▶#<Trail... |
-| ☝ ▶Revise form       | ⛾ ▶Revise                  ☝ ▶Revise form                                      | ⛾ ▶Revise                  ☝ ▶Revise                             ☑ ◉End.suc... |
-| ☝ ▶Delete            | ⛾ ▶Publish ▶Delete ▶Update ☝ ▶Delete ▶Cancel                                   | ⛾ ◉End.success             ☝ ◉End.success                        ☑ ◉End.fai... |
-| ☝ ▶Cancel            | ⛾ ▶Publish ▶Delete ▶Update ☝ ▶Delete ▶Cancel                                   | ⛾ ▶Publish ▶Delete ▶Update ☝ ▶Update form ▶Delete? form ▶Publish ☑ ◉End.fai... |
-| ☝ ▶Archive           | ⛾ ▶Archive                 ☝ ▶Archive                                          | ⛾ ◉End.success             ☝ ◉End.success                        ☑ ◉End.fai... |
-| ☝ ▶Revise            | ⛾ ▶Revise                  ☝ ▶Revise                                           | ⛾ ▶Revise ▶Notify approver ☝ ▶Update form ▶Notify approver       ☑ ◉End.suc... |
+| ☝ ▶Create form       | ☝ ▶Create form                        ⛾ ▶Create                  ☑ ▶#<Trail... | ☝ ▶Create                             ⛾ ▶Create                  ☑ ▶#<Trail... |
+| ☝ ▶Create            | ☝ ▶Create                             ⛾ ▶Create                  ☑ ▶#<Trail... | ☝ ▶Update form ▶Notify approver       ⛾ ▶Update ▶Notify approver ☑ ▶#<Trail... |
+| ☝ ▶Create ⛞          | ☝ ▶Create                             ⛾ ▶Create                  ☑ ▶#<Trail... | ☝ ▶Create                             ⛾ ▶Create                  ☑ ▶#<Trail... |
+| ☝ ▶Update form       | ☝ ▶Update form ▶Notify approver       ⛾ ▶Update ▶Notify approver ☑ ▶#<Trail... | ☝ ▶Update                             ⛾ ▶Update ▶Notify approver ☑ ▶#<Trail... |
+| ☝ ▶Notify approver   | ☝ ▶Update form ▶Notify approver       ⛾ ▶Update ▶Notify approver ☑ ▶#<Trail... | ☝ ▶Update form ▶Delete? form ▶Publish ⛾ ▶Publish ▶Delete ▶Update ☑ ◉End.fai... |
+| ☝ ▶Update            | ☝ ▶Update                             ⛾ ▶Update ▶Notify approver ☑ ▶#<Trail... | ☝ ▶Update form ▶Notify approver       ⛾ ▶Notify approver ▶Update ☑ ▶#<Trail... |
+| ☝ ▶Notify approver ⛞ | ☝ ▶Update form ▶Notify approver       ⛾ ▶Update ▶Notify approver ☑ ▶#<Trail... | ☝ ▶Revise form                        ⛾ ▶Revise                  ☑ ◉End.suc... |
+| ☝ ▶Delete? form      | ☝ ▶Update form ▶Delete? form ▶Publish ⛾ ▶Publish ▶Delete ▶Update ☑         ... | ☝ ▶Delete ▶Cancel                     ⛾ ▶Publish ▶Delete ▶Update ☑ ◉End.fai... |
+| ☝ ▶Publish           | ☝ ▶Update form ▶Delete? form ▶Publish ⛾ ▶Publish ▶Delete ▶Update ☑         ... | ☝ ▶Archive                            ⛾ ▶Archive                 ☑ ◉End.fai... |
+| ☝ ▶Update ⛞          | ☝ ▶Update                             ⛾ ▶Update ▶Notify approver ☑ ▶#<Trail... | ☝ ▶Update                             ⛾ ▶Update ▶Notify approver ☑ ▶#<Trail... |
+| ☝ ▶Revise form       | ☝ ▶Revise form                        ⛾ ▶Revise                  ☑         ... | ☝ ▶Revise                             ⛾ ▶Revise                  ☑ ◉End.suc... |
+| ☝ ▶Delete            | ☝ ▶Delete ▶Cancel                     ⛾ ▶Publish ▶Delete ▶Update ☑         ... | ☝ ◉End.success                        ⛾ ◉End.success             ☑ ◉End.fai... |
+| ☝ ▶Cancel            | ☝ ▶Delete ▶Cancel                     ⛾ ▶Publish ▶Delete ▶Update ☑         ... | ☝ ▶Update form ▶Delete? form ▶Publish ⛾ ▶Publish ▶Delete ▶Update ☑ ◉End.fai... |
+| ☝ ▶Archive           | ☝ ▶Archive                            ⛾ ▶Archive                 ☑         ... | ☝ ◉End.success                        ⛾ ◉End.success             ☑ ◉End.fai... |
+| ☝ ▶Revise            | ☝ ▶Revise                             ⛾ ▶Revise                  ☑         ... | ☝ ▶Update form ▶Notify approver       ⛾ ▶Revise ▶Notify approver ☑ ◉End.suc... |
 +----------------------+--------------------------------------------------------------------------------+--------------------------------------------------------------------------------+
 15 rows in set)
 
@@ -597,6 +601,9 @@ start_position = Trailblazer::Workflow::State::Discovery.position_from_tuple(lan
 # current position.
 #DISCUSS: here, we could also ask the State layer for the start configuration, on a different level.
 lane_positions = [Trailblazer::Workflow::State::Discovery.position_from_tuple(lanes, *["lifecycle", "suspend-Gateway_01p7uj7"]), Trailblazer::Workflow::State::Discovery.position_from_tuple(lanes, *["UI", "suspend-Gateway_1xs96ik"])]
+
+lane_positions = Trailblazer::Workflow::Collaboration::Positions.new(lane_positions)
+
 
 configuration, (ctx, flow) = Trailblazer::Workflow::Collaboration::Synchronous.advance(
   schema,

@@ -63,18 +63,6 @@
       },
       {
         "tuple": [
-          "UI",
-          "suspend-Gateway_14h0q7a"
-        ],
-        "comment": [
-          "before",
-          [
-            "Create"
-          ]
-        ]
-      },
-      {
-        "tuple": [
           "approver",
           "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
         ],
@@ -82,6 +70,18 @@
           "before",
           [
             "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          ]
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_14h0q7a"
+        ],
+        "comment": [
+          "before",
+          [
+            "Create"
           ]
         ]
       }
@@ -115,6 +115,18 @@
       },
       {
         "tuple": [
+          "approver",
+          "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
+        ],
+        "comment": [
+          "before",
+          [
+            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          ]
+        ]
+      },
+      {
+        "tuple": [
           "UI",
           "suspend-Gateway_14h0q7a"
         ],
@@ -124,7 +136,9 @@
             "Create"
           ]
         ]
-      },
+      }
+    ],
+    "expected_lane_positions": [
       {
         "tuple": [
           "approver",
@@ -136,9 +150,7 @@
             "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
           ]
         ]
-      }
-    ],
-    "expected_lane_positions": [
+      },
       {
         "tuple": [
           "lifecycle",
@@ -162,18 +174,6 @@
           [
             "Update form",
             "Notify approver"
-          ]
-        ]
-      },
-      {
-        "tuple": [
-          "approver",
-          "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
-        ],
-        "comment": [
-          "before",
-          [
-            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
           ]
         ]
       }
@@ -207,6 +207,18 @@
       },
       {
         "tuple": [
+          "approver",
+          "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
+        ],
+        "comment": [
+          "before",
+          [
+            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          ]
+        ]
+      },
+      {
+        "tuple": [
           "UI",
           "suspend-Gateway_14h0q7a"
         ],
@@ -216,7 +228,9 @@
             "Create"
           ]
         ]
-      },
+      }
+    ],
+    "expected_lane_positions": [
       {
         "tuple": [
           "approver",
@@ -228,9 +242,7 @@
             "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
           ]
         ]
-      }
-    ],
-    "expected_lane_positions": [
+      },
       {
         "tuple": [
           "lifecycle",
@@ -254,18 +266,6 @@
             "Create"
           ]
         ]
-      },
-      {
-        "tuple": [
-          "approver",
-          "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
-        ],
-        "comment": [
-          "before",
-          [
-            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
-          ]
-        ]
       }
     ],
     "expected_outcome": "failure",
@@ -283,6 +283,18 @@
       ]
     },
     "start_configuration": [
+      {
+        "tuple": [
+          "approver",
+          "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
+        ],
+        "comment": [
+          "before",
+          [
+            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          ]
+        ]
+      },
       {
         "tuple": [
           "lifecycle",
@@ -308,7 +320,9 @@
             "Notify approver"
           ]
         ]
-      },
+      }
+    ],
+    "expected_lane_positions": [
       {
         "tuple": [
           "approver",
@@ -320,9 +334,7 @@
             "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
           ]
         ]
-      }
-    ],
-    "expected_lane_positions": [
+      },
       {
         "tuple": [
           "lifecycle",
@@ -347,18 +359,6 @@
             "Update"
           ]
         ]
-      },
-      {
-        "tuple": [
-          "approver",
-          "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
-        ],
-        "comment": [
-          "before",
-          [
-            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
-          ]
-        ]
       }
     ],
     "expected_outcome": "success",
@@ -376,6 +376,18 @@
       ]
     },
     "start_configuration": [
+      {
+        "tuple": [
+          "approver",
+          "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
+        ],
+        "comment": [
+          "before",
+          [
+            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          ]
+        ]
+      },
       {
         "tuple": [
           "lifecycle",
@@ -401,21 +413,19 @@
             "Notify approver"
           ]
         ]
-      },
-      {
-        "tuple": [
-          "approver",
-          "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
-        ],
-        "comment": [
-          "before",
-          [
-            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
-          ]
-        ]
       }
     ],
     "expected_lane_positions": [
+      {
+        "tuple": [
+          "approver",
+          "End.failure"
+        ],
+        "comment": [
+          "terminus",
+          "failure"
+        ]
+      },
       {
         "tuple": [
           "lifecycle",
@@ -443,16 +453,6 @@
             "Publish"
           ]
         ]
-      },
-      {
-        "tuple": [
-          "approver",
-          "End.failure"
-        ],
-        "comment": [
-          "terminus",
-          "failure"
-        ]
       }
     ],
     "expected_outcome": "success",
@@ -470,6 +470,18 @@
       ]
     },
     "start_configuration": [
+      {
+        "tuple": [
+          "approver",
+          "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
+        ],
+        "comment": [
+          "before",
+          [
+            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          ]
+        ]
+      },
       {
         "tuple": [
           "lifecycle",
@@ -494,7 +506,9 @@
             "Update"
           ]
         ]
-      },
+      }
+    ],
+    "expected_lane_positions": [
       {
         "tuple": [
           "approver",
@@ -506,9 +520,7 @@
             "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
           ]
         ]
-      }
-    ],
-    "expected_lane_positions": [
+      },
       {
         "tuple": [
           "lifecycle",
@@ -534,18 +546,6 @@
             "Notify approver"
           ]
         ]
-      },
-      {
-        "tuple": [
-          "approver",
-          "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
-        ],
-        "comment": [
-          "before",
-          [
-            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
-          ]
-        ]
       }
     ],
     "expected_outcome": "success",
@@ -563,6 +563,18 @@
       ]
     },
     "start_configuration": [
+      {
+        "tuple": [
+          "approver",
+          "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
+        ],
+        "comment": [
+          "before",
+          [
+            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          ]
+        ]
+      },
       {
         "tuple": [
           "lifecycle",
@@ -588,21 +600,19 @@
             "Notify approver"
           ]
         ]
-      },
-      {
-        "tuple": [
-          "approver",
-          "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
-        ],
-        "comment": [
-          "before",
-          [
-            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
-          ]
-        ]
       }
     ],
     "expected_lane_positions": [
+      {
+        "tuple": [
+          "approver",
+          "End.success"
+        ],
+        "comment": [
+          "terminus",
+          "success"
+        ]
+      },
       {
         "tuple": [
           "lifecycle",
@@ -625,16 +635,6 @@
           [
             "Revise form"
           ]
-        ]
-      },
-      {
-        "tuple": [
-          "approver",
-          "End.success"
-        ],
-        "comment": [
-          "terminus",
-          "success"
         ]
       }
     ],
@@ -685,6 +685,16 @@
     "expected_lane_positions": [
       {
         "tuple": [
+          "approver",
+          "End.failure"
+        ],
+        "comment": [
+          "terminus",
+          "failure"
+        ]
+      },
+      {
+        "tuple": [
           "lifecycle",
           "suspend-Gateway_1hp2ssj"
         ],
@@ -708,16 +718,6 @@
             "Delete",
             "Cancel"
           ]
-        ]
-      },
-      {
-        "tuple": [
-          "approver",
-          "End.failure"
-        ],
-        "comment": [
-          "terminus",
-          "failure"
         ]
       }
     ],
@@ -768,6 +768,16 @@
     "expected_lane_positions": [
       {
         "tuple": [
+          "approver",
+          "End.failure"
+        ],
+        "comment": [
+          "terminus",
+          "failure"
+        ]
+      },
+      {
+        "tuple": [
           "lifecycle",
           "suspend-gw-to-catch-before-Activity_1hgscu3"
         ],
@@ -789,16 +799,6 @@
             "Archive"
           ]
         ]
-      },
-      {
-        "tuple": [
-          "approver",
-          "End.failure"
-        ],
-        "comment": [
-          "terminus",
-          "failure"
-        ]
       }
     ],
     "expected_outcome": "success",
@@ -818,6 +818,18 @@
     "start_configuration": [
       {
         "tuple": [
+          "approver",
+          "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
+        ],
+        "comment": [
+          "before",
+          [
+            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          ]
+        ]
+      },
+      {
+        "tuple": [
           "lifecycle",
           "suspend-Gateway_0fnbg3r"
         ],
@@ -838,18 +850,6 @@
           "before",
           [
             "Update"
-          ]
-        ]
-      },
-      {
-        "tuple": [
-          "approver",
-          "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
-        ],
-        "comment": [
-          "before",
-          [
-            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
           ]
         ]
       }
@@ -857,6 +857,18 @@
     "expected_lane_positions": [
       {
         "tuple": [
+          "approver",
+          "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
+        ],
+        "comment": [
+          "before",
+          [
+            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
+          ]
+        ]
+      },
+      {
+        "tuple": [
           "lifecycle",
           "suspend-Gateway_0fnbg3r"
         ],
@@ -877,18 +889,6 @@
           "before",
           [
             "Update"
-          ]
-        ]
-      },
-      {
-        "tuple": [
-          "approver",
-          "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
-        ],
-        "comment": [
-          "before",
-          [
-            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
           ]
         ]
       }
@@ -936,6 +936,16 @@
     "expected_lane_positions": [
       {
         "tuple": [
+          "approver",
+          "End.success"
+        ],
+        "comment": [
+          "terminus",
+          "success"
+        ]
+      },
+      {
+        "tuple": [
           "lifecycle",
           "suspend-Gateway_01p7uj7"
         ],
@@ -956,16 +966,6 @@
           [
             "Revise"
           ]
-        ]
-      },
-      {
-        "tuple": [
-          "approver",
-          "End.success"
-        ],
-        "comment": [
-          "terminus",
-          "success"
         ]
       }
     ],
@@ -1015,6 +1015,16 @@
     "expected_lane_positions": [
       {
         "tuple": [
+          "approver",
+          "End.failure"
+        ],
+        "comment": [
+          "terminus",
+          "failure"
+        ]
+      },
+      {
+        "tuple": [
           "lifecycle",
           "Event_1p8873y"
         ],
@@ -1031,16 +1041,6 @@
         "comment": [
           "terminus",
           "success"
-        ]
-      },
-      {
-        "tuple": [
-          "approver",
-          "End.failure"
-        ],
-        "comment": [
-          "terminus",
-          "failure"
         ]
       }
     ],
@@ -1090,6 +1090,16 @@
     "expected_lane_positions": [
       {
         "tuple": [
+          "approver",
+          "End.failure"
+        ],
+        "comment": [
+          "terminus",
+          "failure"
+        ]
+      },
+      {
+        "tuple": [
           "lifecycle",
           "suspend-Gateway_1hp2ssj"
         ],
@@ -1114,16 +1124,6 @@
             "Delete? form",
             "Publish"
           ]
-        ]
-      },
-      {
-        "tuple": [
-          "approver",
-          "End.failure"
-        ],
-        "comment": [
-          "terminus",
-          "failure"
         ]
       }
     ],
@@ -1170,6 +1170,16 @@
     "expected_lane_positions": [
       {
         "tuple": [
+          "approver",
+          "End.failure"
+        ],
+        "comment": [
+          "terminus",
+          "failure"
+        ]
+      },
+      {
+        "tuple": [
           "lifecycle",
           "Event_1p8873y"
         ],
@@ -1186,16 +1196,6 @@
         "comment": [
           "terminus",
           "success"
-        ]
-      },
-      {
-        "tuple": [
-          "approver",
-          "End.failure"
-        ],
-        "comment": [
-          "terminus",
-          "failure"
         ]
       }
     ],
@@ -1242,6 +1242,16 @@
     "expected_lane_positions": [
       {
         "tuple": [
+          "approver",
+          "End.success"
+        ],
+        "comment": [
+          "terminus",
+          "success"
+        ]
+      },
+      {
+        "tuple": [
           "lifecycle",
           "suspend-Gateway_1kl7pnm"
         ],
@@ -1264,16 +1274,6 @@
             "Update form",
             "Notify approver"
           ]
-        ]
-      },
-      {
-        "tuple": [
-          "approver",
-          "End.success"
-        ],
-        "comment": [
-          "terminus",
-          "success"
         ]
       }
     ],

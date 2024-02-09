@@ -29,7 +29,49 @@ module Trailblazer
             task:     task
           }
         end
+
+        def to_a
+          [
+            activity,
+            task
+          ]
+        end
       end
+
+      # DISCUSS: is lane_positions same as Configuration?
+      class Positions
+        def initialize(positions)
+          @positions = positions
+
+          @activity_to_task = positions.collect { |position| [position.activity, position.task] }.to_h
+          freeze
+        end
+
+        def [](activity) # TODO: do that mapping in constructor.
+          @activity_to_task[activity]
+        end
+
+        def replace(activity, task)
+          replaced_position = @positions.find { |position| position.activity == activity }
+
+          new_positions = @positions - [replaced_position] + [Position.new(activity, task)]
+
+          Positions.new(new_positions)
+        end
+
+        def to_a
+          @positions
+        end
+
+        # Iterate [activity, task] directly, without the {Position} instance.
+        def collect(&block)
+          @positions
+            .collect { |position| position.to_a }
+            .collect(&block)
+        end
+      end
+
+
 
       # DISCUSS: rename to State or something better matching?
       # Keeps the collaboration lane positions after running, it's a "state"
@@ -119,13 +161,13 @@ module Trailblazer
         # {:activity} and {:task} are the targeted position.
         def validate_targeted_position(lane_positions, activity:, task:)
           # the *actual* receiver position, where we're currently.
-          actual_receiver_position = lane_positions[activity] # receiver should always be in a suspend task/event gateway.
+          actual_receiver_task = lane_positions[activity] # receiver should always be in a suspend task/event gateway.
 
 #           puts "######### #{} | #{task}
-# >>>>>>>>> #{actual_receiver_position}"
+# >>>>>>>>> #{actual_receiver_task}"
 #           puts
 
-          reachable_catch_events = actual_receiver_position.to_h["resumes"]
+          reachable_catch_events = actual_receiver_task.to_h["resumes"]
             .collect { |catch_id| Trailblazer::Activity::Introspect.Nodes(activity, id: catch_id).task }
 
           # if possible_catch_event_ids =
@@ -138,7 +180,7 @@ module Trailblazer
         # @private
         # @param signal Workflow::Event::Suspend
         def advance_position(lane_positions, activity, suspend_event)
-          lane_positions.merge(activity => suspend_event)
+          lane_positions.replace(activity, suspend_event)
         end
 
 

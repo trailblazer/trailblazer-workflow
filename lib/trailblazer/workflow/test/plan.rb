@@ -23,6 +23,8 @@ lane_positions = [#{row[:start_configuration].collect do |row|
   "Trailblazer::Workflow::State::Discovery.position_from_tuple(lanes, *#{row[:tuple].inspect})"
 end.join(", ")}]
 
+lane_positions = Trailblazer::Workflow::Collaboration::Positions.new(lane_positions)
+
 configuration, (ctx, flow) = Trailblazer::Workflow::Collaboration::Synchronous.advance(
   schema,
   [{seq: []}, {throw: []}],
