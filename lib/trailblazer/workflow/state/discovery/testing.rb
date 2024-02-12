@@ -5,6 +5,8 @@ module Trailblazer
         module Testing
           module_function
 
+          # The structure is serialized and only contains IDs.
+
           # DISCUSS: In the Testing JSON, we want
           #   1. start event, start configuration, input => expected suspend configuration
           #   2. a "comment" table above that which draws out the same in readable format.

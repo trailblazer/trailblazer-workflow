@@ -595,27 +595,32 @@ lanes = ___lanes___.invert
 
 # test: ☝ ▶Revise
 
-start_tuple = ["UI", "catch-before-Activity_1wiumzv"] # ["before", "Revise"]
-start_position = Trailblazer::Workflow::State::Discovery.position_from_tuple(lanes, *start_tuple)
+assert_advance "☝ ▶Revise", ctx: {}, test_plan: testing_structure, lanes: lanes, schema: schema, message_flow: message_flow
 
-# current position.
-#DISCUSS: here, we could also ask the State layer for the start configuration, on a different level.
-lane_positions = [Trailblazer::Workflow::State::Discovery.position_from_tuple(lanes, *["lifecycle", "suspend-Gateway_01p7uj7"]), Trailblazer::Workflow::State::Discovery.position_from_tuple(lanes, *["UI", "suspend-Gateway_1xs96ik"])]
+# start_tuple = ["UI", "catch-before-Activity_1wiumzv"] # ["before", "Revise"]
+# start_position = Trailblazer::Workflow::State::Discovery.position_from_tuple(lanes, *start_tuple)
 
-lane_positions = Trailblazer::Workflow::Collaboration::Positions.new(lane_positions)
+# # current position.
+# #DISCUSS: here, we could also ask the State layer for the start configuration, on a different level.
+# lane_positions = [Trailblazer::Workflow::State::Discovery.position_from_tuple(lanes, *["lifecycle", "suspend-Gateway_01p7uj7"]), Trailblazer::Workflow::State::Discovery.position_from_tuple(lanes, *["UI", "suspend-Gateway_1xs96ik"])]
+
+# lane_positions = Trailblazer::Workflow::Collaboration::Positions.new(lane_positions)
 
 
-configuration, (ctx, flow) = Trailblazer::Workflow::Collaboration::Synchronous.advance(
-  schema,
-  [{seq: []}, {throw: []}],
-  {}, # circuit_options
+# configuration, (ctx, flow) = Trailblazer::Workflow::Collaboration::Synchronous.advance(
+#   schema,
+#   [{seq: []}, {throw: []}],
+#   {}, # circuit_options
 
-  start_position: start_position,
-  lane_positions: lane_positions, # current position/"state"
+#   start_position: start_position,
+#   lane_positions: lane_positions, # current position/"state"
 
-  message_flow: message_flow,
-)
+#   message_flow: message_flow,
+# )
 
+# assert_positions configuration[:lane_positions], [{:tuple=>["approver", "End.success"], :comment=>[:terminus, :success]}, {:tuple=>["lifecycle", "suspend-Gateway_1kl7pnm"], :comment=>["before", ["Revise", "Notify approver"]]}, {:tuple=>["UI", "suspend-Gateway_1g3fhu2"], :comment=>["before", ["Update form", "Notify approver"]]}], lanes: lanes
+
+# assert_positions "☝ ▶Revise", configuration[:lane_positions], lanes: lanes
 
 
 
@@ -673,4 +678,6 @@ configuration, (ctx, flow) = Trailblazer::Workflow::Collaboration::Synchronous.a
     # we can actually see the last signal and its semantic is {[:suspend, "suspend-Gateway_0kknfje"]}
     assert_equal configuration.signal.inspect, %(#<Trailblazer::Workflow::Event::Suspend resumes=["catch-before-Activity_1165bw9", "catch-before-Activity_1dt5di5"] type=:suspend semantic=[:suspend, "suspend-Gateway_0kknfje"]>)
   end
+  include Trailblazer::Workflow::Test::Assertions
+
 end
