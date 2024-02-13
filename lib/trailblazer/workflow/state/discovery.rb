@@ -229,7 +229,6 @@ module Trailblazer
         # Find the next connected task, usually outgoing from a catch event.
         def self.find_next_task_label(activity, catch_event)
           task_after_catch = activity.to_h[:circuit].to_h[:map][catch_event][Trailblazer::Activity::Right]
-
           Trailblazer::Activity::Introspect.Nodes(activity, task: task_after_catch).data[:label] || task_after_catch
         end
 

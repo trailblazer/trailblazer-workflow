@@ -3,6 +3,10 @@ require "test_helper"
 # TODO: how can we prevent users from triggering lifecycle.Create? only UI events allowed?
 #
 class CollaborationTest < Minitest::Spec
+  require "trailblazer/test/assertions"
+  include Trailblazer::Test::Assertions # DISCUSS: this is for assert_advance and friends.
+
+
   def build_schema()
     moderation_json = File.read("test/fixtures/v1/moderation.json")
     signal, (ctx, _) = Trailblazer::Workflow::Generate.invoke([{json_document: moderation_json}, {}])
@@ -594,38 +598,89 @@ This event is possible because process_model is in configuration ABC ("state")
 lanes = ___lanes___.invert
 
 # test: ☝ ▶Revise
+ctx = assert_advance "☝ ▶Revise", expected_ctx: {}, test_plan: testing_structure, lanes: lanes, schema: schema, message_flow: message_flow
+assert_exposes ctx, seq: [:revise, :revise], reader: :[]
 
-assert_advance "☝ ▶Revise", ctx: {}, test_plan: testing_structure, lanes: lanes, schema: schema, message_flow: message_flow
+# +----------------------+--------------------------------------------------------------------------------+--------------------------------------------------------------------------------+
+# | triggered catch      | start_configuration_formatted                                                  | expected_lane_positions_formatted                                              |
+# +----------------------+--------------------------------------------------------------------------------+--------------------------------------------------------------------------------+
+# | ☝ ▶Create form       | ☝ ▶Create form                        ⛾ ▶Create                  ☑ ▶#<Trail... | ☝ ▶Create                             ⛾ ▶Create                  ☑ ▶#<Trail... |
+# | ☝ ▶Create            | ☝ ▶Create                             ⛾ ▶Create                  ☑ ▶#<Trail... | ☝ ▶Update form ▶Notify approver       ⛾ ▶Update ▶Notify approver ☑ ▶#<Trail... |
+# | ☝ ▶Create ⛞          | ☝ ▶Create                             ⛾ ▶Create                  ☑ ▶#<Trail... | ☝ ▶Create                             ⛾ ▶Create                  ☑ ▶#<Trail... |
+# | ☝ ▶Update form       | ☝ ▶Update form ▶Notify approver       ⛾ ▶Update ▶Notify approver ☑ ▶#<Trail... | ☝ ▶Update                             ⛾ ▶Update ▶Notify approver ☑ ▶#<Trail... |
+# | ☝ ▶Notify approver   | ☝ ▶Update form ▶Notify approver       ⛾ ▶Update ▶Notify approver ☑ ▶#<Trail... | ☝ ▶Update form ▶Delete? form ▶Publish ⛾ ▶Publish ▶Delete ▶Update ☑ ◉End.fai... |
+# | ☝ ▶Update            | ☝ ▶Update                             ⛾ ▶Update ▶Notify approver ☑ ▶#<Trail... | ☝ ▶Update form ▶Notify approver       ⛾ ▶Notify approver ▶Update ☑ ▶#<Trail... |
+# | ☝ ▶Notify approver ⛞ | ☝ ▶Update form ▶Notify approver       ⛾ ▶Update ▶Notify approver ☑ ▶#<Trail... | ☝ ▶Revise form                        ⛾ ▶Revise                  ☑ ◉End.suc... |
+# | ☝ ▶Delete? form      | ☝ ▶Update form ▶Delete? form ▶Publish ⛾ ▶Publish ▶Delete ▶Update ☑         ... | ☝ ▶Delete ▶Cancel                     ⛾ ▶Publish ▶Delete ▶Update ☑ ◉End.fai... |
+# | ☝ ▶Publish           | ☝ ▶Update form ▶Delete? form ▶Publish ⛾ ▶Publish ▶Delete ▶Update ☑         ... | ☝ ▶Archive                            ⛾ ▶Archive                 ☑ ◉End.fai... |
+# | ☝ ▶Update ⛞          | ☝ ▶Update                             ⛾ ▶Update ▶Notify approver ☑ ▶#<Trail... | ☝ ▶Update                             ⛾ ▶Update ▶Notify approver ☑ ▶#<Trail... |
+# | ☝ ▶Revise form       | ☝ ▶Revise form                        ⛾ ▶Revise                  ☑         ... | ☝ ▶Revise                             ⛾ ▶Revise                  ☑ ◉End.suc... |
+# | ☝ ▶Delete            | ☝ ▶Delete ▶Cancel                     ⛾ ▶Publish ▶Delete ▶Update ☑         ... | ☝ ◉End.success                        ⛾ ◉End.success             ☑ ◉End.fai... |
+# | ☝ ▶Cancel            | ☝ ▶Delete ▶Cancel                     ⛾ ▶Publish ▶Delete ▶Update ☑         ... | ☝ ▶Update form ▶Delete? form ▶Publish ⛾ ▶Publish ▶Delete ▶Update ☑ ◉End.fai... |
+# | ☝ ▶Archive           | ☝ ▶Archive                            ⛾ ▶Archive                 ☑         ... | ☝ ◉End.success                        ⛾ ◉End.success             ☑ ◉End.fai... |
+# | ☝ ▶Revise            | ☝ ▶Revise                             ⛾ ▶Revise                  ☑         ... | ☝ ▶Update form ▶Notify approver       ⛾ ▶Revise ▶Notify approver ☑ ◉End.suc... |
+# +----------------------+--------------------------------------------------------------------------------+--------------------------------------------------------------------------------+
+# 15 rows in set
 
-# start_tuple = ["UI", "catch-before-Activity_1wiumzv"] # ["before", "Revise"]
-# start_position = Trailblazer::Workflow::State::Discovery.position_from_tuple(lanes, *start_tuple)
+# test: ☝ ▶Create form
+ctx = assert_advance "☝ ▶Create form", expected_ctx: {}, test_plan: testing_structure, lanes: lanes, schema: schema, message_flow: message_flow
+assert_exposes ctx, seq: [:create_form], reader: :[]
 
-# # current position.
-# #DISCUSS: here, we could also ask the State layer for the start configuration, on a different level.
-# lane_positions = [Trailblazer::Workflow::State::Discovery.position_from_tuple(lanes, *["lifecycle", "suspend-Gateway_01p7uj7"]), Trailblazer::Workflow::State::Discovery.position_from_tuple(lanes, *["UI", "suspend-Gateway_1xs96ik"])]
+# test: ☝ ▶Create
+ctx = assert_advance "☝ ▶Create", expected_ctx: {}, test_plan: testing_structure, lanes: lanes, schema: schema, message_flow: message_flow
+assert_exposes ctx, seq: [:ui_create, :create], reader: :[]
 
-# lane_positions = Trailblazer::Workflow::Collaboration::Positions.new(lane_positions)
+# test: ☝ ▶Create ⛞
+ctx = assert_advance "☝ ▶Create ⛞", expected_ctx: {}, test_plan: testing_structure, lanes: lanes, schema: schema, message_flow: message_flow
+assert_exposes ctx, seq: [:revise, :revise], reader: :[]
 
+# test: ☝ ▶Update form
+ctx = assert_advance "☝ ▶Update form", expected_ctx: {}, test_plan: testing_structure, lanes: lanes, schema: schema, message_flow: message_flow
+assert_exposes ctx, seq: [:revise, :revise], reader: :[]
 
-# configuration, (ctx, flow) = Trailblazer::Workflow::Collaboration::Synchronous.advance(
-#   schema,
-#   [{seq: []}, {throw: []}],
-#   {}, # circuit_options
+# test: ☝ ▶Notify approver
+ctx = assert_advance "☝ ▶Notify approver", expected_ctx: {}, test_plan: testing_structure, lanes: lanes, schema: schema, message_flow: message_flow
+assert_exposes ctx, seq: [:revise, :revise], reader: :[]
 
-#   start_position: start_position,
-#   lane_positions: lane_positions, # current position/"state"
+# test: ☝ ▶Update
+ctx = assert_advance "☝ ▶Update", expected_ctx: {}, test_plan: testing_structure, lanes: lanes, schema: schema, message_flow: message_flow
+assert_exposes ctx, seq: [:revise, :revise], reader: :[]
 
-#   message_flow: message_flow,
-# )
+# test: ☝ ▶Notify approver ⛞
+ctx = assert_advance "☝ ▶Notify approver ⛞", expected_ctx: {}, test_plan: testing_structure, lanes: lanes, schema: schema, message_flow: message_flow
+assert_exposes ctx, seq: [:revise, :revise], reader: :[]
 
-# assert_positions configuration[:lane_positions], [{:tuple=>["approver", "End.success"], :comment=>[:terminus, :success]}, {:tuple=>["lifecycle", "suspend-Gateway_1kl7pnm"], :comment=>["before", ["Revise", "Notify approver"]]}, {:tuple=>["UI", "suspend-Gateway_1g3fhu2"], :comment=>["before", ["Update form", "Notify approver"]]}], lanes: lanes
+# test: ☝ ▶Delete? form
+ctx = assert_advance "☝ ▶Delete? form", expected_ctx: {}, test_plan: testing_structure, lanes: lanes, schema: schema, message_flow: message_flow
+assert_exposes ctx, seq: [:revise, :revise], reader: :[]
 
-# assert_positions "☝ ▶Revise", configuration[:lane_positions], lanes: lanes
+# test: ☝ ▶Publish
+ctx = assert_advance "☝ ▶Publish", expected_ctx: {}, test_plan: testing_structure, lanes: lanes, schema: schema, message_flow: message_flow
+assert_exposes ctx, seq: [:revise, :revise], reader: :[]
 
+# test: ☝ ▶Update ⛞
+ctx = assert_advance "☝ ▶Update ⛞", expected_ctx: {}, test_plan: testing_structure, lanes: lanes, schema: schema, message_flow: message_flow
+assert_exposes ctx, seq: [:revise, :revise], reader: :[]
 
+# test: ☝ ▶Revise form
+ctx = assert_advance "☝ ▶Revise form", expected_ctx: {}, test_plan: testing_structure, lanes: lanes, schema: schema, message_flow: message_flow
+assert_exposes ctx, seq: [:revise, :revise], reader: :[]
 
+# test: ☝ ▶Delete
+ctx = assert_advance "☝ ▶Delete", expected_ctx: {}, test_plan: testing_structure, lanes: lanes, schema: schema, message_flow: message_flow
+assert_exposes ctx, seq: [:revise, :revise], reader: :[]
 
+# test: ☝ ▶Cancel
+ctx = assert_advance "☝ ▶Cancel", expected_ctx: {}, test_plan: testing_structure, lanes: lanes, schema: schema, message_flow: message_flow
+assert_exposes ctx, seq: [:revise, :revise], reader: :[]
 
+# test: ☝ ▶Archive
+ctx = assert_advance "☝ ▶Archive", expected_ctx: {}, test_plan: testing_structure, lanes: lanes, schema: schema, message_flow: message_flow
+assert_exposes ctx, seq: [:revise, :revise], reader: :[]
+
+# test: ☝ ▶Revise
+ctx = assert_advance "☝ ▶Revise", expected_ctx: {}, test_plan: testing_structure, lanes: lanes, schema: schema, message_flow: message_flow
+assert_exposes ctx, seq: [:revise, :revise], reader: :[]
 
 
 
