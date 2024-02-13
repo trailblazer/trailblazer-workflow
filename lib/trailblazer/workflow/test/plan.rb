@@ -23,7 +23,7 @@ module Trailblazer
         end
 
         # Compile error message when the expected lane position doesn't match the actual one.
-        def self.error_message_for(position, expected_position, lanes:)
+        def self.error_message_for(position, expected_position, lanes:) # TODO: test me.
           # TODO: make the labels use UTF8 icons etc, as in the CLI rendering code.
           expected_label = State::Discovery::Testing.serialize_lane_position(position, lanes: lanes)[:comment]
           actual_label   = State::Discovery::Testing.serialize_lane_position(expected_position, lanes: lanes)[:comment]
@@ -33,7 +33,7 @@ module Trailblazer
 
         # Grab the start_position and expected_lane_positions from the discovered plan, run
         # the collaboration from there and check if it actually reached the expected configuration.
-        def assert_advance(event_label, test_plan:, lanes:, schema:, message_flow:, expected_ctx:, **) # TODO: allow {ctx}
+        def assert_advance(event_label, test_plan:, lanes:, schema:, message_flow:, expected_ctx:, ctx: {seq: []}, **) # TODO: allow {ctx}
           testing_row = test_plan.find { |row| row[:event_label] == event_label }
 
           start_position = testing_row[:start_position]
@@ -48,9 +48,11 @@ module Trailblazer
 
           lane_positions = Trailblazer::Workflow::Collaboration::Positions.new(lane_positions)
 
+          ctx_for_advance = ctx
+
           configuration, (ctx, flow) = Trailblazer::Workflow::Collaboration::Synchronous.advance(
             schema,
-            [{seq: []}, {throw: []}],
+            [ctx_for_advance, {throw: []}],
             {}, # circuit_options
 
             start_position: start_position,
