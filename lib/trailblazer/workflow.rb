@@ -16,3 +16,5 @@ require "trailblazer/workflow/state/discovery/testing"
 require "trailblazer/workflow/state/table"
 
 require "trailblazer/workflow/test/plan"
+
+require "trailblazer/workflow/discovery"

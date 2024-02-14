@@ -7,11 +7,10 @@ module Trailblazer
           @message_flow           = message_flow
           # @initial_lane_positions = Synchronous.initial_lane_positions(lanes.values)
           # @options = options # FIXME: test me!!!
-        end
 
-        # attr_reader :initial_lane_positions
-        # attr_reader :message_flow
-        # attr_reader :lanes # @private
+          # TODO: define what we need here, for runtime.
+          #    1. a Collaboration doesn't mandatorily need its initial_lane_positions, that's only relevant for state discovery or State layer.
+        end
 
         def to_h
           {

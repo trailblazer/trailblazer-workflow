@@ -59,89 +59,59 @@ class CollaborationTest < Minitest::Spec
       # "Reject" => implementing.method(:reject),
     )
 
-    id_to_lane = {
+    # TODO: move this into the Schema-build process.
+    # This is needed to translate the JSON message structure to Ruby,
+    # where we reference lanes by their {Activity} instance.
+    json_id_to_lane = {
       "article moderation"    => lane_activity,
       "<ui> author workflow"  => lane_activity_ui,
+    }
+
+    # lane_icons: lane_icons = {"UI" => "☝", "lifecycle" => "⛾", "approver" => "☑"},
+    lanes_cfg = {
+      "article moderation"    => {
+        label: "lifecycle",
+        icon:  "⛾",
+        activity: lane_activity, # this is copied here after the activity has been compiled in {Schema.build}.
+      },
+      "<ui> author workflow"  => {
+        label: "UI",
+        icon:  "☝",
+        activity: lane_activity_ui,
+      },
+      # TODO: add editor/approver lane.
     }
 
     # pp ctx[:structure].lanes
     message_flow = Trailblazer::Workflow::Collaboration.Messages(
       ctx[:structure].messages,
-      id_to_lane
+      json_id_to_lane
     )
 
+    # DISCUSS: {lanes} is always ID to activity?
+    lanes = {
+      lifecycle:  lane_activity,
+      ui:         lane_activity_ui,
+    }
+
     schema = Trailblazer::Workflow::Collaboration::Schema.new(
-      lanes: {
-        lifecycle:  lane_activity,
-        ui:         lane_activity_ui
-      },
+      lanes: lanes,
       message_flow: message_flow,
     )
 
-    return schema, lane_activity, lane_activity_ui, message_flow
+    approver_activity, extended_message_flow, extended_initial_lane_positions = build_custom_editor_lane(lanes, message_flow)
+
+    return schema, lanes.merge(approver: approver_activity), extended_message_flow, extended_initial_lane_positions
   end
 
-  it "Collaboration::StateTable generating" do # FIXME: move me
-    skip "extract me from below"
-    schema, lane_activity, lane_activity_ui, message_flow = build_schema()
-
-    state_table = Trailblazer::Workflow::State::Discovery.generate_state_table
-
-  end
-
-  it "Collaboration::StateTable interface that already knows the lane positions" do
-    schema, lane_activity, lane_activity_ui, message_flow = build_schema()
-
-    state_table = todo
-
-    collaboration_state_table_interface.(schema, state_table, event: "ui_create_form", process_model_id: nil)
-  end
-
-  it "low level {Collaboration.advance} API" do
-    ui_create_form = "Activity_0wc2mcq" # TODO: this is from pro-rails tests.
-    ui_create = "Activity_1psp91r"
-    ui_create_valid = "Event_0km79t5"
-    ui_create_invalid = "Event_0co8ygx"
-    ui_update_form = 'Activity_1165bw9'
-    ui_update = "Activity_0j78uzd"
-    ui_update_valid = "Event_1vf88fn"
-    ui_update_invalid = "Event_1nt0djb"
-    ui_notify_approver = "Activity_1dt5di5"
-    ui_accepted = "Event_1npw1tg"
-    ui_delete_form = "Activity_0ha7224"
-    ui_delete = "Activity_15nnysv"
-    ui_cancel = "Activity_1uhozy1"
-    ui_publish = "Activity_0bsjggk"
-    ui_archive = "Activity_0fy41qq"
-    ui_revise_form = "Activity_0zsock2"
-    ui_revise = "Activity_1wiumzv"
-    ui_revise_valid = "Event_1bz3ivj"
-    ui_revise_invalid = "Event_1wly6jj"
-    ui_revise_form_with_errors = "Activity_19m1lnz"
-    ui_create_form_with_errors = "Activity_08p0cun"
-    ui_update_form_with_errors = "Activity_00kfo8w"
-    ui_rejected = "Event_1vb197y"
-
-    # FIXME: redundant with {lane_test}.
-    create_id = "Activity_0wwfenp"
-    update_id = "Activity_0q9p56e"
-    notify_id = "Activity_0wr78cv"
-    reject_id = "Activity_0d9yewp"
+  # DISCUSS: this is mostly to play around with the "API" of building a Collaboration.
+  def build_custom_editor_lane(lanes, message_flow)
     approve_id = "Activity_1qrkaz0"
-    revise_id = "Activity_18qv6ob"
-    publish_id = "Activity_1bjelgv"
-    delete_id = "Activity_0cc4us9"
-    archive_id = "Activity_1hgscu3"
-    success_id = "Event_1p8873y"
+    reject_id = "Activity_0d9yewp"
 
+    lifecycle_activity = lanes[:lifecycle]
 
-    schema, lane_activity, lane_activity_ui, message_flow = build_schema()
-    schema_hash = schema.to_h
-
-    # raise schema_hash.keys.inspect
-
-
-    missing_throw_from_notify_approver = Trailblazer::Activity::Introspect.Nodes(lane_activity, id: "throw-after-Activity_0wr78cv").task
+    missing_throw_from_notify_approver = Trailblazer::Activity::Introspect.Nodes(lifecycle_activity, id: "throw-after-Activity_0wr78cv").task
 
     decision_is_approve_throw = nil
     decision_is_reject_throw  = nil
@@ -167,136 +137,19 @@ class CollaborationTest < Minitest::Spec
     extended_message_flow = message_flow.merge(
       # "throw-after-Activity_0wr78cv"
       missing_throw_from_notify_approver => [approver_activity, Trailblazer::Activity::Introspect.Nodes(approver_activity, id: "xxx").task],
-      decision_is_approve_throw => [lane_activity, Trailblazer::Activity::Introspect.Nodes(lane_activity, id: "catch-before-#{approve_id}").task],
-      decision_is_reject_throw => [lane_activity, Trailblazer::Activity::Introspect.Nodes(lane_activity, id: "catch-before-#{reject_id}").task],
+      decision_is_approve_throw => [lifecycle_activity, Trailblazer::Activity::Introspect.Nodes(lifecycle_activity, id: "catch-before-#{approve_id}").task],
+      decision_is_reject_throw => [lifecycle_activity, Trailblazer::Activity::Introspect.Nodes(lifecycle_activity, id: "catch-before-#{reject_id}").task],
     )
 
-    # initial_lane_positions = Trailblazer::Workflow::Collaboration::Synchronous.initial_lane_positions(schema_hash[:lanes].values) # TODO: remove me!
-    initial_lane_positions = Trailblazer::Workflow::Collaboration::Synchronous.initial_lane_positions(schema_hash[:lanes])
-
-    # TODO: do this in the State layer.
-    start_task = Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_create_form}").task # catch-before-Activity_0wc2mcq
-    start_position = Trailblazer::Workflow::Collaboration::Position.new(lane_activity_ui, start_task)
-
+    initial_lane_positions = Trailblazer::Workflow::Collaboration::Synchronous.initial_lane_positions(lanes) # we need to do this manually here, as initial_lane_positions isn't part of the {Schema.build} process.
     extended_initial_lane_positions = initial_lane_positions.merge(
       approver_activity => approver_start_suspend
     )
     extended_initial_lane_positions = Trailblazer::Workflow::Collaboration::Positions.new(extended_initial_lane_positions.collect { |activity, task| Trailblazer::Workflow::Collaboration::Position.new(activity, task) })
 
+    return approver_activity, extended_message_flow, extended_initial_lane_positions
+  end
 
-# State discovery:
-# The idea is that we collect suspend events and follow up on all their resumes (catch) events.
-# We can't see into {Collaboration.call}, meaning we can really only collect public entry points,
-# just like a user (like a controller) of our process.
-# 1. one problem is, when a decision is involved in the run ahead of us we need to invoke the same
-#    catch multiple times, with different input data.
-#    DISCUSS: could we figure out the two different suspend termini that way, to make it easier for users to define
-#    which outcome is "success"?
-    resumes_to_invoke = [
-      [
-        start_position,
-        extended_initial_lane_positions,
-        {}, # ctx_merge
-        {outcome: :success} # config_payload
-      ]
-    ]
-
-    states = []
-    additional_state_data = {}
-
-    already_visited_catch_events = {}
-    already_visited_catch_events_again = {} # FIXME: well, yeah.
-
-    # DISCUSS: We could probably figure out "binary" paths automatically? That would
-    #          imply we start from a public resume and discover the path?
-    run_multiple_times = {
-      # suspend after Notify approver in lifecycle
-      # We're "clicking" the [Notify_approver] button again, this time to get rejected.
-      Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_notify_approver}").task => {ctx_merge: {decision: false}, config_payload: {outcome: :failure}},
-
-      # Click [UI Create] again, with invalid data.
-      Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_create}").task => {ctx_merge: {create: false}, config_payload: {outcome: :failure}}, # lifecycle create is supposed to fail.
-
-      # Click [UI Update] again, with invalid data.
-      Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_update}").task => {ctx_merge: {update: false}, config_payload: {outcome: :failure}}, # lifecycle create is supposed to fail.
-    }
-
-    while resumes_to_invoke.any?
-      (start_position, lane_positions, ctx_merge, config_payload) = resumes_to_invoke.shift
-      puts "~~~~~~~~~"
-
-      ctx = {seq: []}.merge(ctx_merge)
-      start_task = start_position.to_h[:task]
-      if (do_again_config = run_multiple_times[start_task]) && !already_visited_catch_events_again[start_task] # TODO: do this by keying by resume event and ctx variable(s).
-
-        resumes_to_invoke << [
-          start_position,
-          lane_positions, # same positions as the original situation.
-          do_again_config[:ctx_merge],
-          do_again_config[:config_payload]
-        ]
-
-        already_visited_catch_events_again[start_task] = true
-      end
-
-      # register new state.
-      # Note that we do that before anything is invoked.
-      states << state = [lane_positions, start_position] # FIXME: we need to add {configuration} here!
-
-      state_data = [ctx.inspect]
-
-      configuration, (ctx, flow) = Trailblazer::Workflow::Collaboration::Synchronous.advance(
-        schema,
-        [ctx, {throw: []}],
-        {}, # circuit_options
-
-        start_position: start_position,
-        lane_positions: lane_positions, # current position/"state"
-
-        message_flow: extended_message_flow,
-      )
-
-    # 3. optional feature: outcome marking
-      additional_state_data[[state.object_id, :outcome]] = config_payload[:outcome]
-
-
-    # 1. optional feature: tracing
-      state_data << ctx.inspect # context after. DISCUSS: use tracing?
-      additional_state_data[[state.object_id, :ctx]] = state_data
-
-    # 2. optional feature: remember stop configuration so we can use that in a test.
-      # raise configuration.inspect
-      suspend_configuration = configuration
-      additional_state_data[[state.object_id, :suspend_configuration]] = suspend_configuration
-
-      # figure out possible next resumes/catchs:
-      last_lane        = configuration.last_lane
-      suspend_terminus = configuration.lane_positions[last_lane]
-
-      next if suspend_terminus.instance_of?(Trailblazer::Activity::End) # a real end event!
-      # elsif suspend_terminus.is_a?(Trailblazer::Activity::Railway::End) # a real end event!
-
-      #   raise suspend_terminus.inspect
-
-      # Go through all possible resume/catch events and "remember" them
-      suspend_terminus.to_h["resumes"].each do |resume_event_id|
-        resume_event = Trailblazer::Activity::Introspect.Nodes(last_lane, id: resume_event_id).task
-
-        unless already_visited_catch_events[resume_event]
-          resumes_to_invoke << [
-            Trailblazer::Workflow::Collaboration::Position.new(last_lane, resume_event),
-            configuration.lane_positions,
-            {},
-            {outcome: :success}
-          ]
-        end
-
-        already_visited_catch_events[resume_event] = true
-      end
-    end
-
-    # {states} is compile-time relevant
-    #  {additional_state_data} is runtime
 
     # TODO: remove me, or move me at least!
     # DISCUSS: {states} should probably be named {reached_states} as some states appear multiple times in the list.
@@ -362,6 +215,98 @@ class CollaborationTest < Minitest::Spec
         "ctx after",
       ], max_width: 186) # 186 for laptop 13"
     end
+
+
+  it "Collaboration::StateTable generating" do # FIXME: move me
+    skip "extract me from below"
+    schema, lane_activity, lane_activity_ui, message_flow = build_schema()
+
+    state_table = Trailblazer::Workflow::State::Discovery.generate_state_table
+
+  end
+
+  it "Collaboration::StateTable interface that already knows the lane positions" do
+    schema, lane_activity, lane_activity_ui, message_flow = build_schema()
+
+    state_table = todo
+
+    collaboration_state_table_interface.(schema, state_table, event: "ui_create_form", process_model_id: nil)
+  end
+
+  it "low level {Collaboration.advance} API" do
+    ui_create_form = "Activity_0wc2mcq" # TODO: this is from pro-rails tests.
+    ui_create = "Activity_1psp91r"
+    ui_create_valid = "Event_0km79t5"
+    ui_create_invalid = "Event_0co8ygx"
+    ui_update_form = 'Activity_1165bw9'
+    ui_update = "Activity_0j78uzd"
+    ui_update_valid = "Event_1vf88fn"
+    ui_update_invalid = "Event_1nt0djb"
+    ui_notify_approver = "Activity_1dt5di5"
+    ui_accepted = "Event_1npw1tg"
+    ui_delete_form = "Activity_0ha7224"
+    ui_delete = "Activity_15nnysv"
+    ui_cancel = "Activity_1uhozy1"
+    ui_publish = "Activity_0bsjggk"
+    ui_archive = "Activity_0fy41qq"
+    ui_revise_form = "Activity_0zsock2"
+    ui_revise = "Activity_1wiumzv"
+    ui_revise_valid = "Event_1bz3ivj"
+    ui_revise_invalid = "Event_1wly6jj"
+    ui_revise_form_with_errors = "Activity_19m1lnz"
+    ui_create_form_with_errors = "Activity_08p0cun"
+    ui_update_form_with_errors = "Activity_00kfo8w"
+    ui_rejected = "Event_1vb197y"
+
+    # FIXME: redundant with {lane_test}.
+    create_id = "Activity_0wwfenp"
+    update_id = "Activity_0q9p56e"
+    notify_id = "Activity_0wr78cv"
+
+
+    revise_id = "Activity_18qv6ob"
+    publish_id = "Activity_1bjelgv"
+    delete_id = "Activity_0cc4us9"
+    archive_id = "Activity_1hgscu3"
+    success_id = "Event_1p8873y"
+
+
+    schema, lanes, message_flow, initial_lane_positions = build_schema()
+    schema_hash = schema.to_h
+
+    lane_activity = lanes[:lifecycle]
+    lane_activity_ui = lanes[:ui]
+    approver_activity = lanes[:approver]
+
+    # raise schema_hash.keys.inspect
+
+
+
+
+
+    # TODO: do this in the State layer.
+    start_task = Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_create_form}").task # catch-before-Activity_0wc2mcq
+    start_position = Trailblazer::Workflow::Collaboration::Position.new(lane_activity_ui, start_task)
+
+
+    states, additional_state_data = Trailblazer::Workflow::Discovery.(
+      schema,
+      initial_lane_positions: initial_lane_positions,
+      start_position: start_position,
+      message_flow: message_flow,
+
+      run_multiple_times: {
+         # We're "clicking" the [Notify_approver] button again, this time to get rejected.
+          Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_notify_approver}").task => {ctx_merge: {decision: false}, config_payload: {outcome: :failure}},
+
+          # Click [UI Create] again, with invalid data.
+          Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_create}").task => {ctx_merge: {create: false}, config_payload: {outcome: :failure}}, # lifecycle create is supposed to fail.
+
+          # Click [UI Update] again, with invalid data.
+          Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_update}").task => {ctx_merge: {update: false}, config_payload: {outcome: :failure}}, # lifecycle create is supposed to fail.
+      }
+    )
+
 
 
 
