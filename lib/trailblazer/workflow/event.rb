@@ -1,10 +1,10 @@
 module Trailblazer
   module Workflow
-    module Event
-      class Suspend < Activity::End
+    class Event < Activity::End
+      class Suspend < Event
       end
 
-      class Throw < Activity::End
+      class Throw < Event
         def call((ctx, flow_options), **circuit_options)
           flow_options = flow_options.merge(
             throw: flow_options[:throw] + [[self, "message"]] # DISCUSS: what message do we want to pass on?
@@ -14,7 +14,7 @@ module Trailblazer
         end
       end # Throwing
 
-      class Catch < Activity::End
+      class Catch < Event
         def call((ctx, flow_options), **circuit_options)
           return Activity::Right, [ctx, flow_options]
         end
