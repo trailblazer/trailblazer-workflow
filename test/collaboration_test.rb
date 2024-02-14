@@ -309,7 +309,6 @@ class CollaborationTest < Minitest::Spec
 
 
 
-
     # render_states(states, lanes: ___lanes___ = {lane_activity => "lifecycle", lane_activity_ui => "UI", approver_activity => "approver"}, additional_state_data: additional_state_data, task_map: task_map)
 # raise "figure out how to build a generated state table"
 
