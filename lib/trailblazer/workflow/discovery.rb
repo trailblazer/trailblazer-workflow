@@ -20,7 +20,7 @@ module Trailblazer
         #          imply we start from a public resume and discover the path?
         # we could save work on {run_multiple_times} with this.
 
-        collaboration, message_flow, start_position, initial_lane_positions = stub_tasks_for(collaboration, message_flow: message_flow, start_position: start_position, initial_lane_positions: initial_lane_positions)
+        collaboration, message_flow, start_position, initial_lane_positions, original_activity_2_stub_activity, original_task_2_stub_task = stub_tasks_for(collaboration, message_flow: message_flow, start_position: start_position, initial_lane_positions: initial_lane_positions)
 
         # pp collaboration.to_h[:lanes][:ui].to_h
         # raise
@@ -34,7 +34,7 @@ module Trailblazer
           ]
         ]
 
-        states = []
+        discovered_states = []
         additional_state_data = {}
 
         already_visited_catch_events = {}
@@ -60,7 +60,7 @@ module Trailblazer
 
           # register new state.
           # Note that we do that before anything is invoked.
-          states << state = [lane_positions, start_position] # FIXME: we need to add {configuration} here!
+          discovered_states << state = [lane_positions, start_position] # FIXME: we need to add {configuration} here!
 
           state_data = [ctx.inspect]
 
@@ -114,14 +114,14 @@ module Trailblazer
           end
         end
 
-        # {states} is compile-time relevant
+        # {discovered_states} is compile-time relevant
         #  {additional_state_data} is runtime
 
-        return states, additional_state_data
+        return discovered_states, additional_state_data
       end
 
       def stub_tasks_for(collaboration, ignore_class: Trailblazer::Activity::End, message_flow:, start_position:, initial_lane_positions:)
-        stubbed_lanes = collaboration.to_h[:lanes].collect do |lane_id, activity|
+        collected = collaboration.to_h[:lanes].collect do |lane_id, activity|
           circuit  = activity.to_h[:circuit]
           lane_map = circuit.to_h[:map].clone
 
@@ -172,23 +172,27 @@ module Trailblazer
           lane = Activity.new(Activity::Schema.new(new_circuit, activity.to_h[:outputs], new_nodes, activity.to_h[:config])) # FIXME: breaking taskWrap here (which is no problem, actually).
 
           # [lane_id, lane, replaced_tasks]
-          [lane_id, lane]
-        end.to_h
+          [[lane_id, lane], replaced_tasks]
+        end
 
-        old_activity_2_new_activity = collaboration.to_h[:lanes].collect { |lane_id, activity| [activity, stubbed_lanes[lane_id]] }.to_h
+        original_task_2_stub_task = collected.inject({}) { |memo, (_, replaced_tasks)| memo.merge(replaced_tasks) }
 
-        new_message_flow = message_flow.collect { |throw_evt, (activity, catch_evt)| [throw_evt, [old_activity_2_new_activity[activity], catch_evt]] }.to_h
+        stubbed_lanes = collected.collect { |lane, _| lane }.to_h
 
-        new_start_position = Collaboration::Position.new(old_activity_2_new_activity.fetch(start_position.activity), start_position.task)
+        original_activity_2_stub_activity = collaboration.to_h[:lanes].collect { |lane_id, activity| [activity, stubbed_lanes[lane_id]] }.to_h
+
+        new_message_flow = message_flow.collect { |throw_evt, (activity, catch_evt)| [throw_evt, [original_activity_2_stub_activity[activity], catch_evt]] }.to_h
+
+        new_start_position = Collaboration::Position.new(original_activity_2_stub_activity.fetch(start_position.activity), start_position.task)
 
         new_initial_lane_positions = initial_lane_positions.collect do |position|
           # TODO: make lane_positions {Position} instances, too.
-          Collaboration::Position.new(old_activity_2_new_activity[position[0]], position[1])
+          Collaboration::Position.new(original_activity_2_stub_activity[position[0]], position[1])
         end
 
         new_initial_lane_positions = Collaboration::Positions.new(new_initial_lane_positions)
 
-        return Collaboration::Schema.new(lanes: stubbed_lanes, message_flow: new_message_flow), new_message_flow, new_start_position, new_initial_lane_positions
+        return Collaboration::Schema.new(lanes: stubbed_lanes, message_flow: new_message_flow), new_message_flow, new_start_position, new_initial_lane_positions, original_activity_2_stub_activity, original_task_2_stub_task
       end
     end
   end
