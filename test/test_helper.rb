@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 $LOAD_PATH.unshift File.expand_path("../lib", __dir__)
 require "trailblazer/workflow"
 
@@ -127,7 +125,7 @@ module BuildSchema
 
     approver_start_suspend = nil
     approver_activity = Class.new(Trailblazer::Activity::Railway) do
-      step task: approver_start_suspend = Trailblazer::Workflow::Event::Suspend.new(semantic: "invented_semantic", "resumes" => ["catch-before-decider-xxx"])
+      step task: approver_start_suspend = Trailblazer::Workflow::Event::Suspend.new(semantic: "invented_semantic", "resumes" => ["catch-before-decider-xxx"]), id: "~suspend~"
 
       fail task: Trailblazer::Workflow::Event::Catch.new(semantic: "xxx --> decider"), id: "catch-before-decider-xxx", Output(:success) => Track(:failure)
       fail :decider, id: "xxx",

@@ -15,13 +15,15 @@ class DiscoveryTest < Minitest::Spec
     lane_activity_ui = lanes[:ui]
     approver_activity = lanes[:approver]
 
+    lanes_sorted = [lane_activity, lane_activity_ui, approver_activity]
+
 
     # TODO: do this in the State layer.
     start_task = Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_create_form}").task # catch-before-Activity_0wc2mcq
     start_position = Trailblazer::Workflow::Collaboration::Position.new(lane_activity_ui, start_task)
 
 
-    states, additional_state_data = Trailblazer::Workflow::Discovery.(
+    states = Trailblazer::Workflow::Discovery.(
       schema,
       initial_lane_positions: initial_lane_positions,
       start_position: start_position,
@@ -49,8 +51,105 @@ class DiscoveryTest < Minitest::Spec
       }
     )
 
-    pp states
+    # pp states
+    # TODO: should we really assert the state table manually?
+    assert_equal states.size, 15
 
-    raise
+    assert_position_before states[0][:positions_before],
+      ["suspend-gw-to-catch-before-Activity_0wwfenp", "suspend-gw-to-catch-before-Activity_0wc2mcq", "~suspend~"],
+      start_id: "catch-before-Activity_0wc2mcq",
+      lanes: lanes_sorted
+
+    assert_position_before states[1][:positions_before],
+      ["suspend-gw-to-catch-before-Activity_0wwfenp", "suspend-Gateway_14h0q7a", "~suspend~"],
+      start_id: "catch-before-Activity_1psp91r",
+      lanes: lanes_sorted
+
+    assert_position_before states[2][:positions_before],
+      ["suspend-gw-to-catch-before-Activity_0wwfenp", "suspend-Gateway_14h0q7a", "~suspend~"],
+      start_id: "catch-before-Activity_1psp91r",
+      lanes: lanes_sorted
+
+    assert_position_before states[4][:positions_before],
+      ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0kknfje", "~suspend~"],
+      start_id: "catch-before-Activity_1dt5di5",
+      lanes: lanes_sorted
+
+    assert_position_before states[4][:positions_before],
+      ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0kknfje", "~suspend~"],
+      start_id: "catch-before-Activity_1dt5di5",
+      lanes: lanes_sorted
+
+    assert_position_before states[5][:positions_before],
+      ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0nxerxv", "~suspend~"],
+      start_id: "catch-before-Activity_0j78uzd",
+      lanes: lanes_sorted
+
+    assert_position_before states[6][:positions_before],
+      ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0kknfje", "~suspend~"],
+      start_id: "catch-before-Activity_1dt5di5",
+      lanes: lanes_sorted
+
+    assert_position_before states[7][:positions_before],
+      ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "End.failure"],
+      start_id: "catch-before-Activity_0ha7224",
+      lanes: lanes_sorted
+
+    assert_position_before states[8][:positions_before],
+      ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "End.failure"],
+      start_id: "catch-before-Activity_0bsjggk",
+      lanes: lanes_sorted
+
+    assert_position_before states[9][:positions_before],
+      ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0nxerxv", "~suspend~"],
+      start_id: "catch-before-Activity_0j78uzd",
+      lanes: lanes_sorted
+
+    assert_position_before states[10][:positions_before],
+      ["suspend-Gateway_01p7uj7", "suspend-gw-to-catch-before-Activity_0zsock2", "End.success"],
+      start_id: "catch-before-Activity_0zsock2",
+      lanes: lanes_sorted
+
+    assert_position_before states[11][:positions_before],
+      ["suspend-Gateway_1hp2ssj", "suspend-Gateway_100g9dn", "End.failure"],
+      start_id: "catch-before-Activity_15nnysv",
+      lanes: lanes_sorted
+
+    assert_position_before states[12][:positions_before],
+      ["suspend-Gateway_1hp2ssj", "suspend-Gateway_100g9dn", "End.failure"],
+      start_id: "catch-before-Activity_1uhozy1",
+      lanes: lanes_sorted
+
+    assert_position_before states[13][:positions_before],
+      ["suspend-gw-to-catch-before-Activity_1hgscu3", "suspend-gw-to-catch-before-Activity_0fy41qq", "End.failure"],
+      start_id: "catch-before-Activity_0fy41qq",
+      lanes: lanes_sorted
+
+    assert_position_before states[14][:positions_before],
+      ["suspend-Gateway_01p7uj7", "suspend-Gateway_1xs96ik", "End.success"],
+      start_id: "catch-before-Activity_1wiumzv",
+      lanes: lanes_sorted
+
+    assert_nil states[15]
+
+
+  end
+
+  # Asserts
+  #   * that positions are always sorted by activity.
+  def assert_position_before(actual_positions, expected_ids, start_id:, lanes:)
+    actual_lane_positions, actual_start_position = actual_positions
+
+    # puts actual_lane_positions.collect { |(a, t)| Trailblazer::Activity::Introspect.Nodes(a, task: t).id }.inspect
+
+    actual_lane_positions.collect.with_index do |(actual_activity, actual_task), index|
+      expected_activity = lanes[index]
+
+      assert_equal [actual_activity, Trailblazer::Activity::Introspect.Nodes(actual_activity, task: actual_task).id],
+        [expected_activity, expected_ids[index]]
+    end
+
+    assert_equal Trailblazer::Activity::Introspect.Nodes(actual_start_position.activity, task: actual_start_position.task).id, start_id, "start task mismatch"
+
   end
 end

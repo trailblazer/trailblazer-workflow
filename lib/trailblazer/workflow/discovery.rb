@@ -20,10 +20,13 @@ module Trailblazer
         #          imply we start from a public resume and discover the path?
         # we could save work on {run_multiple_times} with this.
 
+        original_lanes = collaboration.to_h[:lanes] # this dictates the order within created Positions.
+
         collaboration, message_flow, start_position, initial_lane_positions, original_activity_2_stub_activity, original_task_2_stub_task = stub_tasks_for(collaboration, message_flow: message_flow, start_position: start_position, initial_lane_positions: initial_lane_positions)
 
         # pp collaboration.to_h[:lanes][:ui].to_h
         # raise
+
 
         resumes_to_invoke = [
           [
@@ -35,12 +38,12 @@ module Trailblazer
         ]
 
         discovered_states = []
-        additional_state_data = {}
 
         already_visited_catch_events = {}
         already_visited_catch_events_again = {} # FIXME: well, yeah.
 
         while resumes_to_invoke.any?
+
           (start_position, lane_positions, ctx_merge, config_payload) = resumes_to_invoke.shift
           puts "~~~~~~~~~"
 
@@ -60,9 +63,14 @@ module Trailblazer
 
           # register new state.
           # Note that we do that before anything is invoked.
-          discovered_states << state = [lane_positions, start_position] # FIXME: we need to add {configuration} here!
+          discovered_state = {}
 
-          state_data = [ctx.inspect]
+          discovered_state = discovered_state.merge(
+            stubbed_positions_before: [lane_positions, start_position],
+            positions_before:         [unstub_positions(original_activity_2_stub_activity, original_task_2_stub_task, lane_positions, lanes: original_lanes), *unstub_positions(original_activity_2_stub_activity, original_task_2_stub_task, [start_position], lanes: Hash.new(0))]
+          )
+
+          discovered_state = discovered_state.merge(ctx_before: [ctx.inspect])
 
           configuration, (ctx, flow) = Trailblazer::Workflow::Collaboration::Synchronous.advance(
             collaboration,
@@ -76,21 +84,22 @@ module Trailblazer
           )
 
         # 3. optional feature: outcome marking
-          additional_state_data[[state.object_id, :outcome]] = config_payload[:outcome]
+          discovered_state = discovered_state.merge(outcome: config_payload[:outcome])
 
 
         # 1. optional feature: tracing
-          state_data << ctx.inspect # context after. DISCUSS: use tracing?
-          additional_state_data[[state.object_id, :ctx]] = state_data
+          discovered_state = discovered_state.merge(ctx_after: ctx.inspect) # context after. DISCUSS: use tracing?
 
         # 2. optional feature: remember stop configuration so we can use that in a test.
           # raise configuration.inspect
           suspend_configuration = configuration
-          additional_state_data[[state.object_id, :suspend_configuration]] = suspend_configuration
+          discovered_state = discovered_state.merge(suspend_configuration: suspend_configuration)
 
           # figure out possible next resumes/catchs:
           last_lane        = configuration.last_lane
           suspend_terminus = configuration.lane_positions[last_lane]
+
+          discovered_states << discovered_state
 
           next if suspend_terminus.instance_of?(Trailblazer::Activity::End) # a real end event!
           # elsif suspend_terminus.is_a?(Trailblazer::Activity::Railway::End) # a real end event!
@@ -114,10 +123,7 @@ module Trailblazer
           end
         end
 
-        # {discovered_states} is compile-time relevant
-        #  {additional_state_data} is runtime
-
-        return discovered_states, additional_state_data
+        return discovered_states
       end
 
       def stub_tasks_for(collaboration, ignore_class: Trailblazer::Activity::End, message_flow:, start_position:, initial_lane_positions:)
@@ -193,6 +199,18 @@ module Trailblazer
         new_initial_lane_positions = Collaboration::Positions.new(new_initial_lane_positions)
 
         return Collaboration::Schema.new(lanes: stubbed_lanes, message_flow: new_message_flow), new_message_flow, new_start_position, new_initial_lane_positions, original_activity_2_stub_activity, original_task_2_stub_task
+      end
+
+      # Get the original lane activity and tasks for a {Positions} set from the stubbed ones.
+      def unstub_positions(original_activity_2_stub_activity, original_task_2_stub_task, positions, lanes: {})
+        real_positions = positions.to_a.collect do |position|
+          Collaboration::Position.new(
+            original_activity_2_stub_activity.invert.fetch(position.activity),
+            position.task # since the task will always be a suspend, a resume or terminus, we can safely use the stubbed one, which is identical to the original.
+          )
+        end.sort { |a, b| lanes.values.index(a.activity) <=> lanes.values.index(b.activity) }
+
+        Collaboration::Positions.new(real_positions)
       end
     end
   end
