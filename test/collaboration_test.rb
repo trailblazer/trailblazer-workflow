@@ -94,14 +94,16 @@ class CollaborationTest < Minitest::Spec
       ui:         lane_activity_ui,
     }
 
+    approver_activity, extended_message_flow, extended_initial_lane_positions = build_custom_editor_lane(lanes, message_flow)
+
+    lanes = lanes.merge(approver: approver_activity)
+
     schema = Trailblazer::Workflow::Collaboration::Schema.new(
       lanes: lanes,
       message_flow: message_flow,
     )
 
-    approver_activity, extended_message_flow, extended_initial_lane_positions = build_custom_editor_lane(lanes, message_flow)
-
-    return schema, lanes.merge(approver: approver_activity), extended_message_flow, extended_initial_lane_positions
+    return schema, lanes, extended_message_flow, extended_initial_lane_positions
   end
 
   # DISCUSS: this is mostly to play around with the "API" of building a Collaboration.
@@ -118,8 +120,9 @@ class CollaborationTest < Minitest::Spec
 
     approver_start_suspend = nil
     approver_activity = Class.new(Trailblazer::Activity::Railway) do
-      step task: approver_start_suspend = Trailblazer::Workflow::Event::Suspend.new(semantic: "invented_semantic", "resumes" => ["xxx"])
+      step task: approver_start_suspend = Trailblazer::Workflow::Event::Suspend.new(semantic: "invented_semantic", "resumes" => ["catch-before-decider-xxx"])
 
+      fail task: Trailblazer::Workflow::Event::Catch.new(semantic: "xxx --> decider"), id: "catch-before-decider-xxx", Output(:success) => Track(:failure)
       fail :decider, id: "xxx",
         Output(:failure) => Trailblazer::Activity::Railway.Id("xxx_reject")
       fail task: decision_is_approve_throw = Trailblazer::Workflow::Event::Throw.new(semantic: "xxx_approve")
@@ -136,7 +139,7 @@ class CollaborationTest < Minitest::Spec
 
     extended_message_flow = message_flow.merge(
       # "throw-after-Activity_0wr78cv"
-      missing_throw_from_notify_approver => [approver_activity, Trailblazer::Activity::Introspect.Nodes(approver_activity, id: "xxx").task],
+      missing_throw_from_notify_approver => [approver_activity, Trailblazer::Activity::Introspect.Nodes(approver_activity, id: "catch-before-decider-xxx").task],
       decision_is_approve_throw => [lifecycle_activity, Trailblazer::Activity::Introspect.Nodes(lifecycle_activity, id: "catch-before-#{approve_id}").task],
       decision_is_reject_throw => [lifecycle_activity, Trailblazer::Activity::Introspect.Nodes(lifecycle_activity, id: "catch-before-#{reject_id}").task],
     )
@@ -278,9 +281,6 @@ class CollaborationTest < Minitest::Spec
     lane_activity_ui = lanes[:ui]
     approver_activity = lanes[:approver]
 
-    # raise schema_hash.keys.inspect
-
-
 
 
 
@@ -297,13 +297,22 @@ class CollaborationTest < Minitest::Spec
 
       run_multiple_times: {
          # We're "clicking" the [Notify_approver] button again, this time to get rejected.
-          Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_notify_approver}").task => {ctx_merge: {decision: false}, config_payload: {outcome: :failure}},
+          Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_notify_approver}").task => {ctx_merge: {
+              # decision: false, # TODO: this is how it should be.
+              :"approver:xxx" => Trailblazer::Activity::Left, # FIXME: {:decision} must be translated to {:"approver:xxx"}
+            }, config_payload: {outcome: :failure}},
 
           # Click [UI Create] again, with invalid data.
-          Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_create}").task => {ctx_merge: {create: false}, config_payload: {outcome: :failure}}, # lifecycle create is supposed to fail.
+          Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_create}").task => {ctx_merge: {
+              # create: false
+              :"lifecycle:Create" => Trailblazer::Activity::Left,
+            }, config_payload: {outcome: :failure}}, # lifecycle create is supposed to fail.
 
           # Click [UI Update] again, with invalid data.
-          Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_update}").task => {ctx_merge: {update: false}, config_payload: {outcome: :failure}}, # lifecycle create is supposed to fail.
+          Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_update}").task => {ctx_merge: {
+              # update: false
+              :"lifecycle:Update" => Trailblazer::Activity::Left,
+            }, config_payload: {outcome: :failure}}, # lifecycle create is supposed to fail.
       }
     )
 

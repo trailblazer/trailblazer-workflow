@@ -130,15 +130,16 @@ module Trailblazer
 
           replaced_tasks = tasks_to_stub.collect do |task, links|
             node  = Activity::Introspect.Nodes(activity, task: task)
-            label = node.data[:label]
+            label = node.data[:label] || node.id # TODO: test this case, when there's no {:label}.
 
             stub_task_name = "#{lane_id}:#{label}".to_sym
-            stub_task = Activity::Testing.def_steps(stub_task_name).method(stub_task_name)
+            stub_task = Activity::Testing.def_tasks(stub_task_name).method(stub_task_name)
 
             # raise label.inspect
             [task, stub_task]
           end.to_h
 
+          # TODO: really remove original tasks from the circuit, as this causes confusion.
           # Now, "replace" (rather: "add") the original task with the stub.
           replaced_tasks.each do |task, stub_task|
             lane_map[stub_task] = lane_map[task]
@@ -155,9 +156,20 @@ module Trailblazer
             [task, new_links]
           end.to_h
 
+          # Add nodes for introspection
+          new_nodes = replaced_tasks.collect do |task, stub_task|
+            node = Activity::Introspect.Nodes(activity, task: task)
+            new_node_attributes = Activity::Schema::Nodes::Attributes.new(node.id, stub_task, node.data, node.outputs)
+
+            [stub_task, new_node_attributes]
+          end.to_h
+
+          existing_nodes = activity.to_h[:nodes]
+          new_nodes = existing_nodes.merge(new_nodes) # DISCUSS: Nodes#merge is not official.
+
           new_circuit = Activity::Circuit.new(new_circuit_map, circuit.to_h[:end_events], start_task: circuit.to_h[:start_task])
 
-          lane = Activity.new(Activity::Schema.new(new_circuit, activity.to_h[:outputs], activity.to_h[:nodes], activity.to_h[:config])) # FIXME: breaking taskWrap here (which is no problem, actually).
+          lane = Activity.new(Activity::Schema.new(new_circuit, activity.to_h[:outputs], new_nodes, activity.to_h[:config])) # FIXME: breaking taskWrap here (which is no problem, actually).
 
           # [lane_id, lane, replaced_tasks]
           [lane_id, lane]
@@ -165,22 +177,16 @@ module Trailblazer
 
         old_activity_2_new_activity = collaboration.to_h[:lanes].collect { |lane_id, activity| [activity, stubbed_lanes[lane_id]] }.to_h
 
-        puts "@@@@@@@@@ activity mapping @@@@@@@@@"
-        pp old_activity_2_new_activity
-
-        # stubbed_tasks = stubbed_lanes.flat_map { |id, lane, replaced_tasks| replaced_tasks.to_a }.to_h # DISCUSS: do we need this?
-
-        # message_flow = collaboration.to_h[:message_flow]
         new_message_flow = message_flow.collect { |throw_evt, (activity, catch_evt)| [throw_evt, [old_activity_2_new_activity[activity], catch_evt]] }.to_h
 
         new_start_position = Collaboration::Position.new(old_activity_2_new_activity.fetch(start_position.activity), start_position.task)
-        # raise start_position.inspect
 
         new_initial_lane_positions = initial_lane_positions.collect do |position|
           # TODO: make lane_positions {Position} instances, too.
-
-          raise position.inspect
+          Collaboration::Position.new(old_activity_2_new_activity[position[0]], position[1])
         end
+
+        new_initial_lane_positions = Collaboration::Positions.new(new_initial_lane_positions)
 
         return Collaboration::Schema.new(lanes: stubbed_lanes, message_flow: new_message_flow), new_message_flow, new_start_position, new_initial_lane_positions
       end
