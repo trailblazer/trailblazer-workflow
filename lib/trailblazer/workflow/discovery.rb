@@ -93,7 +93,10 @@ module Trailblazer
         # 2. optional feature: remember stop configuration so we can use that in a test.
           # raise configuration.inspect
           suspend_configuration = configuration
-          discovered_state = discovered_state.merge(suspend_configuration: suspend_configuration)
+          discovered_state = discovered_state.merge(
+            stubbed_suspend_configuration: suspend_configuration,
+            suspend_configuration: unstub_configuration(original_activity_2_stub_activity, configuration, lanes: original_lanes)
+          )
 
           # figure out possible next resumes/catchs:
           last_lane        = configuration.last_lane
@@ -211,6 +214,19 @@ module Trailblazer
         end.sort { |a, b| lanes.values.index(a.activity) <=> lanes.values.index(b.activity) }
 
         Collaboration::Positions.new(real_positions)
+      end
+
+      def unstub_configuration(original_activity_2_stub_activity, configuration, lanes:)
+
+        real_lane_positions = unstub_positions(original_activity_2_stub_activity, nil, configuration.lane_positions, lanes: lanes)
+
+        real_last_lane = original_activity_2_stub_activity[configuration.last_lane]
+
+        Collaboration::Configuration.new(
+          **configuration.to_h,
+          lane_positions: real_lane_positions,
+          last_lane: real_last_lane
+        )
       end
     end
   end
