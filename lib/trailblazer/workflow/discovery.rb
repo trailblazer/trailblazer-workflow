@@ -107,8 +107,6 @@ module Trailblazer
           next if suspend_terminus.instance_of?(Trailblazer::Activity::End) # a real end event!
           # elsif suspend_terminus.is_a?(Trailblazer::Activity::Railway::End) # a real end event!
 
-          #   raise suspend_terminus.inspect
-
           # Go through all possible resume/catch events and "remember" them
           suspend_terminus.to_h["resumes"].each do |resume_event_id|
             resume_event = Trailblazer::Activity::Introspect.Nodes(last_lane, id: resume_event_id).task

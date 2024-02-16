@@ -191,8 +191,6 @@ class DiscoveryTest < Minitest::Spec
       lanes: lanes_sorted
 
     assert_nil states[15]
-
-
   end
 
   # Asserts
@@ -200,19 +198,17 @@ class DiscoveryTest < Minitest::Spec
   def assert_position_before(actual_positions, expected_ids, start_id:, lanes:)
     actual_lane_positions, actual_start_position = actual_positions
 
-    _assert_positions(actual_lane_positions, expected_ids, lanes: lanes)
+    assert_positions_for(actual_lane_positions, expected_ids, lanes: lanes)
 
     assert_equal Trailblazer::Activity::Introspect.Nodes(actual_start_position.activity, task: actual_start_position.task).id, start_id, "start task mismatch"
   end
 
-  def _assert_positions(actual_lane_positions, expected_ids, lanes:)
-    puts actual_lane_positions.collect { |(a, t)|
-      puts "@@@@@..... #{a.inspect}  #{t}"
-
-      Trailblazer::Activity::Introspect.Nodes(a, task: t).id }.inspect
+  def assert_positions_for(actual_lane_positions, expected_ids, lanes:)
+    # puts actual_lane_positions.collect { |(a, t)| Trailblazer::Activity::Introspect.Nodes(a, task: t).id }.inspect
 
     # FIXME: always use Positions -> Position
     actual_lane_positions.collect.with_index do |actual_position, index|
+      raise actual_position.inspect if actual_position.class == Array # FIXME: remove me.
       actual_activity, actual_task = actual_position.to_a
 
       expected_activity = lanes[index]
@@ -223,14 +219,8 @@ class DiscoveryTest < Minitest::Spec
   end
 
   def assert_position_after(actual_configuration, expected_ids, lanes:)
-    actual_positions = actual_configuration.lane_positions.to_a
+    actual_positions = actual_configuration.lane_positions
 
-    # FIXME: always use Configuration -> Positions -> Position
-    actual_positions = actual_positions.collect.with_index do |actual_position, index|
-      actual_activity, actual_task = actual_position.to_a
-    end
-
-
-    _assert_positions(actual_positions, expected_ids, lanes: lanes)
+    assert_positions_for(actual_positions, expected_ids, lanes: lanes)
   end
 end
