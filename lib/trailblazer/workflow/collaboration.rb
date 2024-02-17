@@ -68,6 +68,18 @@ module Trailblazer
             .collect { |position| position.to_a }
             .collect(&block)
         end
+
+        def ==(b)
+          eql?(b)
+        end
+
+        def eql?(b)
+          hash == b.hash
+        end
+
+        def hash
+          @positions.collect { |position| position.hash }.sort.join("").to_i
+        end
       end
 
 
