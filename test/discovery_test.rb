@@ -235,7 +235,7 @@ class DiscoveryTest < Minitest::Spec
         # DISCUSS: technically, this is an event table, not a state table.
     # state_table = Trailblazer::Workflow::State::Discovery.generate_state_table(states, lanes: lanes_cfg)
 
-    cli_state_table = Trailblazer::Workflow::Discovery::Present.render_cli_state_table(states, lanes_cfg: lanes_cfg)
+    cli_state_table = Trailblazer::Workflow::Discovery::Present::StateTable.(states, lanes_cfg: lanes_cfg)
     puts cli_state_table
     assert_equal cli_state_table,
 %(+---------------------------------+----------------------------------------+

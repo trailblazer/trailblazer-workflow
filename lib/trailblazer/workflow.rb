@@ -19,3 +19,5 @@ require "trailblazer/workflow/test/plan"
 
 require "trailblazer/workflow/discovery"
 require "trailblazer/workflow/discovery/present"
+require "trailblazer/workflow/discovery/present/state_table"
+require "trailblazer/workflow/discovery/present/event_table"

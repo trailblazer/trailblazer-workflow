@@ -99,29 +99,6 @@ class CollaborationTest < Minitest::Spec
     approver_activity = lanes[:approver]
 
 
-
-    # DISCUSS: technically, this is an event table, not a state table.
-    # state_table = Trailblazer::Workflow::State::Discovery.generate_state_table(states, lanes: lanes_cfg)
-
-    cli_state_table = Trailblazer::Workflow::State::Discovery.render_cli_state_table(states, lanes: lanes_cfg)
-    puts cli_state_table
-    assert_equal cli_state_table,
-%(+---------------------------------+--------------------------------------------+
-| state name                      | triggerable events                         |
-+---------------------------------+--------------------------------------------+
-| "> Create form"                 | "UI: ▶Create form"                         |
-| "> Create"                      | "UI: ▶Create"                              |
-| "> Update form/Notify approver" | "UI: ▶Update form", "UI: ▶Notify approver" |
-| "> Update"                      | "UI: ▶Update"                              |
-| "> Delete? form/Publish"        | "UI: ▶Delete? form", "UI: ▶Publish"        |
-| "> Revise form"                 | "UI: ▶Revise form"                         |
-| "> Delete/Cancel"               | "UI: ▶Delete", "UI: ▶Cancel"               |
-| "> Archive"                     | "UI: ▶Archive"                             |
-| "> Revise"                      | "UI: ▶Revise"                              |
-+---------------------------------+--------------------------------------------+
-9 rows in set)
-
-
 # currently, from this table we can read the discovery process, what states were discovered and what start lane positions those states imply.
 # we still have redundant states here, as the discovery algorithm was instructed to invoke several events multiple times.
     cli_state_table = Trailblazer::Workflow::State::Discovery.render_cli_event_table(state_table)
