@@ -238,19 +238,19 @@ class DiscoveryTest < Minitest::Spec
     cli_state_table = Trailblazer::Workflow::Discovery::Present.render_cli_state_table(states, lanes_cfg: lanes_cfg)
     puts cli_state_table
     assert_equal cli_state_table,
-%(+---------------------------------+--------------------------------------------+
-| state name                      | triggerable events                         |
-+---------------------------------+--------------------------------------------+
-| "> Create form"                 | "UI: ▶Create form"                         |
-| "> Create"                      | "UI: ▶Create"                              |
-| "> Update form/Notify approver" | "UI: ▶Update form", "UI: ▶Notify approver" |
-| "> Update"                      | "UI: ▶Update"                              |
-| "> Delete? form/Publish"        | "UI: ▶Delete? form", "UI: ▶Publish"        |
-| "> Revise form"                 | "UI: ▶Revise form"                         |
-| "> Delete/Cancel"               | "UI: ▶Delete", "UI: ▶Cancel"               |
-| "> Archive"                     | "UI: ▶Archive"                             |
-| "> Revise"                      | "UI: ▶Revise"                              |
-+---------------------------------+--------------------------------------------+
+%(+---------------------------------+----------------------------------------+
+| state name                      | triggerable events                     |
++---------------------------------+----------------------------------------+
+| "⛊ Create form"                 | "☝ ▶Create form"                       |
+| "⛊ Create"                      | "☝ ▶Create"                            |
+| "⛊ Update form/Notify approver" | "☝ ▶Update form", "☝ ▶Notify approver" |
+| "⛊ Update"                      | "☝ ▶Update"                            |
+| "⛊ Delete? form/Publish"        | "☝ ▶Delete? form", "☝ ▶Publish"        |
+| "⛊ Revise form"                 | "☝ ▶Revise form"                       |
+| "⛊ Delete/Cancel"               | "☝ ▶Delete", "☝ ▶Cancel"               |
+| "⛊ Archive"                     | "☝ ▶Archive"                           |
+| "⛊ Revise"                      | "☝ ▶Revise"                            |
++---------------------------------+----------------------------------------+
 9 rows in set)
 
   end

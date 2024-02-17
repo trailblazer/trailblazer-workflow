@@ -75,22 +75,20 @@ module Trailblazer
           cli_rows = states.flat_map do |configuration, catch_events|
             suggested_state_name = suggested_state_name_for(catch_events)
 
-            suggested_state_name = "⛊ #{suggested_state_name}"
-              .inspect
+            suggested_state_name = "⛊ #{suggested_state_name}".inspect
 
-
-            # triggerable_events = events
-            #   .collect { |event_position| readable_name_for_catch_event(event_position, lanes_cfg: lanes_cfg).inspect }
-            #   .uniq
-            #   .join(", ")
+            triggerable_events = catch_events
+              .collect { |event_position| readable_name_for_catch_event(*event_position.to_a, lanes_cfg: lanes_cfg).inspect }
+              .uniq
+              .join(", ")
 
 
             Hash[
               "state name",
               suggested_state_name,
 
-              # "triggerable events",
-              # triggerable_events
+              "triggerable events",
+              triggerable_events
             ]
           end
 
