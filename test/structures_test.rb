@@ -19,5 +19,10 @@ class StructuresTest < Minitest::Spec
 
     #@ Positions.collect automatically decomposes each iterated position.
     assert_equal positions.collect { |activity, task| [activity, task] }.inspect, %([[\"A\", \"suspend:a\"], [\"B\", \"suspend:b\"]])
+
+    #@ Positions#replace
+    positions = positions.replace(activity_a, "suspend:c")
+    # DISCUSS: check how the interal order is now different!
+    assert_equal positions.collect { |activity, task| [activity, task] }.inspect, %([[\"B\", \"suspend:b\"], [\"A\", \"suspend:c\"]])
   end
 end
