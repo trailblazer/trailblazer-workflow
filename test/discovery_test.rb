@@ -3,13 +3,14 @@ require "test_helper"
 class DiscoveryTest < Minitest::Spec
   include BuildSchema
 
-  it "Discovery.call" do
+  def states
     ui_create_form = "Activity_0wc2mcq" # TODO: this is from pro-rails tests.
     ui_create = "Activity_1psp91r"
     ui_update = "Activity_0j78uzd"
     ui_notify_approver = "Activity_1dt5di5"
 
-    schema, lanes, message_flow, initial_lane_positions = build_schema()
+    # TODO: either {lanes} or {lanes_cfg}.
+    schema, lanes, message_flow, initial_lane_positions, lanes_cfg = build_schema()
 
     lane_activity = lanes[:lifecycle]
     lane_activity_ui = lanes[:ui]
@@ -50,6 +51,12 @@ class DiscoveryTest < Minitest::Spec
             }, config_payload: {outcome: :failure}}, # lifecycle create is supposed to fail.
       }
     )
+
+    return states, lanes_sorted, lanes_cfg
+  end
+
+  it "Discovery.call" do
+    states, lanes_sorted, lanes_cfg = self.states
 
     # pp states
     # TODO: should we really assert the state table manually?
@@ -206,9 +213,7 @@ class DiscoveryTest < Minitest::Spec
   def assert_positions_for(actual_lane_positions, expected_ids, lanes:)
     # puts actual_lane_positions.collect { |(a, t)| Trailblazer::Activity::Introspect.Nodes(a, task: t).id }.inspect
 
-    # FIXME: always use Positions -> Position
     actual_lane_positions.collect.with_index do |actual_position, index|
-      raise actual_position.inspect if actual_position.class == Array # FIXME: remove me.
       actual_activity, actual_task = actual_position.to_a
 
       expected_activity = lanes[index]
@@ -222,5 +227,31 @@ class DiscoveryTest < Minitest::Spec
     actual_positions = actual_configuration.lane_positions
 
     assert_positions_for(actual_positions, expected_ids, lanes: lanes)
+  end
+
+  it "{#render_cli_state_table}" do
+    states, lanes_sorted, lanes_cfg = self.states()
+
+        # DISCUSS: technically, this is an event table, not a state table.
+    # state_table = Trailblazer::Workflow::State::Discovery.generate_state_table(states, lanes: lanes_cfg)
+
+    cli_state_table = Trailblazer::Workflow::Discovery::Present.render_cli_state_table(states, lanes_cfg: lanes_cfg)
+    puts cli_state_table
+    assert_equal cli_state_table,
+%(+---------------------------------+--------------------------------------------+
+| state name                      | triggerable events                         |
++---------------------------------+--------------------------------------------+
+| "> Create form"                 | "UI: ▶Create form"                         |
+| "> Create"                      | "UI: ▶Create"                              |
+| "> Update form/Notify approver" | "UI: ▶Update form", "UI: ▶Notify approver" |
+| "> Update"                      | "UI: ▶Update"                              |
+| "> Delete? form/Publish"        | "UI: ▶Delete? form", "UI: ▶Publish"        |
+| "> Revise form"                 | "UI: ▶Revise form"                         |
+| "> Delete/Cancel"               | "UI: ▶Delete", "UI: ▶Cancel"               |
+| "> Archive"                     | "UI: ▶Archive"                             |
+| "> Revise"                      | "UI: ▶Revise"                              |
++---------------------------------+--------------------------------------------+
+9 rows in set)
+
   end
 end

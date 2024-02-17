@@ -101,14 +101,23 @@ module BuildSchema
 
     approver_activity, extended_message_flow, extended_initial_lane_positions = build_custom_editor_lane(lanes, message_flow)
 
+    lanes_cfg = lanes_cfg.merge(
+      "approver" => {
+        label: "approver",
+        icon: "☑",
+        activity: approver_activity
+      }
+    )
+
     lanes = lanes.merge(approver: approver_activity)
 
+    # TODO: add {lanes_cfg}.
     schema = Trailblazer::Workflow::Collaboration::Schema.new(
       lanes: lanes,
       message_flow: message_flow,
     )
 
-    return schema, lanes, extended_message_flow, extended_initial_lane_positions
+    return schema, lanes, extended_message_flow, extended_initial_lane_positions, lanes_cfg
   end
 
   # DISCUSS: this is mostly to play around with the "API" of building a Collaboration.

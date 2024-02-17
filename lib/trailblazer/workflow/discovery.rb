@@ -22,7 +22,7 @@ module Trailblazer
 
         original_lanes = collaboration.to_h[:lanes] # this dictates the order within created Positions.
 
-        collaboration, message_flow, start_position, initial_lane_positions, original_activity_2_stub_activity, original_task_2_stub_task = stub_tasks_for(collaboration, message_flow: message_flow, start_position: start_position, initial_lane_positions: initial_lane_positions)
+        collaboration, message_flow, start_position, initial_lane_positions, activity_2_stub, original_task_2_stub_task = stub_tasks_for(collaboration, message_flow: message_flow, start_position: start_position, initial_lane_positions: initial_lane_positions)
 
         # pp collaboration.to_h[:lanes][:ui].to_h
         # raise
@@ -67,7 +67,7 @@ module Trailblazer
 
           discovered_state = discovered_state.merge(
             stubbed_positions_before: [lane_positions, start_position],
-            positions_before:         [unstub_positions(original_activity_2_stub_activity, original_task_2_stub_task, lane_positions, lanes: original_lanes), *unstub_positions(original_activity_2_stub_activity, original_task_2_stub_task, [start_position], lanes: Hash.new(0))]
+            positions_before:         [unstub_positions(activity_2_stub, original_task_2_stub_task, lane_positions, lanes: original_lanes), *unstub_positions(activity_2_stub, original_task_2_stub_task, [start_position], lanes: Hash.new(0))]
           )
 
           discovered_state = discovered_state.merge(ctx_before: [ctx.inspect])
@@ -95,7 +95,7 @@ module Trailblazer
           suspend_configuration = configuration
           discovered_state = discovered_state.merge(
             stubbed_suspend_configuration: suspend_configuration,
-            suspend_configuration: unstub_configuration(original_activity_2_stub_activity, configuration, lanes: original_lanes)
+            suspend_configuration: unstub_configuration(activity_2_stub, configuration, lanes: original_lanes)
           )
 
           # figure out possible next resumes/catchs:
@@ -178,35 +178,35 @@ module Trailblazer
 
           lane = Activity.new(Activity::Schema.new(new_circuit, activity.to_h[:outputs], new_nodes, activity.to_h[:config])) # FIXME: breaking taskWrap here (which is no problem, actually).
 
-          # [lane_id, lane, replaced_tasks]
           [[lane_id, lane], replaced_tasks]
         end
 
+        # DISCUSS: interestingly, we don't need this map as all stubbed tasks are user tasks, and positions always reference suspends or catch events, which arent' stubbed.
         original_task_2_stub_task = collected.inject({}) { |memo, (_, replaced_tasks)| memo.merge(replaced_tasks) }
 
         stubbed_lanes = collected.collect { |lane, _| lane }.to_h
 
-        original_activity_2_stub_activity = collaboration.to_h[:lanes].collect { |lane_id, activity| [activity, stubbed_lanes[lane_id]] }.to_h
+        activity_2_stub = collaboration.to_h[:lanes].collect { |lane_id, activity| [activity, stubbed_lanes[lane_id]] }.to_h
 
-        new_message_flow = message_flow.collect { |throw_evt, (activity, catch_evt)| [throw_evt, [original_activity_2_stub_activity[activity], catch_evt]] }.to_h
+        new_message_flow = message_flow.collect { |throw_evt, (activity, catch_evt)| [throw_evt, [activity_2_stub[activity], catch_evt]] }.to_h
 
-        new_start_position = Collaboration::Position.new(original_activity_2_stub_activity.fetch(start_position.activity), start_position.task)
+        new_start_position = Collaboration::Position.new(activity_2_stub.fetch(start_position.activity), start_position.task)
 
         new_initial_lane_positions = initial_lane_positions.collect do |position|
           # TODO: make lane_positions {Position} instances, too.
-          Collaboration::Position.new(original_activity_2_stub_activity[position[0]], position[1])
+          Collaboration::Position.new(activity_2_stub[position[0]], position[1])
         end
 
         new_initial_lane_positions = Collaboration::Positions.new(new_initial_lane_positions)
 
-        return Collaboration::Schema.new(lanes: stubbed_lanes, message_flow: new_message_flow), new_message_flow, new_start_position, new_initial_lane_positions, original_activity_2_stub_activity, original_task_2_stub_task
+        return Collaboration::Schema.new(lanes: stubbed_lanes, message_flow: new_message_flow), new_message_flow, new_start_position, new_initial_lane_positions, activity_2_stub, original_task_2_stub_task
       end
 
       # Get the original lane activity and tasks for a {Positions} set from the stubbed ones.
-      def unstub_positions(original_activity_2_stub_activity, original_task_2_stub_task, positions, lanes: {})
+      def unstub_positions(activity_2_stub, original_task_2_stub_task, positions, lanes: {})
         real_positions = positions.to_a.collect do |position|
           Collaboration::Position.new(
-            original_activity_2_stub_activity.invert.fetch(position.activity),
+            activity_2_stub.invert.fetch(position.activity),
             position.task # since the task will always be a suspend, a resume or terminus, we can safely use the stubbed one, which is identical to the original.
           )
         end.sort { |a, b| lanes.values.index(a.activity) <=> lanes.values.index(b.activity) }
@@ -214,11 +214,10 @@ module Trailblazer
         Collaboration::Positions.new(real_positions)
       end
 
-      def unstub_configuration(original_activity_2_stub_activity, configuration, lanes:)
+      def unstub_configuration(activity_2_stub, configuration, lanes:)
+        real_lane_positions = unstub_positions(activity_2_stub, nil, configuration.lane_positions, lanes: lanes)
 
-        real_lane_positions = unstub_positions(original_activity_2_stub_activity, nil, configuration.lane_positions, lanes: lanes)
-
-        real_last_lane = original_activity_2_stub_activity[configuration.last_lane]
+        real_last_lane = activity_2_stub[configuration.last_lane]
 
         Collaboration::Configuration.new(
           **configuration.to_h,

@@ -40,7 +40,7 @@ module Trailblazer
       # DISCUSS: is lane_positions same as Configuration?
       class Positions
         def initialize(positions)
-          @positions = positions
+          @positions = positions.sort { |a, b| a.activity.object_id <=> b.activity.object_id } # TODO: allow other orders?
 
           @activity_to_task = positions.collect { |position| [position.activity, position.task] }.to_h
           freeze
@@ -69,7 +69,7 @@ module Trailblazer
             .collect(&block)
         end
 
-        def ==(b)
+        def ==(b) # DISCUSS: needed?
           eql?(b)
         end
 
@@ -78,7 +78,7 @@ module Trailblazer
         end
 
         def hash
-          @positions.collect { |position| position.hash }.sort.join("").to_i
+          @positions.flat_map { |position| position.to_a }.hash
         end
       end
 

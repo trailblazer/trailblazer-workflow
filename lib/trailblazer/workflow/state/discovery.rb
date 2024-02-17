@@ -75,73 +75,9 @@ module Trailblazer
           state_table
         end
 
-        # Each row represents a configuration of suspends aka "state".
-        # The state knows its possible resume events.
-        #   does the state know which state fields belong to it?
-        def self.render_cli_state_table(discovery_state_table)
-          start_position_to_catch = {}
-
-          # Key by lane_positions, which represent a state.
-          # State (lane_positions) => [events (start position)]
-          states = {}
-
-          discovery_state_table.each do |row|
-            configuration = row[:lane_positions]
-
-            events = states[configuration]
-            events = [] if events.nil?
-
-            events << row[:start_position]
-
-            states[configuration] = events
-          end
 
 
-          # render
-          cli_rows = states.flat_map do |configuration, events|
-            suggested_state_name = events
-              .collect { |event| event[:comment][1] }
-              .uniq
-              .join("/")
 
-            suggested_state_name = "> #{suggested_state_name}"
-              .inspect
-
-
-            triggerable_events = events
-              .collect { |event| readable_name_for_catch_event(event).inspect }
-              .uniq
-              .join(", ")
-
-
-            Hash[
-              "state name",
-              suggested_state_name,
-
-              "triggerable events",
-              triggerable_events
-            ]
-          end
-
-          Hirb::Helpers::Table.render(cli_rows, fields: [
-              "state name",
-              "triggerable events",
-              # *lane_ids,
-            ],
-            max_width: 186,
-          ) # 186 for laptop 13"
-        end
-
-        def self.readable_name_for_catch_event(position, envelope_icon: false, lane_icons: {})
-          envelope_icon = "(✉)➔" # TODO: implement {envelope_icon} flag.
-          envelope_icon = "▶"
-
-          lane_name  = position[:tuple][0]
-          lane_label = "#{lane_name}:"
-          lane_label = lane_icons[lane_name] if lane_icons.key?(lane_name)
-
-          "#{lane_label} #{envelope_icon}#{position[:comment][1]}"
-        end
 
         def self.readable_name_for_resume_event(position, tuple: false, lane_icons: {})
           resume_labels = position[:comment][1]
@@ -224,12 +160,6 @@ module Trailblazer
             ],
             max_width: 186,
           ) # 186 for laptop 13"
-        end
-
-        # Find the next connected task, usually outgoing from a catch event.
-        def self.find_next_task_label(activity, catch_event)
-          task_after_catch = activity.to_h[:circuit].to_h[:map][catch_event][Trailblazer::Activity::Right]
-          Trailblazer::Activity::Introspect.Nodes(activity, task: task_after_catch).data[:label] || task_after_catch
         end
 
         def self.serialize_comment(event_name)

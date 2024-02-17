@@ -18,3 +18,4 @@ require "trailblazer/workflow/state/table"
 require "trailblazer/workflow/test/plan"
 
 require "trailblazer/workflow/discovery"
+require "trailblazer/workflow/discovery/present"
