@@ -94,73 +94,7 @@ module Trailblazer
           "#{lane_label} [#{catch_events}]"
         end
 
-        def self.render_cli_event_table(discovery_state_table, render_ids: false, hide_lanes: [])
-          rows = discovery_state_table.flat_map do |row|
-            start_lane_id, start_lane_task_id = row[:start_position][:tuple]
 
-            lane_positions = row[:lane_positions].flat_map do |lane_position|
-              lane_id, suspend_id = lane_position[:tuple]
-              comment = lane_position[:comment][1]
-
-              [
-                lane_id,
-                comment
-              ]
-            end
-
-            # The resulting hash represents one row.
-            state_row = Hash[
-              "event name",
-              row[:event_name].inspect,
-
-              "triggered catch event",
-              readable_name_for_catch_event(row[:start_position]),
-
-              *lane_positions
-            ]
-
-            rows = [
-              state_row,
-            ]
-
-            # FIXME: use developer for coloring.
-            # def bg_gray(str);        "\e[47m#{str}\e[0m" end
-
-          # TODO: optional feature, extract!
-            if render_ids
-              lane_position_ids = row[:lane_positions].flat_map do |lane_position|
-                tuple = lane_position[:tuple]
-
-                # [tuple[0], "\e[34m#{tuple[1]}\e[0m"] # FIXME: when entry is shortened by Hirb, the stop byte gets lost.
-                tuple
-              end
-
-              id_row = Hash[
-                "triggered catch event",
-                "\e[34m#{row[:start_position][:tuple][1]}\e[0m",
-
-                *lane_position_ids, # TODO: this adds the remaining IDs.
-              ]
-
-              rows << id_row
-            end
-
-
-            rows
-          end
-
-          lane_ids = discovery_state_table[0][:lane_positions].collect { |lane_position| lane_position[:tuple][0] }
-
-          lane_ids = lane_ids - hide_lanes # TODO: extract, new feature.
-
-          Hirb::Helpers::Table.render(rows, fields: [
-              "event name",
-              "triggered catch event",
-              *lane_ids,
-            ],
-            max_width: 186,
-          ) # 186 for laptop 13"
-        end
 
         def self.serialize_comment(event_name)
           ["before", event_name]

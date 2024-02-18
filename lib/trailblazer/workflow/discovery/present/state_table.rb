@@ -9,8 +9,6 @@ module Trailblazer
           # Each row represents a configuration of suspends aka "state".
           # The state knows its possible resume events.
           #   does the state know which state fields belong to it?
-          #
-          # TODO: move that to separate module {StateTable.call}.
           def call(discovered_states, lanes_cfg:)
             # raise discovery_state_table.inspect
             start_position_to_catch = {}
@@ -36,7 +34,7 @@ module Trailblazer
             cli_rows = states.flat_map do |configuration, catch_events|
               suggested_state_name = suggested_state_name_for(catch_events)
 
-              suggested_state_name = "⛊ #{suggested_state_name}".inspect
+              suggested_state_name = "⏸︎ #{suggested_state_name}".inspect
 
               triggerable_events = catch_events
                 .collect { |event_position| Present.readable_name_for_catch_event(*event_position.to_a, lanes_cfg: lanes_cfg).inspect }
