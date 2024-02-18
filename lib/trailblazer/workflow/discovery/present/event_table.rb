@@ -17,9 +17,6 @@ module Trailblazer
                 "triggered event",
                 Present.readable_name_for_catch_event(*start_position.to_a, lanes_cfg: lanes_cfg),
 
-                # "triggered catch event",
-                # readable_name_for_catch_event(row[:start_position]),
-
                 *lane_positions
               ]
 
@@ -30,7 +27,10 @@ module Trailblazer
               # FIXME: use developer for coloring.
               # def bg_gray(str);        "\e[47m#{str}\e[0m" end
               if render_ids
+                triggered_event_id_column = {"triggered event" => Present.id_for_task(start_position)}
+
                 rows << render_lane_position_id_columns(positions_before, lanes_cfg: lanes_cfg)
+                  .merge(triggered_event_id_column)
               end
 
               rows
@@ -76,7 +76,7 @@ module Trailblazer
             lane_position_ids = positions_before.to_a.flat_map do |lane_position|
               # Present.readable_id_label(*lane_position.to_a, **options)
               lane_label = lane_label_for(lane_position, **options) # FIXME: redundant in {#render_lane_position_columns}
-              id = Trailblazer::Activity::Introspect.Nodes(lane_position.activity, task: lane_position.task).id
+              id = Present.id_for_task(lane_position)
 
               [
                 lane_label, # column name
@@ -88,6 +88,7 @@ module Trailblazer
               *lane_position_ids, # TODO: this adds the remaining IDs.
             ]
           end
+
 
           def lane_label_for(lane_position, **options)
             Present.lane_options_for(*lane_position.to_a, **options)[:label]

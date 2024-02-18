@@ -40,6 +40,10 @@ module Trailblazer
           lane_options_for(activity, task, lanes_cfg: lanes_cfg)[:icon]
         end
 
+        def id_for_task(lane_position)
+          Trailblazer::Activity::Introspect.Nodes(lane_position.activity, task: lane_position.task).id
+        end
+
         # def readable_id_label(activity, task, **options)
         #   id = Trailblazer::Activity::Introspect.Nodes(activity, task: task).id
         #   lane_label = lane_label_for(activity, task, **options)

@@ -261,40 +261,40 @@ class DiscoveryTest < Minitest::Spec
     cli_state_table_with_ids = Trailblazer::Workflow::Discovery::Present::EventTable.(states, render_ids: true, hide_lanes: ["approver"], lanes_cfg: lanes_cfg)
 puts cli_state_table_with_ids
 assert_equal cli_state_table_with_ids,
-%(+---------------------+---------------------------------------------+----------------------------------------------+
-| triggered event     | lifecycle                                   | UI                                           |
-+---------------------+---------------------------------------------+----------------------------------------------+
-| ☝ ⏵︎Create form     | ⛾ ⏵︎Create                                  | ☝ ⏵︎Create form                              |
-|                     | suspend-gw-to-catch-before-Activity_0wwfenp | suspend-gw-to-catch-before-Activity_0wc2mcq  |
-| ☝ ⏵︎Create          | ⛾ ⏵︎Create                                  | ☝ ⏵︎Create                                   |
-|                     | suspend-gw-to-catch-before-Activity_0wwfenp | suspend-Gateway_14h0q7a                      |
-| ☝ ⏵︎Create          | ⛾ ⏵︎Create                                  | ☝ ⏵︎Create                                   |
-|                     | suspend-gw-to-catch-before-Activity_0wwfenp | suspend-Gateway_14h0q7a                      |
-| ☝ ⏵︎Update form     | ⛾ ⏵︎Update,⛾ ⏵︎Notify approver              | ☝ ⏵︎Update form,☝ ⏵︎Notify approver          |
-|                     | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0kknfje                      |
-| ☝ ⏵︎Notify approver | ⛾ ⏵︎Update,⛾ ⏵︎Notify approver              | ☝ ⏵︎Update form,☝ ⏵︎Notify approver          |
-|                     | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0kknfje                      |
-| ☝ ⏵︎Update          | ⛾ ⏵︎Update,⛾ ⏵︎Notify approver              | ☝ ⏵︎Update                                   |
-|                     | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0nxerxv                      |
-| ☝ ⏵︎Notify approver | ⛾ ⏵︎Update,⛾ ⏵︎Notify approver              | ☝ ⏵︎Update form,☝ ⏵︎Notify approver          |
-|                     | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0kknfje                      |
-| ☝ ⏵︎Delete? form    | ⛾ ⏵︎Publish,⛾ ⏵︎Delete,⛾ ⏵︎Update           | ☝ ⏵︎Update form,☝ ⏵︎Delete? form,☝ ⏵︎Publish |
-|                     | suspend-Gateway_1hp2ssj                     | suspend-Gateway_1sq41iq                      |
-| ☝ ⏵︎Publish         | ⛾ ⏵︎Publish,⛾ ⏵︎Delete,⛾ ⏵︎Update           | ☝ ⏵︎Update form,☝ ⏵︎Delete? form,☝ ⏵︎Publish |
-|                     | suspend-Gateway_1hp2ssj                     | suspend-Gateway_1sq41iq                      |
-| ☝ ⏵︎Update          | ⛾ ⏵︎Update,⛾ ⏵︎Notify approver              | ☝ ⏵︎Update                                   |
-|                     | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0nxerxv                      |
-| ☝ ⏵︎Revise form     | ⛾ ⏵︎Revise                                  | ☝ ⏵︎Revise form                              |
-|                     | suspend-Gateway_01p7uj7                     | suspend-gw-to-catch-before-Activity_0zsock2  |
-| ☝ ⏵︎Delete          | ⛾ ⏵︎Publish,⛾ ⏵︎Delete,⛾ ⏵︎Update           | ☝ ⏵︎Delete,☝ ⏵︎Cancel                        |
-|                     | suspend-Gateway_1hp2ssj                     | suspend-Gateway_100g9dn                      |
-| ☝ ⏵︎Cancel          | ⛾ ⏵︎Publish,⛾ ⏵︎Delete,⛾ ⏵︎Update           | ☝ ⏵︎Delete,☝ ⏵︎Cancel                        |
-|                     | suspend-Gateway_1hp2ssj                     | suspend-Gateway_100g9dn                      |
-| ☝ ⏵︎Archive         | ⛾ ⏵︎Archive                                 | ☝ ⏵︎Archive                                  |
-|                     | suspend-gw-to-catch-before-Activity_1hgscu3 | suspend-gw-to-catch-before-Activity_0fy41qq  |
-| ☝ ⏵︎Revise          | ⛾ ⏵︎Revise                                  | ☝ ⏵︎Revise                                   |
-|                     | suspend-Gateway_01p7uj7                     | suspend-Gateway_1xs96ik                      |
-+---------------------+---------------------------------------------+----------------------------------------------+
+%(+-------------------------------+---------------------------------------------+----------------------------------------------+
+| triggered event               | lifecycle                                   | UI                                           |
++-------------------------------+---------------------------------------------+----------------------------------------------+
+| ☝ ⏵︎Create form               | ⛾ ⏵︎Create                                  | ☝ ⏵︎Create form                              |
+| catch-before-Activity_0wc2mcq | suspend-gw-to-catch-before-Activity_0wwfenp | suspend-gw-to-catch-before-Activity_0wc2mcq  |
+| ☝ ⏵︎Create                    | ⛾ ⏵︎Create                                  | ☝ ⏵︎Create                                   |
+| catch-before-Activity_1psp91r | suspend-gw-to-catch-before-Activity_0wwfenp | suspend-Gateway_14h0q7a                      |
+| ☝ ⏵︎Create                    | ⛾ ⏵︎Create                                  | ☝ ⏵︎Create                                   |
+| catch-before-Activity_1psp91r | suspend-gw-to-catch-before-Activity_0wwfenp | suspend-Gateway_14h0q7a                      |
+| ☝ ⏵︎Update form               | ⛾ ⏵︎Update,⛾ ⏵︎Notify approver              | ☝ ⏵︎Update form,☝ ⏵︎Notify approver          |
+| catch-before-Activity_1165bw9 | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0kknfje                      |
+| ☝ ⏵︎Notify approver           | ⛾ ⏵︎Update,⛾ ⏵︎Notify approver              | ☝ ⏵︎Update form,☝ ⏵︎Notify approver          |
+| catch-before-Activity_1dt5di5 | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0kknfje                      |
+| ☝ ⏵︎Update                    | ⛾ ⏵︎Update,⛾ ⏵︎Notify approver              | ☝ ⏵︎Update                                   |
+| catch-before-Activity_0j78uzd | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0nxerxv                      |
+| ☝ ⏵︎Notify approver           | ⛾ ⏵︎Update,⛾ ⏵︎Notify approver              | ☝ ⏵︎Update form,☝ ⏵︎Notify approver          |
+| catch-before-Activity_1dt5di5 | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0kknfje                      |
+| ☝ ⏵︎Delete? form              | ⛾ ⏵︎Publish,⛾ ⏵︎Delete,⛾ ⏵︎Update           | ☝ ⏵︎Update form,☝ ⏵︎Delete? form,☝ ⏵︎Publish |
+| catch-before-Activity_0ha7224 | suspend-Gateway_1hp2ssj                     | suspend-Gateway_1sq41iq                      |
+| ☝ ⏵︎Publish                   | ⛾ ⏵︎Publish,⛾ ⏵︎Delete,⛾ ⏵︎Update           | ☝ ⏵︎Update form,☝ ⏵︎Delete? form,☝ ⏵︎Publish |
+| catch-before-Activity_0bsjggk | suspend-Gateway_1hp2ssj                     | suspend-Gateway_1sq41iq                      |
+| ☝ ⏵︎Update                    | ⛾ ⏵︎Update,⛾ ⏵︎Notify approver              | ☝ ⏵︎Update                                   |
+| catch-before-Activity_0j78uzd | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0nxerxv                      |
+| ☝ ⏵︎Revise form               | ⛾ ⏵︎Revise                                  | ☝ ⏵︎Revise form                              |
+| catch-before-Activity_0zsock2 | suspend-Gateway_01p7uj7                     | suspend-gw-to-catch-before-Activity_0zsock2  |
+| ☝ ⏵︎Delete                    | ⛾ ⏵︎Publish,⛾ ⏵︎Delete,⛾ ⏵︎Update           | ☝ ⏵︎Delete,☝ ⏵︎Cancel                        |
+| catch-before-Activity_15nnysv | suspend-Gateway_1hp2ssj                     | suspend-Gateway_100g9dn                      |
+| ☝ ⏵︎Cancel                    | ⛾ ⏵︎Publish,⛾ ⏵︎Delete,⛾ ⏵︎Update           | ☝ ⏵︎Delete,☝ ⏵︎Cancel                        |
+| catch-before-Activity_1uhozy1 | suspend-Gateway_1hp2ssj                     | suspend-Gateway_100g9dn                      |
+| ☝ ⏵︎Archive                   | ⛾ ⏵︎Archive                                 | ☝ ⏵︎Archive                                  |
+| catch-before-Activity_0fy41qq | suspend-gw-to-catch-before-Activity_1hgscu3 | suspend-gw-to-catch-before-Activity_0fy41qq  |
+| ☝ ⏵︎Revise                    | ⛾ ⏵︎Revise                                  | ☝ ⏵︎Revise                                   |
+| catch-before-Activity_1wiumzv | suspend-Gateway_01p7uj7                     | suspend-Gateway_1xs96ik                      |
++-------------------------------+---------------------------------------------+----------------------------------------------+
 30 rows in set)
   end
 end

@@ -13,7 +13,6 @@ require "trailblazer/workflow/collaboration/messages"
 require "trailblazer/workflow/event"
 require "trailblazer/workflow/state/discovery"
 require "trailblazer/workflow/state/discovery/testing"
-require "trailblazer/workflow/state/table"
 
 require "trailblazer/workflow/test/plan"
 
