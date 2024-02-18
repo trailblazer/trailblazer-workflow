@@ -70,8 +70,10 @@ module Trailblazer
       end
 
       module Plan
+        module_function
+
         # Code fragment with assertions for the discovered/configured test plan.
-        def self.for(test_structure, input:)
+        def for(test_structure, input:)
           code_string = test_structure.collect do |row|
 
 
@@ -88,6 +90,90 @@ assert_exposes ctx, seq: [:revise, :revise], reader: :[]
 )
           end
         end
+
+        def render_comment_header(discovered_states, **options)
+          CommentHeader.(discovered_states, **options)
+        end
+
+        module CommentHeader
+          module_function
+
+          def call(discovered_states, **options)
+
+            all_start_position_labels = discovered_states.collect do |row|
+              row[:positions_before][0].collect do |activity, task|
+                [
+                  activity,
+                  Discovery::Present.readable_name_for_suspend_or_terminus(activity, task, **options)
+                ]
+              end
+            end
+
+            start_position_combined_column = format_positions_column(all_start_position_labels, **options)
+
+            rows = discovered_states.collect.with_index do |row, index|
+              positions_before, start_position = row[:positions_before]
+
+              Hash[
+                "triggered catch",
+                start_position_label(start_position, row, **options),
+
+                "start configuration",
+                # start_configuration(positions_before, **options)
+                start_position_combined_column[index],
+              ]
+            end
+
+            Discovery::Present::Table.render(["triggered catch", "start configuration"], rows)
+          end
+
+          def start_position_label(start_position, row, **options)
+            outcome = row[:outcome]
+
+            start_position_label_for(start_position, expected_outcome: outcome, **options)
+          end
+
+          def start_position_label_for(position, expected_outcome:, **options)
+            event_label = Discovery::Present.readable_name_for_catch_event(*position.to_a, **options)
+
+            event_label += " ⛞" if expected_outcome == :failure # FIXME: what happens to :symbol after serialization?
+
+            event_label
+          end
+
+
+          def compute_combined_column_widths(position_rows, lanes_cfg:, **)
+            # Find out the longest entry per lane.
+            columns = lanes_cfg.collect { |_, cfg| [cfg[:activity], []] }.to_h # {<lifecycle> => [], ...}
+
+            position_rows.each do |event_labels|
+              event_labels.each do |(activity, suspend_label)|
+                length = suspend_label ? suspend_label.length : 0 # DISCUSS: why can {suspend_label} be nil?
+
+                columns[activity] << length
+              end
+            end
+
+            _columns_2_length = columns.collect { |activity, lengths| [activity, lengths.max] }.to_h
+          end
+
+          def format_positions_column(position_rows, lanes_cfg:, **options)
+            columns_2_length = compute_combined_column_widths(position_rows, lanes_cfg: lanes_cfg, **options)
+
+            rows = position_rows.collect do |event_labels|
+              columns = event_labels.collect do |activity, suspend_label|
+                col_length = columns_2_length[activity]
+
+                suspend_label.ljust(col_length, " ")
+              end
+
+              content = columns.join(" ")
+            end
+
+            rows
+          end
+        end
+
       end
 
     end # Test

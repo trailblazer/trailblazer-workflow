@@ -13,15 +13,20 @@ module Trailblazer
           Trailblazer::Activity::Introspect.Nodes(activity, task: task_after_catch).data[:label] || task_after_catch
         end
 
-        def readable_name_for_catch_event(activity, catch_event, lanes_cfg: {})
+        def readable_name_for_catch_event(activity, catch_event, show_lane_icon: true, lanes_cfg: {})
           envelope_icon = "(✉)➔" # TODO: implement {envelope_icon} flag.
           envelope_icon = "⏵︎"
 
-          lane_label = lane_label_for(activity, catch_event, lanes_cfg: lanes_cfg)
+          lane_label = if show_lane_icon
+            _lane_label = lane_label_for(activity, catch_event, lanes_cfg: lanes_cfg)
+            "#{_lane_label} "
+          else
+            ""
+          end
 
           event_label = label_for_next_task(activity, catch_event)
 
-          "#{lane_label} #{envelope_icon}#{event_label}"
+          "#{lane_label}#{envelope_icon}#{event_label}"
         end
 
         # Compute real catch events from the ID for a particular resume.
@@ -32,12 +37,15 @@ module Trailblazer
         end
 
         def readable_name_for_suspend_or_terminus(activity, event, **options)
+          lane_icon = lane_label_for(activity, event, **options)
+
           if event.to_h["resumes"].nil? # Terminus.
-            readable_lane_position = "◉End.#{event.to_h[:semantic]}"
+            readable_lane_position = "#{lane_icon} ◉End.#{event.to_h[:semantic]}"
           else
-            readable_lane_position = Present.resumes_from_suspend(activity, event).collect do |catch_event|
-              Present.readable_name_for_catch_event(activity, catch_event, **options)
-            end.join(",")
+            catch_labels = Present.resumes_from_suspend(activity, event).collect do |catch_event|
+              Present.readable_name_for_catch_event(activity, catch_event, show_lane_icon: false, **options)
+            end.join(" ")
+            "#{lane_icon} #{catch_labels}"
           end
         end
 
