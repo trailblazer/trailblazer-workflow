@@ -51,13 +51,8 @@ module Trailblazer
               ]
             end
 
-            Hirb::Helpers::Table.render(cli_rows, fields: [
-                "state name",
-                "triggerable events",
-                # *lane_ids,
-              ],
-              max_width: 186,
-            ) # 186 for laptop 13"
+            columns = ["state name", "triggerable events"]
+            Present::Table.render(columns, cli_rows)
           end
 
           # @private

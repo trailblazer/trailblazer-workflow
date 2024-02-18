@@ -37,18 +37,12 @@ module Trailblazer
             end
 
 
-            pp rows
             lane_labels = lanes_cfg.collect { |id, cfg| cfg[:label] }
 
             lane_labels = lane_labels - hide_lanes # TODO: extract, new feature.
 
-            Hirb::Helpers::Table.render(rows, fields: [
-                # "event name",
-                "triggered event",
-                *lane_labels,
-              ],
-              max_width: 186,
-            ) # 186 for laptop 13"
+            columns = ["triggered event", *lane_labels]
+            Present::Table.render(columns, rows)
           end
 
           # @private
@@ -56,14 +50,7 @@ module Trailblazer
             lane_positions = positions_before.to_a.flat_map do |lane_position|
               lane_label = Present.lane_options_for(*lane_position.to_a, **options)[:label]
 
-              # DISCUSS: extract?
-              if lane_position.task.to_h["resumes"].nil? # Terminus.
-                readable_lane_position = "◉End.#{lane_position.task.to_h[:semantic]}"
-              else
-                readable_lane_position = Present.resumes_from_suspend(*lane_position.to_a).collect do |catch_event|
-                  Present.readable_name_for_catch_event(lane_position.activity, catch_event, **options)
-                end.join(",")
-              end
+              readable_lane_position = Present.readable_name_for_suspend_or_terminus(*lane_position.to_a, **options)
 
               [
                 lane_label,

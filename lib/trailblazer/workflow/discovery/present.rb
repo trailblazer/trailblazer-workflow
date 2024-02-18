@@ -31,6 +31,16 @@ module Trailblazer
           end
         end
 
+        def readable_name_for_suspend_or_terminus(activity, event, **options)
+          if event.to_h["resumes"].nil? # Terminus.
+            readable_lane_position = "◉End.#{event.to_h[:semantic]}"
+          else
+            readable_lane_position = Present.resumes_from_suspend(activity, event).collect do |catch_event|
+              Present.readable_name_for_catch_event(activity, catch_event, **options)
+            end.join(",")
+          end
+        end
+
         def lane_options_for(activity, task, lanes_cfg:)
           lanes_cfg.values.find { |options| options[:activity] == activity } or raise
         end
@@ -50,6 +60,24 @@ module Trailblazer
 
         #   %(#{lane_label} #{id})
         # end
+
+        module Table
+          module_function
+
+          # {rows} are [{column_name => content}]
+          def rows_for_terminal_table(columns, rows)
+            rows.collect do |row|
+              columns.collect { |column_name| row[column_name] }
+            end
+          end
+
+          def render(columns, rows)
+            rows_for_terminal_table = Present::Table.rows_for_terminal_table(columns, rows)
+            # pp rows_for_terminal_table
+
+            Terminal::Table.new(headings: columns, rows: rows_for_terminal_table).to_s
+          end
+        end
       end
     end
   end

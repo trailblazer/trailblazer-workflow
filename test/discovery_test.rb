@@ -1,9 +1,9 @@
 require "test_helper"
 
 class DiscoveryTest < Minitest::Spec
-  include BuildSchema
+  extend BuildSchema
 
-  def states
+  def self.states
     ui_create_form = "Activity_0wc2mcq" # TODO: this is from pro-rails tests.
     ui_create = "Activity_1psp91r"
     ui_update = "Activity_0j78uzd"
@@ -56,7 +56,7 @@ class DiscoveryTest < Minitest::Spec
   end
 
   it "Discovery.call" do
-    states, lanes_sorted, lanes_cfg = self.states
+    states, lanes_sorted, lanes_cfg = self.class.states
 
     # pp states
     # TODO: should we really assert the state table manually?
@@ -230,7 +230,7 @@ class DiscoveryTest < Minitest::Spec
   end
 
   it "{#render_cli_state_table}" do
-    states, lanes_sorted, lanes_cfg = self.states()
+    states, lanes_sorted, lanes_cfg = self.class.states()
 
         # DISCUSS: technically, this is an event table, not a state table.
     # state_table = Trailblazer::Workflow::State::Discovery.generate_state_table(states, lanes: lanes_cfg)
@@ -238,63 +238,74 @@ class DiscoveryTest < Minitest::Spec
     cli_state_table = Trailblazer::Workflow::Discovery::Present::StateTable.(states, lanes_cfg: lanes_cfg)
     puts cli_state_table
     assert_equal cli_state_table,
-%(+----------------------------------+------------------------------------------+
-| state name                       | triggerable events                       |
-+----------------------------------+------------------------------------------+
-| "⏸︎ Create form"                 | "☝ ⏵︎Create form"                        |
-| "⏸︎ Create"                      | "☝ ⏵︎Create"                             |
+%(+---------------------------------+----------------------------------------+
+| state name                      | triggerable events                     |
++---------------------------------+----------------------------------------+
+| "⏸︎ Create form"                 | "☝ ⏵︎Create form"                       |
+| "⏸︎ Create"                      | "☝ ⏵︎Create"                            |
 | "⏸︎ Update form/Notify approver" | "☝ ⏵︎Update form", "☝ ⏵︎Notify approver" |
-| "⏸︎ Update"                      | "☝ ⏵︎Update"                             |
+| "⏸︎ Update"                      | "☝ ⏵︎Update"                            |
 | "⏸︎ Delete? form/Publish"        | "☝ ⏵︎Delete? form", "☝ ⏵︎Publish"        |
-| "⏸︎ Revise form"                 | "☝ ⏵︎Revise form"                        |
+| "⏸︎ Revise form"                 | "☝ ⏵︎Revise form"                       |
 | "⏸︎ Delete/Cancel"               | "☝ ⏵︎Delete", "☝ ⏵︎Cancel"               |
-| "⏸︎ Archive"                     | "☝ ⏵︎Archive"                            |
-| "⏸︎ Revise"                      | "☝ ⏵︎Revise"                             |
-+----------------------------------+------------------------------------------+
-9 rows in set)
+| "⏸︎ Archive"                     | "☝ ⏵︎Archive"                           |
+| "⏸︎ Revise"                      | "☝ ⏵︎Revise"                            |
++---------------------------------+----------------------------------------+)
 
   end
 
+  # DISCUSS: currently, this event table doesn't make a lot of sense.
   it "{Present::EventTable.call}" do
-    states, lanes_sorted, lanes_cfg = self.states()
+    states, lanes_sorted, lanes_cfg = self.class.states()
 
     cli_state_table_with_ids = Trailblazer::Workflow::Discovery::Present::EventTable.(states, render_ids: true, hide_lanes: ["approver"], lanes_cfg: lanes_cfg)
 puts cli_state_table_with_ids
 assert_equal cli_state_table_with_ids,
-%(+-------------------------------+---------------------------------------------+----------------------------------------------+
-| triggered event               | lifecycle                                   | UI                                           |
-+-------------------------------+---------------------------------------------+----------------------------------------------+
-| ☝ ⏵︎Create form               | ⛾ ⏵︎Create                                  | ☝ ⏵︎Create form                              |
-| catch-before-Activity_0wc2mcq | suspend-gw-to-catch-before-Activity_0wwfenp | suspend-gw-to-catch-before-Activity_0wc2mcq  |
-| ☝ ⏵︎Create                    | ⛾ ⏵︎Create                                  | ☝ ⏵︎Create                                   |
-| catch-before-Activity_1psp91r | suspend-gw-to-catch-before-Activity_0wwfenp | suspend-Gateway_14h0q7a                      |
-| ☝ ⏵︎Create                    | ⛾ ⏵︎Create                                  | ☝ ⏵︎Create                                   |
-| catch-before-Activity_1psp91r | suspend-gw-to-catch-before-Activity_0wwfenp | suspend-Gateway_14h0q7a                      |
-| ☝ ⏵︎Update form               | ⛾ ⏵︎Update,⛾ ⏵︎Notify approver              | ☝ ⏵︎Update form,☝ ⏵︎Notify approver          |
-| catch-before-Activity_1165bw9 | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0kknfje                      |
-| ☝ ⏵︎Notify approver           | ⛾ ⏵︎Update,⛾ ⏵︎Notify approver              | ☝ ⏵︎Update form,☝ ⏵︎Notify approver          |
-| catch-before-Activity_1dt5di5 | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0kknfje                      |
-| ☝ ⏵︎Update                    | ⛾ ⏵︎Update,⛾ ⏵︎Notify approver              | ☝ ⏵︎Update                                   |
-| catch-before-Activity_0j78uzd | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0nxerxv                      |
-| ☝ ⏵︎Notify approver           | ⛾ ⏵︎Update,⛾ ⏵︎Notify approver              | ☝ ⏵︎Update form,☝ ⏵︎Notify approver          |
-| catch-before-Activity_1dt5di5 | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0kknfje                      |
-| ☝ ⏵︎Delete? form              | ⛾ ⏵︎Publish,⛾ ⏵︎Delete,⛾ ⏵︎Update           | ☝ ⏵︎Update form,☝ ⏵︎Delete? form,☝ ⏵︎Publish |
-| catch-before-Activity_0ha7224 | suspend-Gateway_1hp2ssj                     | suspend-Gateway_1sq41iq                      |
-| ☝ ⏵︎Publish                   | ⛾ ⏵︎Publish,⛾ ⏵︎Delete,⛾ ⏵︎Update           | ☝ ⏵︎Update form,☝ ⏵︎Delete? form,☝ ⏵︎Publish |
-| catch-before-Activity_0bsjggk | suspend-Gateway_1hp2ssj                     | suspend-Gateway_1sq41iq                      |
-| ☝ ⏵︎Update                    | ⛾ ⏵︎Update,⛾ ⏵︎Notify approver              | ☝ ⏵︎Update                                   |
-| catch-before-Activity_0j78uzd | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0nxerxv                      |
-| ☝ ⏵︎Revise form               | ⛾ ⏵︎Revise                                  | ☝ ⏵︎Revise form                              |
-| catch-before-Activity_0zsock2 | suspend-Gateway_01p7uj7                     | suspend-gw-to-catch-before-Activity_0zsock2  |
-| ☝ ⏵︎Delete                    | ⛾ ⏵︎Publish,⛾ ⏵︎Delete,⛾ ⏵︎Update           | ☝ ⏵︎Delete,☝ ⏵︎Cancel                        |
-| catch-before-Activity_15nnysv | suspend-Gateway_1hp2ssj                     | suspend-Gateway_100g9dn                      |
-| ☝ ⏵︎Cancel                    | ⛾ ⏵︎Publish,⛾ ⏵︎Delete,⛾ ⏵︎Update           | ☝ ⏵︎Delete,☝ ⏵︎Cancel                        |
-| catch-before-Activity_1uhozy1 | suspend-Gateway_1hp2ssj                     | suspend-Gateway_100g9dn                      |
-| ☝ ⏵︎Archive                   | ⛾ ⏵︎Archive                                 | ☝ ⏵︎Archive                                  |
-| catch-before-Activity_0fy41qq | suspend-gw-to-catch-before-Activity_1hgscu3 | suspend-gw-to-catch-before-Activity_0fy41qq  |
-| ☝ ⏵︎Revise                    | ⛾ ⏵︎Revise                                  | ☝ ⏵︎Revise                                   |
-| catch-before-Activity_1wiumzv | suspend-Gateway_01p7uj7                     | suspend-Gateway_1xs96ik                      |
-+-------------------------------+---------------------------------------------+----------------------------------------------+
-30 rows in set)
+%(+-------------------------------+---------------------------------------------+---------------------------------------------+
+| triggered event               | lifecycle                                   | UI                                          |
++-------------------------------+---------------------------------------------+---------------------------------------------+
+| ☝ ⏵︎Create form                | ⛾ ⏵︎Create                                   | ☝ ⏵︎Create form                              |
+| catch-before-Activity_0wc2mcq | suspend-gw-to-catch-before-Activity_0wwfenp | suspend-gw-to-catch-before-Activity_0wc2mcq |
+| ☝ ⏵︎Create                     | ⛾ ⏵︎Create                                   | ☝ ⏵︎Create                                   |
+| catch-before-Activity_1psp91r | suspend-gw-to-catch-before-Activity_0wwfenp | suspend-Gateway_14h0q7a                     |
+| ☝ ⏵︎Create                     | ⛾ ⏵︎Create                                   | ☝ ⏵︎Create                                   |
+| catch-before-Activity_1psp91r | suspend-gw-to-catch-before-Activity_0wwfenp | suspend-Gateway_14h0q7a                     |
+| ☝ ⏵︎Update form                | ⛾ ⏵︎Update,⛾ ⏵︎Notify approver                | ☝ ⏵︎Update form,☝ ⏵︎Notify approver           |
+| catch-before-Activity_1165bw9 | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0kknfje                     |
+| ☝ ⏵︎Notify approver            | ⛾ ⏵︎Update,⛾ ⏵︎Notify approver                | ☝ ⏵︎Update form,☝ ⏵︎Notify approver           |
+| catch-before-Activity_1dt5di5 | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0kknfje                     |
+| ☝ ⏵︎Update                     | ⛾ ⏵︎Update,⛾ ⏵︎Notify approver                | ☝ ⏵︎Update                                   |
+| catch-before-Activity_0j78uzd | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0nxerxv                     |
+| ☝ ⏵︎Notify approver            | ⛾ ⏵︎Update,⛾ ⏵︎Notify approver                | ☝ ⏵︎Update form,☝ ⏵︎Notify approver           |
+| catch-before-Activity_1dt5di5 | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0kknfje                     |
+| ☝ ⏵︎Delete? form               | ⛾ ⏵︎Publish,⛾ ⏵︎Delete,⛾ ⏵︎Update              | ☝ ⏵︎Update form,☝ ⏵︎Delete? form,☝ ⏵︎Publish   |
+| catch-before-Activity_0ha7224 | suspend-Gateway_1hp2ssj                     | suspend-Gateway_1sq41iq                     |
+| ☝ ⏵︎Publish                    | ⛾ ⏵︎Publish,⛾ ⏵︎Delete,⛾ ⏵︎Update              | ☝ ⏵︎Update form,☝ ⏵︎Delete? form,☝ ⏵︎Publish   |
+| catch-before-Activity_0bsjggk | suspend-Gateway_1hp2ssj                     | suspend-Gateway_1sq41iq                     |
+| ☝ ⏵︎Update                     | ⛾ ⏵︎Update,⛾ ⏵︎Notify approver                | ☝ ⏵︎Update                                   |
+| catch-before-Activity_0j78uzd | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0nxerxv                     |
+| ☝ ⏵︎Revise form                | ⛾ ⏵︎Revise                                   | ☝ ⏵︎Revise form                              |
+| catch-before-Activity_0zsock2 | suspend-Gateway_01p7uj7                     | suspend-gw-to-catch-before-Activity_0zsock2 |
+| ☝ ⏵︎Delete                     | ⛾ ⏵︎Publish,⛾ ⏵︎Delete,⛾ ⏵︎Update              | ☝ ⏵︎Delete,☝ ⏵︎Cancel                         |
+| catch-before-Activity_15nnysv | suspend-Gateway_1hp2ssj                     | suspend-Gateway_100g9dn                     |
+| ☝ ⏵︎Cancel                     | ⛾ ⏵︎Publish,⛾ ⏵︎Delete,⛾ ⏵︎Update              | ☝ ⏵︎Delete,☝ ⏵︎Cancel                         |
+| catch-before-Activity_1uhozy1 | suspend-Gateway_1hp2ssj                     | suspend-Gateway_100g9dn                     |
+| ☝ ⏵︎Archive                    | ⛾ ⏵︎Archive                                  | ☝ ⏵︎Archive                                  |
+| catch-before-Activity_0fy41qq | suspend-gw-to-catch-before-Activity_1hgscu3 | suspend-gw-to-catch-before-Activity_0fy41qq |
+| ☝ ⏵︎Revise                     | ⛾ ⏵︎Revise                                   | ☝ ⏵︎Revise                                   |
+| catch-before-Activity_1wiumzv | suspend-Gateway_01p7uj7                     | suspend-Gateway_1xs96ik                     |
++-------------------------------+---------------------------------------------+---------------------------------------------+)
+  end
+end
+
+class DiscoveryTestPlanTest < Minitest::Spec
+  it "render comment header for test plan" do
+    states, lanes_sorted, lanes_cfg = DiscoveryTest.states()
+
+    # this usually happens straight after discovery:
+    test_plan_comment_header = Trailblazer::Workflow::Test::Plan.render_comment_header(states, lanes_cfg: lanes_cfg)
+    puts test_plan_comment_header
+    assert_equal test_plan_comment_header, %(
+)
   end
 end

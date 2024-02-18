@@ -35,5 +35,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "multi_json"
   spec.add_dependency "trailblazer-macro"
   spec.add_dependency "trailblazer-activity", ">= 0.16.2", "< 0.17.0"
+  spec.add_dependency "terminal-table"
   spec.add_development_dependency "minitest-line"
 end
