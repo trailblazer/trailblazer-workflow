@@ -306,24 +306,24 @@ class DiscoveryTestPlanTest < Minitest::Spec
     test_plan_comment_header = Trailblazer::Workflow::Test::Plan.render_comment_header(states, lanes_cfg: lanes_cfg)
     puts test_plan_comment_header
     assert_equal test_plan_comment_header,
-%(+----------------------+-----------------------------------------------------------------------------------------------------------------------------------+
-| triggered catch      | start configuration                                                                                                               |
-+----------------------+-----------------------------------------------------------------------------------------------------------------------------------+
-| ☝ ⏵︎Create form       | ⛾ ⏵︎Create                  ☝ ⏵︎Create form                        ☑ ⏵︎#<Trailblazer::Activity::TaskBuilder::Task user_proc=decider> |
-| ☝ ⏵︎Create            | ⛾ ⏵︎Create                  ☝ ⏵︎Create                             ☑ ⏵︎#<Trailblazer::Activity::TaskBuilder::Task user_proc=decider> |
-| ☝ ⏵︎Create ⛞          | ⛾ ⏵︎Create                  ☝ ⏵︎Create                             ☑ ⏵︎#<Trailblazer::Activity::TaskBuilder::Task user_proc=decider> |
-| ☝ ⏵︎Update form       | ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update form ⏵︎Notify approver       ☑ ⏵︎#<Trailblazer::Activity::TaskBuilder::Task user_proc=decider> |
-| ☝ ⏵︎Notify approver   | ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update form ⏵︎Notify approver       ☑ ⏵︎#<Trailblazer::Activity::TaskBuilder::Task user_proc=decider> |
-| ☝ ⏵︎Update            | ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update                             ☑ ⏵︎#<Trailblazer::Activity::TaskBuilder::Task user_proc=decider> |
-| ☝ ⏵︎Notify approver ⛞ | ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update form ⏵︎Notify approver       ☑ ⏵︎#<Trailblazer::Activity::TaskBuilder::Task user_proc=decider> |
-| ☝ ⏵︎Delete? form      | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish ☑ ◉End.failure                                                   |
-| ☝ ⏵︎Publish           | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish ☑ ◉End.failure                                                   |
-| ☝ ⏵︎Update ⛞          | ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update                             ☑ ⏵︎#<Trailblazer::Activity::TaskBuilder::Task user_proc=decider> |
-| ☝ ⏵︎Revise form       | ⛾ ⏵︎Revise                  ☝ ⏵︎Revise form                        ☑ ◉End.success                                                   |
-| ☝ ⏵︎Delete            | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update ☝ ⏵︎Delete ⏵︎Cancel                     ☑ ◉End.failure                                                   |
-| ☝ ⏵︎Cancel            | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update ☝ ⏵︎Delete ⏵︎Cancel                     ☑ ◉End.failure                                                   |
-| ☝ ⏵︎Archive           | ⛾ ⏵︎Archive                 ☝ ⏵︎Archive                            ☑ ◉End.failure                                                   |
-| ☝ ⏵︎Revise            | ⛾ ⏵︎Revise                  ☝ ⏵︎Revise                             ☑ ◉End.success                                                   |
-+----------------------+-----------------------------------------------------------------------------------------------------------------------------------+)
+%(+----------------------+---------------------------------------------------------------------------------+
+| triggered catch      | start configuration                                                             |
++----------------------+---------------------------------------------------------------------------------+
+| ☝ ⏵︎Create form       | ⛾ ⏵︎Create                  ☝ ⏵︎Create form                        ☑ ⏵︎xxx         |
+| ☝ ⏵︎Create            | ⛾ ⏵︎Create                  ☝ ⏵︎Create                             ☑ ⏵︎xxx         |
+| ☝ ⏵︎Create ⛞          | ⛾ ⏵︎Create                  ☝ ⏵︎Create                             ☑ ⏵︎xxx         |
+| ☝ ⏵︎Update form       | ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update form ⏵︎Notify approver       ☑ ⏵︎xxx         |
+| ☝ ⏵︎Notify approver   | ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update form ⏵︎Notify approver       ☑ ⏵︎xxx         |
+| ☝ ⏵︎Update            | ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update                             ☑ ⏵︎xxx         |
+| ☝ ⏵︎Notify approver ⛞ | ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update form ⏵︎Notify approver       ☑ ⏵︎xxx         |
+| ☝ ⏵︎Delete? form      | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish ☑ ◉End.failure |
+| ☝ ⏵︎Publish           | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish ☑ ◉End.failure |
+| ☝ ⏵︎Update ⛞          | ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update                             ☑ ⏵︎xxx         |
+| ☝ ⏵︎Revise form       | ⛾ ⏵︎Revise                  ☝ ⏵︎Revise form                        ☑ ◉End.success |
+| ☝ ⏵︎Delete            | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update ☝ ⏵︎Delete ⏵︎Cancel                     ☑ ◉End.failure |
+| ☝ ⏵︎Cancel            | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update ☝ ⏵︎Delete ⏵︎Cancel                     ☑ ◉End.failure |
+| ☝ ⏵︎Archive           | ⛾ ⏵︎Archive                 ☝ ⏵︎Archive                            ☑ ◉End.failure |
+| ☝ ⏵︎Revise            | ⛾ ⏵︎Revise                  ☝ ⏵︎Revise                             ☑ ◉End.success |
++----------------------+---------------------------------------------------------------------------------+)
   end
 end
