@@ -1,15 +1,6 @@
 [
   {
-    "start_position": {
-      "tuple": [
-        "UI",
-        "catch-before-Activity_0wc2mcq"
-      ],
-      "comment": [
-        "before",
-        "Create form"
-      ]
-    },
+    "event_label": "☝ ⏵︎Create form",
     "start_configuration": [
       {
         "tuple": [
@@ -18,9 +9,7 @@
         ],
         "comment": [
           "before",
-          [
-            "Create"
-          ]
+          "⛾ ⏵︎Create"
         ]
       },
       {
@@ -30,25 +19,21 @@
         ],
         "comment": [
           "before",
-          [
-            "Create form"
-          ]
+          "☝ ⏵︎Create form"
         ]
       },
       {
         "tuple": [
           "approver",
-          "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
+          "~suspend~"
         ],
         "comment": [
           "before",
-          [
-            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
-          ]
+          "☑ ⏵︎xxx"
         ]
       }
     ],
-    "expected_lane_positions": [
+    "suspend_configuration": [
       {
         "tuple": [
           "lifecycle",
@@ -56,21 +41,7 @@
         ],
         "comment": [
           "before",
-          [
-            "Create"
-          ]
-        ]
-      },
-      {
-        "tuple": [
-          "approver",
-          "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
-        ],
-        "comment": [
-          "before",
-          [
-            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
-          ]
+          "⛾ ⏵︎Create"
         ]
       },
       {
@@ -80,26 +51,24 @@
         ],
         "comment": [
           "before",
-          [
-            "Create"
-          ]
+          "☝ ⏵︎Create"
+        ]
+      },
+      {
+        "tuple": [
+          "approver",
+          "~suspend~"
+        ],
+        "comment": [
+          "before",
+          "☑ ⏵︎xxx"
         ]
       }
     ],
-    "expected_outcome": "success",
-    "event_label": "☝ ▶Create form"
+    "outcome": "success"
   },
   {
-    "start_position": {
-      "tuple": [
-        "UI",
-        "catch-before-Activity_1psp91r"
-      ],
-      "comment": [
-        "before",
-        "Create"
-      ]
-    },
+    "event_label": "☝ ⏵︎Create",
     "start_configuration": [
       {
         "tuple": [
@@ -108,21 +77,7 @@
         ],
         "comment": [
           "before",
-          [
-            "Create"
-          ]
-        ]
-      },
-      {
-        "tuple": [
-          "approver",
-          "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
-        ],
-        "comment": [
-          "before",
-          [
-            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
-          ]
+          "⛾ ⏵︎Create"
         ]
       },
       {
@@ -132,25 +87,21 @@
         ],
         "comment": [
           "before",
-          [
-            "Create"
-          ]
+          "☝ ⏵︎Create"
         ]
-      }
-    ],
-    "expected_lane_positions": [
+      },
       {
         "tuple": [
           "approver",
-          "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
+          "~suspend~"
         ],
         "comment": [
           "before",
-          [
-            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
-          ]
+          "☑ ⏵︎xxx"
         ]
-      },
+      }
+    ],
+    "suspend_configuration": [
       {
         "tuple": [
           "lifecycle",
@@ -158,10 +109,7 @@
         ],
         "comment": [
           "before",
-          [
-            "Update",
-            "Notify approver"
-          ]
+          "⛾ ⏵︎Update ⏵︎Notify approver"
         ]
       },
       {
@@ -171,27 +119,24 @@
         ],
         "comment": [
           "before",
-          [
-            "Update form",
-            "Notify approver"
-          ]
+          "☝ ⏵︎Update form ⏵︎Notify approver"
+        ]
+      },
+      {
+        "tuple": [
+          "approver",
+          "~suspend~"
+        ],
+        "comment": [
+          "before",
+          "☑ ⏵︎xxx"
         ]
       }
     ],
-    "expected_outcome": "success",
-    "event_label": "☝ ▶Create"
+    "outcome": "success"
   },
   {
-    "start_position": {
-      "tuple": [
-        "UI",
-        "catch-before-Activity_1psp91r"
-      ],
-      "comment": [
-        "before",
-        "Create"
-      ]
-    },
+    "event_label": "☝ ⏵︎Create ⛞",
     "start_configuration": [
       {
         "tuple": [
@@ -200,21 +145,7 @@
         ],
         "comment": [
           "before",
-          [
-            "Create"
-          ]
-        ]
-      },
-      {
-        "tuple": [
-          "approver",
-          "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
-        ],
-        "comment": [
-          "before",
-          [
-            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
-          ]
+          "⛾ ⏵︎Create"
         ]
       },
       {
@@ -224,25 +155,21 @@
         ],
         "comment": [
           "before",
-          [
-            "Create"
-          ]
+          "☝ ⏵︎Create"
         ]
-      }
-    ],
-    "expected_lane_positions": [
+      },
       {
         "tuple": [
           "approver",
-          "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
+          "~suspend~"
         ],
         "comment": [
           "before",
-          [
-            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
-          ]
+          "☑ ⏵︎xxx"
         ]
-      },
+      }
+    ],
+    "suspend_configuration": [
       {
         "tuple": [
           "lifecycle",
@@ -250,9 +177,7 @@
         ],
         "comment": [
           "before",
-          [
-            "Create"
-          ]
+          "⛾ ⏵︎Create"
         ]
       },
       {
@@ -262,39 +187,25 @@
         ],
         "comment": [
           "before",
-          [
-            "Create"
-          ]
+          "☝ ⏵︎Create"
         ]
-      }
-    ],
-    "expected_outcome": "failure",
-    "event_label": "☝ ▶Create ⛞"
-  },
-  {
-    "start_position": {
-      "tuple": [
-        "UI",
-        "catch-before-Activity_1165bw9"
-      ],
-      "comment": [
-        "before",
-        "Update form"
-      ]
-    },
-    "start_configuration": [
+      },
       {
         "tuple": [
           "approver",
-          "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
+          "~suspend~"
         ],
         "comment": [
           "before",
-          [
-            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
-          ]
+          "☑ ⏵︎xxx"
         ]
-      },
+      }
+    ],
+    "outcome": "failure"
+  },
+  {
+    "event_label": "☝ ⏵︎Update form",
+    "start_configuration": [
       {
         "tuple": [
           "lifecycle",
@@ -302,10 +213,7 @@
         ],
         "comment": [
           "before",
-          [
-            "Update",
-            "Notify approver"
-          ]
+          "⛾ ⏵︎Update ⏵︎Notify approver"
         ]
       },
       {
@@ -315,26 +223,21 @@
         ],
         "comment": [
           "before",
-          [
-            "Update form",
-            "Notify approver"
-          ]
+          "☝ ⏵︎Update form ⏵︎Notify approver"
         ]
-      }
-    ],
-    "expected_lane_positions": [
+      },
       {
         "tuple": [
           "approver",
-          "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
+          "~suspend~"
         ],
         "comment": [
           "before",
-          [
-            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
-          ]
+          "☑ ⏵︎xxx"
         ]
-      },
+      }
+    ],
+    "suspend_configuration": [
       {
         "tuple": [
           "lifecycle",
@@ -342,10 +245,7 @@
         ],
         "comment": [
           "before",
-          [
-            "Update",
-            "Notify approver"
-          ]
+          "⛾ ⏵︎Update ⏵︎Notify approver"
         ]
       },
       {
@@ -355,39 +255,25 @@
         ],
         "comment": [
           "before",
-          [
-            "Update"
-          ]
+          "☝ ⏵︎Update"
         ]
-      }
-    ],
-    "expected_outcome": "success",
-    "event_label": "☝ ▶Update form"
-  },
-  {
-    "start_position": {
-      "tuple": [
-        "UI",
-        "catch-before-Activity_1dt5di5"
-      ],
-      "comment": [
-        "before",
-        "Notify approver"
-      ]
-    },
-    "start_configuration": [
+      },
       {
         "tuple": [
           "approver",
-          "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
+          "~suspend~"
         ],
         "comment": [
           "before",
-          [
-            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
-          ]
+          "☑ ⏵︎xxx"
         ]
-      },
+      }
+    ],
+    "outcome": "success"
+  },
+  {
+    "event_label": "☝ ⏵︎Notify approver",
+    "start_configuration": [
       {
         "tuple": [
           "lifecycle",
@@ -395,10 +281,7 @@
         ],
         "comment": [
           "before",
-          [
-            "Update",
-            "Notify approver"
-          ]
+          "⛾ ⏵︎Update ⏵︎Notify approver"
         ]
       },
       {
@@ -408,24 +291,21 @@
         ],
         "comment": [
           "before",
-          [
-            "Update form",
-            "Notify approver"
-          ]
+          "☝ ⏵︎Update form ⏵︎Notify approver"
         ]
-      }
-    ],
-    "expected_lane_positions": [
+      },
       {
         "tuple": [
           "approver",
-          "End.failure"
+          "~suspend~"
         ],
         "comment": [
-          "terminus",
-          "failure"
+          "before",
+          "☑ ⏵︎xxx"
         ]
-      },
+      }
+    ],
+    "suspend_configuration": [
       {
         "tuple": [
           "lifecycle",
@@ -433,11 +313,7 @@
         ],
         "comment": [
           "before",
-          [
-            "Publish",
-            "Delete",
-            "Update"
-          ]
+          "⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update"
         ]
       },
       {
@@ -447,41 +323,25 @@
         ],
         "comment": [
           "before",
-          [
-            "Update form",
-            "Delete? form",
-            "Publish"
-          ]
+          "☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish"
         ]
-      }
-    ],
-    "expected_outcome": "success",
-    "event_label": "☝ ▶Notify approver"
-  },
-  {
-    "start_position": {
-      "tuple": [
-        "UI",
-        "catch-before-Activity_0j78uzd"
-      ],
-      "comment": [
-        "before",
-        "Update"
-      ]
-    },
-    "start_configuration": [
+      },
       {
         "tuple": [
           "approver",
-          "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
+          "End.failure"
         ],
         "comment": [
-          "before",
-          [
-            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
-          ]
+          "terminus",
+          "failure"
         ]
-      },
+      }
+    ],
+    "outcome": "success"
+  },
+  {
+    "event_label": "☝ ⏵︎Update",
+    "start_configuration": [
       {
         "tuple": [
           "lifecycle",
@@ -489,10 +349,7 @@
         ],
         "comment": [
           "before",
-          [
-            "Update",
-            "Notify approver"
-          ]
+          "⛾ ⏵︎Update ⏵︎Notify approver"
         ]
       },
       {
@@ -502,25 +359,21 @@
         ],
         "comment": [
           "before",
-          [
-            "Update"
-          ]
+          "☝ ⏵︎Update"
         ]
-      }
-    ],
-    "expected_lane_positions": [
+      },
       {
         "tuple": [
           "approver",
-          "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
+          "~suspend~"
         ],
         "comment": [
           "before",
-          [
-            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
-          ]
+          "☑ ⏵︎xxx"
         ]
-      },
+      }
+    ],
+    "suspend_configuration": [
       {
         "tuple": [
           "lifecycle",
@@ -528,10 +381,7 @@
         ],
         "comment": [
           "before",
-          [
-            "Notify approver",
-            "Update"
-          ]
+          "⛾ ⏵︎Notify approver ⏵︎Update"
         ]
       },
       {
@@ -541,40 +391,25 @@
         ],
         "comment": [
           "before",
-          [
-            "Update form",
-            "Notify approver"
-          ]
+          "☝ ⏵︎Update form ⏵︎Notify approver"
         ]
-      }
-    ],
-    "expected_outcome": "success",
-    "event_label": "☝ ▶Update"
-  },
-  {
-    "start_position": {
-      "tuple": [
-        "UI",
-        "catch-before-Activity_1dt5di5"
-      ],
-      "comment": [
-        "before",
-        "Notify approver"
-      ]
-    },
-    "start_configuration": [
+      },
       {
         "tuple": [
           "approver",
-          "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
+          "~suspend~"
         ],
         "comment": [
           "before",
-          [
-            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
-          ]
+          "☑ ⏵︎xxx"
         ]
-      },
+      }
+    ],
+    "outcome": "success"
+  },
+  {
+    "event_label": "☝ ⏵︎Notify approver ⛞",
+    "start_configuration": [
       {
         "tuple": [
           "lifecycle",
@@ -582,10 +417,7 @@
         ],
         "comment": [
           "before",
-          [
-            "Update",
-            "Notify approver"
-          ]
+          "⛾ ⏵︎Update ⏵︎Notify approver"
         ]
       },
       {
@@ -595,24 +427,21 @@
         ],
         "comment": [
           "before",
-          [
-            "Update form",
-            "Notify approver"
-          ]
+          "☝ ⏵︎Update form ⏵︎Notify approver"
         ]
-      }
-    ],
-    "expected_lane_positions": [
+      },
       {
         "tuple": [
           "approver",
-          "End.success"
+          "~suspend~"
         ],
         "comment": [
-          "terminus",
-          "success"
+          "before",
+          "☑ ⏵︎xxx"
         ]
-      },
+      }
+    ],
+    "suspend_configuration": [
       {
         "tuple": [
           "lifecycle",
@@ -620,9 +449,7 @@
         ],
         "comment": [
           "before",
-          [
-            "Revise"
-          ]
+          "⛾ ⏵︎Revise"
         ]
       },
       {
@@ -632,26 +459,24 @@
         ],
         "comment": [
           "before",
-          [
-            "Revise form"
-          ]
+          "☝ ⏵︎Revise form"
+        ]
+      },
+      {
+        "tuple": [
+          "approver",
+          "End.success"
+        ],
+        "comment": [
+          "terminus",
+          "success"
         ]
       }
     ],
-    "expected_outcome": "failure",
-    "event_label": "☝ ▶Notify approver ⛞"
+    "outcome": "failure"
   },
   {
-    "start_position": {
-      "tuple": [
-        "UI",
-        "catch-before-Activity_0ha7224"
-      ],
-      "comment": [
-        "before",
-        "Delete? form"
-      ]
-    },
+    "event_label": "☝ ⏵︎Delete? form",
     "start_configuration": [
       {
         "tuple": [
@@ -660,11 +485,7 @@
         ],
         "comment": [
           "before",
-          [
-            "Publish",
-            "Delete",
-            "Update"
-          ]
+          "⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update"
         ]
       },
       {
@@ -674,15 +495,9 @@
         ],
         "comment": [
           "before",
-          [
-            "Update form",
-            "Delete? form",
-            "Publish"
-          ]
+          "☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish"
         ]
-      }
-    ],
-    "expected_lane_positions": [
+      },
       {
         "tuple": [
           "approver",
@@ -692,7 +507,9 @@
           "terminus",
           "failure"
         ]
-      },
+      }
+    ],
+    "suspend_configuration": [
       {
         "tuple": [
           "lifecycle",
@@ -700,11 +517,7 @@
         ],
         "comment": [
           "before",
-          [
-            "Publish",
-            "Delete",
-            "Update"
-          ]
+          "⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update"
         ]
       },
       {
@@ -714,58 +527,9 @@
         ],
         "comment": [
           "before",
-          [
-            "Delete",
-            "Cancel"
-          ]
-        ]
-      }
-    ],
-    "expected_outcome": "success",
-    "event_label": "☝ ▶Delete? form"
-  },
-  {
-    "start_position": {
-      "tuple": [
-        "UI",
-        "catch-before-Activity_0bsjggk"
-      ],
-      "comment": [
-        "before",
-        "Publish"
-      ]
-    },
-    "start_configuration": [
-      {
-        "tuple": [
-          "lifecycle",
-          "suspend-Gateway_1hp2ssj"
-        ],
-        "comment": [
-          "before",
-          [
-            "Publish",
-            "Delete",
-            "Update"
-          ]
+          "☝ ⏵︎Delete ⏵︎Cancel"
         ]
       },
-      {
-        "tuple": [
-          "UI",
-          "suspend-Gateway_1sq41iq"
-        ],
-        "comment": [
-          "before",
-          [
-            "Update form",
-            "Delete? form",
-            "Publish"
-          ]
-        ]
-      }
-    ],
-    "expected_lane_positions": [
       {
         "tuple": [
           "approver",
@@ -775,7 +539,45 @@
           "terminus",
           "failure"
         ]
+      }
+    ],
+    "outcome": "success"
+  },
+  {
+    "event_label": "☝ ⏵︎Publish",
+    "start_configuration": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_1hp2ssj"
+        ],
+        "comment": [
+          "before",
+          "⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update"
+        ]
       },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_1sq41iq"
+        ],
+        "comment": [
+          "before",
+          "☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish"
+        ]
+      },
+      {
+        "tuple": [
+          "approver",
+          "End.failure"
+        ],
+        "comment": [
+          "terminus",
+          "failure"
+        ]
+      }
+    ],
+    "suspend_configuration": [
       {
         "tuple": [
           "lifecycle",
@@ -783,9 +585,7 @@
         ],
         "comment": [
           "before",
-          [
-            "Archive"
-          ]
+          "⛾ ⏵︎Archive"
         ]
       },
       {
@@ -795,224 +595,9 @@
         ],
         "comment": [
           "before",
-          [
-            "Archive"
-          ]
-        ]
-      }
-    ],
-    "expected_outcome": "success",
-    "event_label": "☝ ▶Publish"
-  },
-  {
-    "start_position": {
-      "tuple": [
-        "UI",
-        "catch-before-Activity_0j78uzd"
-      ],
-      "comment": [
-        "before",
-        "Update"
-      ]
-    },
-    "start_configuration": [
-      {
-        "tuple": [
-          "approver",
-          "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
-        ],
-        "comment": [
-          "before",
-          [
-            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
-          ]
+          "☝ ⏵︎Archive"
         ]
       },
-      {
-        "tuple": [
-          "lifecycle",
-          "suspend-Gateway_0fnbg3r"
-        ],
-        "comment": [
-          "before",
-          [
-            "Update",
-            "Notify approver"
-          ]
-        ]
-      },
-      {
-        "tuple": [
-          "UI",
-          "suspend-Gateway_0nxerxv"
-        ],
-        "comment": [
-          "before",
-          [
-            "Update"
-          ]
-        ]
-      }
-    ],
-    "expected_lane_positions": [
-      {
-        "tuple": [
-          "approver",
-          "#<Trailblazer::Workflow::Event::Suspend resumes=[\"xxx\"] semantic=\"invented_semantic\">"
-        ],
-        "comment": [
-          "before",
-          [
-            "#<Trailblazer::Workflow::Event::Throw semantic=\"xxx_approve\">"
-          ]
-        ]
-      },
-      {
-        "tuple": [
-          "lifecycle",
-          "suspend-Gateway_0fnbg3r"
-        ],
-        "comment": [
-          "before",
-          [
-            "Update",
-            "Notify approver"
-          ]
-        ]
-      },
-      {
-        "tuple": [
-          "UI",
-          "suspend-Gateway_0nxerxv"
-        ],
-        "comment": [
-          "before",
-          [
-            "Update"
-          ]
-        ]
-      }
-    ],
-    "expected_outcome": "failure",
-    "event_label": "☝ ▶Update ⛞"
-  },
-  {
-    "start_position": {
-      "tuple": [
-        "UI",
-        "catch-before-Activity_0zsock2"
-      ],
-      "comment": [
-        "before",
-        "Revise form"
-      ]
-    },
-    "start_configuration": [
-      {
-        "tuple": [
-          "lifecycle",
-          "suspend-Gateway_01p7uj7"
-        ],
-        "comment": [
-          "before",
-          [
-            "Revise"
-          ]
-        ]
-      },
-      {
-        "tuple": [
-          "UI",
-          "suspend-gw-to-catch-before-Activity_0zsock2"
-        ],
-        "comment": [
-          "before",
-          [
-            "Revise form"
-          ]
-        ]
-      }
-    ],
-    "expected_lane_positions": [
-      {
-        "tuple": [
-          "approver",
-          "End.success"
-        ],
-        "comment": [
-          "terminus",
-          "success"
-        ]
-      },
-      {
-        "tuple": [
-          "lifecycle",
-          "suspend-Gateway_01p7uj7"
-        ],
-        "comment": [
-          "before",
-          [
-            "Revise"
-          ]
-        ]
-      },
-      {
-        "tuple": [
-          "UI",
-          "suspend-Gateway_1xs96ik"
-        ],
-        "comment": [
-          "before",
-          [
-            "Revise"
-          ]
-        ]
-      }
-    ],
-    "expected_outcome": "success",
-    "event_label": "☝ ▶Revise form"
-  },
-  {
-    "start_position": {
-      "tuple": [
-        "UI",
-        "catch-before-Activity_15nnysv"
-      ],
-      "comment": [
-        "before",
-        "Delete"
-      ]
-    },
-    "start_configuration": [
-      {
-        "tuple": [
-          "lifecycle",
-          "suspend-Gateway_1hp2ssj"
-        ],
-        "comment": [
-          "before",
-          [
-            "Publish",
-            "Delete",
-            "Update"
-          ]
-        ]
-      },
-      {
-        "tuple": [
-          "UI",
-          "suspend-Gateway_100g9dn"
-        ],
-        "comment": [
-          "before",
-          [
-            "Delete",
-            "Cancel"
-          ]
-        ]
-      }
-    ],
-    "expected_lane_positions": [
       {
         "tuple": [
           "approver",
@@ -1022,7 +607,181 @@
           "terminus",
           "failure"
         ]
+      }
+    ],
+    "outcome": "success"
+  },
+  {
+    "event_label": "☝ ⏵︎Update ⛞",
+    "start_configuration": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_0fnbg3r"
+        ],
+        "comment": [
+          "before",
+          "⛾ ⏵︎Update ⏵︎Notify approver"
+        ]
       },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_0nxerxv"
+        ],
+        "comment": [
+          "before",
+          "☝ ⏵︎Update"
+        ]
+      },
+      {
+        "tuple": [
+          "approver",
+          "~suspend~"
+        ],
+        "comment": [
+          "before",
+          "☑ ⏵︎xxx"
+        ]
+      }
+    ],
+    "suspend_configuration": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_0fnbg3r"
+        ],
+        "comment": [
+          "before",
+          "⛾ ⏵︎Update ⏵︎Notify approver"
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_0nxerxv"
+        ],
+        "comment": [
+          "before",
+          "☝ ⏵︎Update"
+        ]
+      },
+      {
+        "tuple": [
+          "approver",
+          "~suspend~"
+        ],
+        "comment": [
+          "before",
+          "☑ ⏵︎xxx"
+        ]
+      }
+    ],
+    "outcome": "failure"
+  },
+  {
+    "event_label": "☝ ⏵︎Revise form",
+    "start_configuration": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_01p7uj7"
+        ],
+        "comment": [
+          "before",
+          "⛾ ⏵︎Revise"
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-gw-to-catch-before-Activity_0zsock2"
+        ],
+        "comment": [
+          "before",
+          "☝ ⏵︎Revise form"
+        ]
+      },
+      {
+        "tuple": [
+          "approver",
+          "End.success"
+        ],
+        "comment": [
+          "terminus",
+          "success"
+        ]
+      }
+    ],
+    "suspend_configuration": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_01p7uj7"
+        ],
+        "comment": [
+          "before",
+          "⛾ ⏵︎Revise"
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_1xs96ik"
+        ],
+        "comment": [
+          "before",
+          "☝ ⏵︎Revise"
+        ]
+      },
+      {
+        "tuple": [
+          "approver",
+          "End.success"
+        ],
+        "comment": [
+          "terminus",
+          "success"
+        ]
+      }
+    ],
+    "outcome": "success"
+  },
+  {
+    "event_label": "☝ ⏵︎Delete",
+    "start_configuration": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_1hp2ssj"
+        ],
+        "comment": [
+          "before",
+          "⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update"
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_100g9dn"
+        ],
+        "comment": [
+          "before",
+          "☝ ⏵︎Delete ⏵︎Cancel"
+        ]
+      },
+      {
+        "tuple": [
+          "approver",
+          "End.failure"
+        ],
+        "comment": [
+          "terminus",
+          "failure"
+        ]
+      }
+    ],
+    "suspend_configuration": [
       {
         "tuple": [
           "lifecycle",
@@ -1042,22 +801,22 @@
           "terminus",
           "success"
         ]
+      },
+      {
+        "tuple": [
+          "approver",
+          "End.failure"
+        ],
+        "comment": [
+          "terminus",
+          "failure"
+        ]
       }
     ],
-    "expected_outcome": "success",
-    "event_label": "☝ ▶Delete"
+    "outcome": "success"
   },
   {
-    "start_position": {
-      "tuple": [
-        "UI",
-        "catch-before-Activity_1uhozy1"
-      ],
-      "comment": [
-        "before",
-        "Cancel"
-      ]
-    },
+    "event_label": "☝ ⏵︎Cancel",
     "start_configuration": [
       {
         "tuple": [
@@ -1066,11 +825,7 @@
         ],
         "comment": [
           "before",
-          [
-            "Publish",
-            "Delete",
-            "Update"
-          ]
+          "⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update"
         ]
       },
       {
@@ -1080,14 +835,9 @@
         ],
         "comment": [
           "before",
-          [
-            "Delete",
-            "Cancel"
-          ]
+          "☝ ⏵︎Delete ⏵︎Cancel"
         ]
-      }
-    ],
-    "expected_lane_positions": [
+      },
       {
         "tuple": [
           "approver",
@@ -1097,7 +847,9 @@
           "terminus",
           "failure"
         ]
-      },
+      }
+    ],
+    "suspend_configuration": [
       {
         "tuple": [
           "lifecycle",
@@ -1105,11 +857,7 @@
         ],
         "comment": [
           "before",
-          [
-            "Publish",
-            "Delete",
-            "Update"
-          ]
+          "⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update"
         ]
       },
       {
@@ -1119,55 +867,9 @@
         ],
         "comment": [
           "before",
-          [
-            "Update form",
-            "Delete? form",
-            "Publish"
-          ]
-        ]
-      }
-    ],
-    "expected_outcome": "success",
-    "event_label": "☝ ▶Cancel"
-  },
-  {
-    "start_position": {
-      "tuple": [
-        "UI",
-        "catch-before-Activity_0fy41qq"
-      ],
-      "comment": [
-        "before",
-        "Archive"
-      ]
-    },
-    "start_configuration": [
-      {
-        "tuple": [
-          "lifecycle",
-          "suspend-gw-to-catch-before-Activity_1hgscu3"
-        ],
-        "comment": [
-          "before",
-          [
-            "Archive"
-          ]
+          "☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish"
         ]
       },
-      {
-        "tuple": [
-          "UI",
-          "suspend-gw-to-catch-before-Activity_0fy41qq"
-        ],
-        "comment": [
-          "before",
-          [
-            "Archive"
-          ]
-        ]
-      }
-    ],
-    "expected_lane_positions": [
       {
         "tuple": [
           "approver",
@@ -1177,7 +879,45 @@
           "terminus",
           "failure"
         ]
+      }
+    ],
+    "outcome": "success"
+  },
+  {
+    "event_label": "☝ ⏵︎Archive",
+    "start_configuration": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-gw-to-catch-before-Activity_1hgscu3"
+        ],
+        "comment": [
+          "before",
+          "⛾ ⏵︎Archive"
+        ]
       },
+      {
+        "tuple": [
+          "UI",
+          "suspend-gw-to-catch-before-Activity_0fy41qq"
+        ],
+        "comment": [
+          "before",
+          "☝ ⏵︎Archive"
+        ]
+      },
+      {
+        "tuple": [
+          "approver",
+          "End.failure"
+        ],
+        "comment": [
+          "terminus",
+          "failure"
+        ]
+      }
+    ],
+    "suspend_configuration": [
       {
         "tuple": [
           "lifecycle",
@@ -1197,22 +937,22 @@
           "terminus",
           "success"
         ]
+      },
+      {
+        "tuple": [
+          "approver",
+          "End.failure"
+        ],
+        "comment": [
+          "terminus",
+          "failure"
+        ]
       }
     ],
-    "expected_outcome": "success",
-    "event_label": "☝ ▶Archive"
+    "outcome": "success"
   },
   {
-    "start_position": {
-      "tuple": [
-        "UI",
-        "catch-before-Activity_1wiumzv"
-      ],
-      "comment": [
-        "before",
-        "Revise"
-      ]
-    },
+    "event_label": "☝ ⏵︎Revise",
     "start_configuration": [
       {
         "tuple": [
@@ -1221,9 +961,7 @@
         ],
         "comment": [
           "before",
-          [
-            "Revise"
-          ]
+          "⛾ ⏵︎Revise"
         ]
       },
       {
@@ -1233,13 +971,9 @@
         ],
         "comment": [
           "before",
-          [
-            "Revise"
-          ]
+          "☝ ⏵︎Revise"
         ]
-      }
-    ],
-    "expected_lane_positions": [
+      },
       {
         "tuple": [
           "approver",
@@ -1249,7 +983,9 @@
           "terminus",
           "success"
         ]
-      },
+      }
+    ],
+    "suspend_configuration": [
       {
         "tuple": [
           "lifecycle",
@@ -1257,10 +993,7 @@
         ],
         "comment": [
           "before",
-          [
-            "Revise",
-            "Notify approver"
-          ]
+          "⛾ ⏵︎Revise ⏵︎Notify approver"
         ]
       },
       {
@@ -1270,14 +1003,20 @@
         ],
         "comment": [
           "before",
-          [
-            "Update form",
-            "Notify approver"
-          ]
+          "☝ ⏵︎Update form ⏵︎Notify approver"
+        ]
+      },
+      {
+        "tuple": [
+          "approver",
+          "End.success"
+        ],
+        "comment": [
+          "terminus",
+          "success"
         ]
       }
     ],
-    "expected_outcome": "success",
-    "event_label": "☝ ▶Revise"
+    "outcome": "success"
   }
 ]

@@ -331,6 +331,9 @@ class DiscoveryTestPlanTest < Minitest::Spec
     states, lanes_sorted, lanes_cfg = DiscoveryTest.states()
 
     plan_structure = Trailblazer::Workflow::Test::Plan::Structure.(states, lanes_cfg: lanes_cfg)
-    puts plan_structure
+    # pp plan_structure
+    testing_json = JSON.pretty_generate(plan_structure)
+    # File.write "test/discovery_testing_json.json",  testing_json
+    assert_equal testing_json, File.read("test/discovery_testing_json.json")
   end
 end
