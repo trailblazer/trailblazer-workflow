@@ -1,6 +1,16 @@
 [
   {
     "event_label": "☝ ⏵︎Create form",
+    "start_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_0wc2mcq"
+      ],
+      "comment": [
+        "before",
+        "☝ ⏵︎Create form"
+      ]
+    },
     "start_configuration": [
       {
         "tuple": [
@@ -69,6 +79,16 @@
   },
   {
     "event_label": "☝ ⏵︎Create",
+    "start_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_1psp91r"
+      ],
+      "comment": [
+        "before",
+        "☝ ⏵︎Create"
+      ]
+    },
     "start_configuration": [
       {
         "tuple": [
@@ -137,6 +157,16 @@
   },
   {
     "event_label": "☝ ⏵︎Create ⛞",
+    "start_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_1psp91r"
+      ],
+      "comment": [
+        "before",
+        "☝ ⏵︎Create"
+      ]
+    },
     "start_configuration": [
       {
         "tuple": [
@@ -205,6 +235,16 @@
   },
   {
     "event_label": "☝ ⏵︎Update form",
+    "start_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_1165bw9"
+      ],
+      "comment": [
+        "before",
+        "☝ ⏵︎Update form"
+      ]
+    },
     "start_configuration": [
       {
         "tuple": [
@@ -273,6 +313,16 @@
   },
   {
     "event_label": "☝ ⏵︎Notify approver",
+    "start_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_1dt5di5"
+      ],
+      "comment": [
+        "before",
+        "☝ ⏵︎Notify approver"
+      ]
+    },
     "start_configuration": [
       {
         "tuple": [
@@ -341,6 +391,16 @@
   },
   {
     "event_label": "☝ ⏵︎Update",
+    "start_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_0j78uzd"
+      ],
+      "comment": [
+        "before",
+        "☝ ⏵︎Update"
+      ]
+    },
     "start_configuration": [
       {
         "tuple": [
@@ -409,6 +469,16 @@
   },
   {
     "event_label": "☝ ⏵︎Notify approver ⛞",
+    "start_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_1dt5di5"
+      ],
+      "comment": [
+        "before",
+        "☝ ⏵︎Notify approver"
+      ]
+    },
     "start_configuration": [
       {
         "tuple": [
@@ -477,6 +547,16 @@
   },
   {
     "event_label": "☝ ⏵︎Delete? form",
+    "start_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_0ha7224"
+      ],
+      "comment": [
+        "before",
+        "☝ ⏵︎Delete? form"
+      ]
+    },
     "start_configuration": [
       {
         "tuple": [
@@ -545,6 +625,16 @@
   },
   {
     "event_label": "☝ ⏵︎Publish",
+    "start_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_0bsjggk"
+      ],
+      "comment": [
+        "before",
+        "☝ ⏵︎Publish"
+      ]
+    },
     "start_configuration": [
       {
         "tuple": [
@@ -613,6 +703,16 @@
   },
   {
     "event_label": "☝ ⏵︎Update ⛞",
+    "start_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_0j78uzd"
+      ],
+      "comment": [
+        "before",
+        "☝ ⏵︎Update"
+      ]
+    },
     "start_configuration": [
       {
         "tuple": [
@@ -681,6 +781,16 @@
   },
   {
     "event_label": "☝ ⏵︎Revise form",
+    "start_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_0zsock2"
+      ],
+      "comment": [
+        "before",
+        "☝ ⏵︎Revise form"
+      ]
+    },
     "start_configuration": [
       {
         "tuple": [
@@ -749,6 +859,16 @@
   },
   {
     "event_label": "☝ ⏵︎Delete",
+    "start_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_15nnysv"
+      ],
+      "comment": [
+        "before",
+        "☝ ⏵︎Delete"
+      ]
+    },
     "start_configuration": [
       {
         "tuple": [
@@ -817,6 +937,16 @@
   },
   {
     "event_label": "☝ ⏵︎Cancel",
+    "start_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_1uhozy1"
+      ],
+      "comment": [
+        "before",
+        "☝ ⏵︎Cancel"
+      ]
+    },
     "start_configuration": [
       {
         "tuple": [
@@ -885,6 +1015,16 @@
   },
   {
     "event_label": "☝ ⏵︎Archive",
+    "start_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_0fy41qq"
+      ],
+      "comment": [
+        "before",
+        "☝ ⏵︎Archive"
+      ]
+    },
     "start_configuration": [
       {
         "tuple": [
@@ -953,6 +1093,16 @@
   },
   {
     "event_label": "☝ ⏵︎Revise",
+    "start_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_1wiumzv"
+      ],
+      "comment": [
+        "before",
+        "☝ ⏵︎Revise"
+      ]
+    },
     "start_configuration": [
       {
         "tuple": [

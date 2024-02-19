@@ -354,7 +354,13 @@ class TestPlanExecutionTest < Minitest::Spec
     #@ Test plan
     puts Trailblazer::Workflow::Test::Plan.for(states, lanes_cfg: lanes_cfg, input: {})
 
-    test_plan_structure = states
+
+    # TODO: encapsulate
+    plan_structure = Trailblazer::Workflow::Test::Plan::Structure.serialize(states, lanes_cfg: lanes_cfg)
+    testing_json = JSON.pretty_generate(plan_structure)
+    test_plan_structure = Trailblazer::Workflow::Test::Plan::Structure.deserialize(plan_structure, lanes_cfg: lanes_cfg)
+
+
 
     # test: ☝ ⏵︎Create form
     ctx = assert_advance "☝ ⏵︎Create form", expected_ctx: {}, test_plan: test_plan_structure, lanes_cfg: lanes_cfg, schema: schema, message_flow: message_flow

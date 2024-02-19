@@ -29,6 +29,7 @@ assert_exposes ctx, seq: [:revise, :revise], reader: :[]
             discovered_states.collect do |row|
               {
                 event_label:            CommentHeader.start_position_label(row[:positions_before][1], row, **options),
+                start_position:         serialize_position(*row[:positions_before][1].to_a, **options),
                 start_configuration:    serialize_configuration(row[:positions_before][0], **options),
                 suspend_configuration:  serialize_configuration(row[:suspend_configuration].lane_positions, **options),
                 outcome:                row[:outcome],
@@ -49,9 +50,8 @@ assert_exposes ctx, seq: [:revise, :revise], reader: :[]
               @lane_label_2_activity = lanes_cfg.values.collect { |cfg| [cfg[:label], cfg[:activity]] }.to_h
             end
 
-            # Retrieve real tuple for id tuple.
-            def [](lane_label, task_id)
-              position_from_tuple(lane_label, task_id)
+            def [](event_label)
+              @id_structure.find { |row| row[:event_label] == event_label } || raise
             end
 
             # "Deserialize" a {Position} from a serialized tuple.
@@ -66,7 +66,7 @@ assert_exposes ctx, seq: [:revise, :revise], reader: :[]
 
           def serialize_configuration(start_positions, **options)
             start_positions.collect do |activity, suspend|
-              serialize_position(activity, suspend, **options)
+              serialize_suspend_position(activity, suspend, **options)
             end
           end
 
@@ -78,7 +78,7 @@ assert_exposes ctx, seq: [:revise, :revise], reader: :[]
           end
 
           # A lane position is always a {Suspend} (or a terminus).
-          def self.serialize_position(activity, suspend, **options)
+          def self.serialize_suspend_position(activity, suspend, **options)
             position_tuple = id_tuple_for(activity, suspend, **options) # usually, this is a suspend. sometimes a terminus {End}.
 
             comment =
@@ -87,6 +87,18 @@ assert_exposes ctx, seq: [:revise, :revise], reader: :[]
               else
                 [:before, Discovery::Present.readable_name_for_suspend_or_terminus(activity, suspend, **options)]
               end
+
+            {
+              tuple: position_tuple,
+              comment: comment,
+            }
+          end
+
+          # TODO: merge with serialize_suspend_position.
+          def serialize_position(activity, catch_event, **options)
+            position_tuple = id_tuple_for(activity, catch_event, **options)
+
+            comment = [:before, Discovery::Present.readable_name_for_catch_event(activity, catch_event, **options)]
 
             {
               tuple: position_tuple,
