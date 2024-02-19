@@ -136,25 +136,33 @@ assert_exposes ctx, seq: [:revise, :revise], reader: :[]
           def start_position_label_for(position, expected_outcome:, **options)
             event_label = Discovery::Present.readable_name_for_catch_event(*position.to_a, **options)
 
-            event_label += " ⛞" if expected_outcome == :failure # FIXME: what happens to :symbol after serialization?
+            event_label += " #{Discovery::Present::ICONS[:failure]}" if expected_outcome == :failure # FIXME: what happens to :symbol after serialization?
 
             event_label
           end
 
 
           def compute_combined_column_widths(position_rows, lanes_cfg:, **)
+            chars_to_filter = Discovery::Present::ICONS.values + lanes_cfg.collect { |_, cfg| cfg[:icon] } # TODO: do this way up in the code path.
+
             # Find out the longest entry per lane.
             columns = lanes_cfg.collect { |_, cfg| [cfg[:activity], []] }.to_h # {<lifecycle> => [], ...}
 
             position_rows.each do |event_labels|
               event_labels.each do |(activity, suspend_label)|
-                length = suspend_label ? suspend_label.length : 0 # DISCUSS: why can {suspend_label} be nil?
+                length = suspend_label ? label_length(suspend_label, chars_to_filter: chars_to_filter) : 0 # DISCUSS: why can {suspend_label} be nil?
 
                 columns[activity] << length
               end
             end
 
             _columns_2_length = columns.collect { |activity, lengths| [activity, lengths.max] }.to_h
+          end
+
+          # @private
+          def label_length(label, chars_to_filter:)
+            countable_label = chars_to_filter.inject(label) { |memo, char| memo.gsub(char, "@") }
+            countable_label.length
           end
 
           def format_positions_column(position_rows, lanes_cfg:, **options)
@@ -164,7 +172,11 @@ assert_exposes ctx, seq: [:revise, :revise], reader: :[]
               columns = event_labels.collect do |activity, suspend_label|
                 col_length = columns_2_length[activity]
 
-                suspend_label.ljust(col_length, " ")
+                # Correct {#ljust}, it considers one emoji as two characters,
+                # hence we need to add those when padding.
+                emoji_overflows = suspend_label.chars.find_all { |char| char == "︎" } # this is a "wrong" character behind an emoji.
+
+                suspend_label.ljust(col_length + emoji_overflows.size, " ")
               end
 
               content = columns.join(" ")
