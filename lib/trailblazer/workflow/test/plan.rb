@@ -91,6 +91,70 @@ assert_exposes ctx, seq: [:revise, :revise], reader: :[]
           end
         end
 
+        # Render a test plan JSON structure that can be checked in so the assertions
+        # don't change with code modifications.
+        module Structure
+          module_function
+          # {
+          #       start_position: start_p___FIXME,
+          #       start_configuration: serialized_start_configuration,
+          #       expected_lane_positions: expected_lane_positions,
+
+          #       expected_outcome: expected_outcome= additional_state_data[[state.state_from_discovery_fixme.object_id, :outcome]],
+
+          #       event_label: default_event_label(start_p___FIXME, expected_outcome: expected_outcome, lane_icons: lane_icons)
+          #     }
+          def call(discovered_states, **options)
+            discovered_states.collect do |row|
+              {
+                event_label:            CommentHeader.start_position_label(row[:positions_before][1], row, **options),
+                start_configuration:    serialize_configuration(row[:positions_before][0], **options),
+                suspend_configuration:  serialize_configuration(row[:suspend_configuration].lane_positions, **options),
+                outcome:                row[:outcome],
+              }
+            end
+          end
+
+          def serialize_configuration(start_positions, **options)
+            start_positions.collect do |activity, suspend|
+              serialize_position(activity, suspend, **options)
+            end
+          end
+
+          def id_tuple_for(activity, task, lanes_cfg:)
+            activity_id = lanes_cfg.values.find { |cfg| cfg[:activity] == activity }[:label]
+            task_id = Trailblazer::Activity::Introspect.Nodes(activity, task: task).id
+
+            return activity_id, task_id
+          end
+                    # FIXME: move  me somewhere else!
+          # "Deserialize" a {Position} from a serialized tuple.
+          # Opposite of {#id_tuple_for}.
+          # def position_from_tuple(lanes, lane_id, task_id)
+          #   lane_activity = lanes[lane_id]
+          #   task = Trailblazer::Activity::Introspect.Nodes(lane_activity, id: task_id).task
+
+          #   Collaboration::Position.new(lane_activity, task)
+          # end
+
+          # A lane position is always a {Suspend} (or a terminus).
+          def self.serialize_position(activity, suspend, **options)
+            position_tuple = id_tuple_for(activity, suspend, **options) # usually, this is a suspend. sometimes a terminus {End}.
+
+            comment =
+              if suspend.to_h["resumes"].nil? # FIXME: for termini.
+                comment = [:terminus, suspend.to_h[:semantic]]
+              else
+                [:before, Discovery::Present.readable_name_for_suspend_or_terminus(activity, suspend, **options)]
+              end
+
+            {
+              tuple: position_tuple,
+              comment: comment,
+            }
+          end
+        end
+
         def render_comment_header(discovered_states, **options)
           CommentHeader.(discovered_states, **options)
         end

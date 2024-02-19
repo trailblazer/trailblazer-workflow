@@ -326,4 +326,11 @@ class DiscoveryTestPlanTest < Minitest::Spec
 | ☝ ⏵︎Revise            | ⛾ ⏵︎Revise                  ☝ ⏵︎Revise                             ☑ ◉End.success | ⛾ ⏵︎Revise ⏵︎Notify approver ☝ ⏵︎Update form ⏵︎Notify approver       ☑ ◉End.success |
 +----------------------+---------------------------------------------------------------------------------+---------------------------------------------------------------------------------+)
   end
+
+  it "render structure" do
+    states, lanes_sorted, lanes_cfg = DiscoveryTest.states()
+
+    plan_structure = Trailblazer::Workflow::Test::Plan::Structure.(states, lanes_cfg: lanes_cfg)
+    puts plan_structure
+  end
 end
