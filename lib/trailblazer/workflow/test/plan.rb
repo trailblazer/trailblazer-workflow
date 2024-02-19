@@ -111,6 +111,20 @@ assert_exposes ctx, seq: [:revise, :revise], reader: :[]
 
             start_position_combined_column = format_positions_column(all_start_position_labels, **options)
 
+
+            all_expected_positions_labels = discovered_states.collect do |row|
+              row[:suspend_configuration].lane_positions.collect do |activity, task|
+                [
+                  activity,
+                  Discovery::Present.readable_name_for_suspend_or_terminus(activity, task, **options)
+                ]
+              end
+            end
+
+            expected_position_combined_column = format_positions_column(all_expected_positions_labels, **options)
+
+
+
             rows = discovered_states.collect.with_index do |row, index|
               positions_before, start_position = row[:positions_before]
 
@@ -121,10 +135,13 @@ assert_exposes ctx, seq: [:revise, :revise], reader: :[]
                 "start configuration",
                 # start_configuration(positions_before, **options)
                 start_position_combined_column[index],
+
+                "expected reached configuration",
+                expected_position_combined_column[index],
               ]
             end
 
-            Discovery::Present::Table.render(["triggered catch", "start configuration"], rows)
+            Discovery::Present::Table.render(["triggered catch", "start configuration", "expected reached configuration"], rows)
           end
 
           def start_position_label(start_position, row, **options)
