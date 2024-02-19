@@ -347,6 +347,8 @@ end
 
 class TestPlanExecutionTest < Minitest::Spec
   include Trailblazer::Workflow::Test::Assertions
+  require "trailblazer/test/assertions"
+  include Trailblazer::Test::Assertions # DISCUSS: this is for assert_advance and friends.
 
   it "run test plan" do
     states, lanes_sorted, lanes_cfg, schema, message_flow = DiscoveryTest.states()
