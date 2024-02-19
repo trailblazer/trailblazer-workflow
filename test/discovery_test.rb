@@ -306,24 +306,24 @@ class DiscoveryTestPlanTest < Minitest::Spec
     test_plan_comment_header = Trailblazer::Workflow::Test::Plan.render_comment_header(states, lanes_cfg: lanes_cfg)
     puts test_plan_comment_header
     assert_equal test_plan_comment_header,
-%(+----------------------+---------------------------------------------------------------------------------+
-| triggered catch      | start configuration                                                             |
-+----------------------+---------------------------------------------------------------------------------+
-| ☝ ⏵︎Create form       | ⛾ ⏵︎Create                  ☝ ⏵︎Create form                        ☑ ⏵︎xxx         |
-| ☝ ⏵︎Create            | ⛾ ⏵︎Create                  ☝ ⏵︎Create                             ☑ ⏵︎xxx         |
-| ☝ ⏵︎Create ⛞          | ⛾ ⏵︎Create                  ☝ ⏵︎Create                             ☑ ⏵︎xxx         |
-| ☝ ⏵︎Update form       | ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update form ⏵︎Notify approver       ☑ ⏵︎xxx         |
-| ☝ ⏵︎Notify approver   | ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update form ⏵︎Notify approver       ☑ ⏵︎xxx         |
-| ☝ ⏵︎Update            | ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update                             ☑ ⏵︎xxx         |
-| ☝ ⏵︎Notify approver ⛞ | ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update form ⏵︎Notify approver       ☑ ⏵︎xxx         |
-| ☝ ⏵︎Delete? form      | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish ☑ ◉End.failure |
-| ☝ ⏵︎Publish           | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish ☑ ◉End.failure |
-| ☝ ⏵︎Update ⛞          | ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update                             ☑ ⏵︎xxx         |
-| ☝ ⏵︎Revise form       | ⛾ ⏵︎Revise                  ☝ ⏵︎Revise form                        ☑ ◉End.success |
-| ☝ ⏵︎Delete            | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update ☝ ⏵︎Delete ⏵︎Cancel                     ☑ ◉End.failure |
-| ☝ ⏵︎Cancel            | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update ☝ ⏵︎Delete ⏵︎Cancel                     ☑ ◉End.failure |
-| ☝ ⏵︎Archive           | ⛾ ⏵︎Archive                 ☝ ⏵︎Archive                            ☑ ◉End.failure |
-| ☝ ⏵︎Revise            | ⛾ ⏵︎Revise                  ☝ ⏵︎Revise                             ☑ ◉End.success |
-+----------------------+---------------------------------------------------------------------------------+)
+%(+----------------------+---------------------------------------------------------------------------------+---------------------------------------------------------------------------------+
+| triggered catch      | start configuration                                                             | expected reached configuration                                                  |
++----------------------+---------------------------------------------------------------------------------+---------------------------------------------------------------------------------+
+| ☝ ⏵︎Create form       | ⛾ ⏵︎Create                  ☝ ⏵︎Create form                        ☑ ⏵︎xxx         | ⛾ ⏵︎Create                  ☝ ⏵︎Create                             ☑ ⏵︎xxx         |
+| ☝ ⏵︎Create            | ⛾ ⏵︎Create                  ☝ ⏵︎Create                             ☑ ⏵︎xxx         | ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update form ⏵︎Notify approver       ☑ ⏵︎xxx         |
+| ☝ ⏵︎Create ⛞          | ⛾ ⏵︎Create                  ☝ ⏵︎Create                             ☑ ⏵︎xxx         | ⛾ ⏵︎Create                  ☝ ⏵︎Create                             ☑ ⏵︎xxx         |
+| ☝ ⏵︎Update form       | ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update form ⏵︎Notify approver       ☑ ⏵︎xxx         | ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update                             ☑ ⏵︎xxx         |
+| ☝ ⏵︎Notify approver   | ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update form ⏵︎Notify approver       ☑ ⏵︎xxx         | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish ☑ ◉End.failure |
+| ☝ ⏵︎Update            | ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update                             ☑ ⏵︎xxx         | ⛾ ⏵︎Notify approver ⏵︎Update ☝ ⏵︎Update form ⏵︎Notify approver       ☑ ⏵︎xxx         |
+| ☝ ⏵︎Notify approver ⛞ | ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update form ⏵︎Notify approver       ☑ ⏵︎xxx         | ⛾ ⏵︎Revise                  ☝ ⏵︎Revise form                        ☑ ◉End.success |
+| ☝ ⏵︎Delete? form      | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish ☑ ◉End.failure | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update ☝ ⏵︎Delete ⏵︎Cancel                     ☑ ◉End.failure |
+| ☝ ⏵︎Publish           | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish ☑ ◉End.failure | ⛾ ⏵︎Archive                 ☝ ⏵︎Archive                            ☑ ◉End.failure |
+| ☝ ⏵︎Update ⛞          | ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update                             ☑ ⏵︎xxx         | ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update                             ☑ ⏵︎xxx         |
+| ☝ ⏵︎Revise form       | ⛾ ⏵︎Revise                  ☝ ⏵︎Revise form                        ☑ ◉End.success | ⛾ ⏵︎Revise                  ☝ ⏵︎Revise                             ☑ ◉End.success |
+| ☝ ⏵︎Delete            | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update ☝ ⏵︎Delete ⏵︎Cancel                     ☑ ◉End.failure | ⛾ ◉End.success             ☝ ◉End.success                        ☑ ◉End.failure |
+| ☝ ⏵︎Cancel            | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update ☝ ⏵︎Delete ⏵︎Cancel                     ☑ ◉End.failure | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish ☑ ◉End.failure |
+| ☝ ⏵︎Archive           | ⛾ ⏵︎Archive                 ☝ ⏵︎Archive                            ☑ ◉End.failure | ⛾ ◉End.success             ☝ ◉End.success                        ☑ ◉End.failure |
+| ☝ ⏵︎Revise            | ⛾ ⏵︎Revise                  ☝ ⏵︎Revise                             ☑ ◉End.success | ⛾ ⏵︎Revise ⏵︎Notify approver ☝ ⏵︎Update form ⏵︎Notify approver       ☑ ◉End.success |
++----------------------+---------------------------------------------------------------------------------+---------------------------------------------------------------------------------+)
   end
 end

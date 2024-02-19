@@ -99,31 +99,8 @@ assert_exposes ctx, seq: [:revise, :revise], reader: :[]
           module_function
 
           def call(discovered_states, **options)
-
-            all_start_position_labels = discovered_states.collect do |row|
-              row[:positions_before][0].collect do |activity, task|
-                [
-                  activity,
-                  Discovery::Present.readable_name_for_suspend_or_terminus(activity, task, **options)
-                ]
-              end
-            end
-
-            start_position_combined_column = format_positions_column(all_start_position_labels, **options)
-
-
-            all_expected_positions_labels = discovered_states.collect do |row|
-              row[:suspend_configuration].lane_positions.collect do |activity, task|
-                [
-                  activity,
-                  Discovery::Present.readable_name_for_suspend_or_terminus(activity, task, **options)
-                ]
-              end
-            end
-
-            expected_position_combined_column = format_positions_column(all_expected_positions_labels, **options)
-
-
+            start_position_combined_column    = render_combined_column_labels(discovered_states.collect { |row| row[:positions_before][0] }, **options)
+            expected_position_combined_column = render_combined_column_labels(discovered_states.collect { |row| row[:suspend_configuration].lane_positions }, **options)
 
             rows = discovered_states.collect.with_index do |row, index|
               positions_before, start_position = row[:positions_before]
@@ -133,7 +110,6 @@ assert_exposes ctx, seq: [:revise, :revise], reader: :[]
                 start_position_label(start_position, row, **options),
 
                 "start configuration",
-                # start_configuration(positions_before, **options)
                 start_position_combined_column[index],
 
                 "expected reached configuration",
@@ -158,6 +134,22 @@ assert_exposes ctx, seq: [:revise, :revise], reader: :[]
             event_label
           end
 
+          # Render the content of a combined column (usually used for positions, such as {}).
+          # Note that this renders for the entire table/all rows.
+          #
+          #   ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update form ⏵︎Notify approver       ☑ ⏵︎xxx
+          def render_combined_column_labels(positions_rows, **options)
+            all_position_labels = positions_rows.collect do |positions|
+              positions.collect do |activity, task|
+                [
+                  activity,
+                  Discovery::Present.readable_name_for_suspend_or_terminus(activity, task, **options)
+                ]
+              end
+            end
+
+            position_combined_column = format_positions_column(all_position_labels, **options)
+          end
 
           def compute_combined_column_widths(position_rows, lanes_cfg:, **)
             chars_to_filter = Discovery::Present::ICONS.values + lanes_cfg.collect { |_, cfg| cfg[:icon] } # TODO: do this way up in the code path.
