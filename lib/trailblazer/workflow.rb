@@ -20,3 +20,5 @@ require "trailblazer/workflow/discovery/present"
 require "trailblazer/workflow/discovery/present/state_table"
 require "trailblazer/workflow/discovery/present/event_table"
 require "terminal-table" # TODO: only require when discovery is "loaded".
+
+require "trailblazer/workflow/iteration"

@@ -64,47 +64,7 @@ assert_exposes ctx, seq: [:revise, :revise], reader: :[]
             end
           end
 
-          def serialize_configuration(start_positions, **options)
-            start_positions.collect do |activity, suspend|
-              serialize_suspend_position(activity, suspend, **options)
-            end
-          end
 
-          def id_tuple_for(activity, task, lanes_cfg:)
-            activity_id = lanes_cfg.values.find { |cfg| cfg[:activity] == activity }[:label]
-            task_id = Trailblazer::Activity::Introspect.Nodes(activity, task: task).id
-
-            return activity_id, task_id
-          end
-
-          # A lane position is always a {Suspend} (or a terminus).
-          def self.serialize_suspend_position(activity, suspend, **options)
-            position_tuple = id_tuple_for(activity, suspend, **options) # usually, this is a suspend. sometimes a terminus {End}.
-
-            comment =
-              if suspend.to_h["resumes"].nil? # FIXME: for termini.
-                comment = [:terminus, suspend.to_h[:semantic]]
-              else
-                [:before, Discovery::Present.readable_name_for_suspend_or_terminus(activity, suspend, **options)]
-              end
-
-            {
-              tuple: position_tuple,
-              comment: comment,
-            }
-          end
-
-          # TODO: merge with serialize_suspend_position.
-          def serialize_position(activity, catch_event, **options)
-            position_tuple = id_tuple_for(activity, catch_event, **options)
-
-            comment = [:before, Discovery::Present.readable_name_for_catch_event(activity, catch_event, **options)]
-
-            {
-              tuple: position_tuple,
-              comment: comment,
-            }
-          end
         end
 
         def render_comment_header(discovered_states, **options)

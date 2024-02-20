@@ -200,6 +200,19 @@ class DiscoveryTest < Minitest::Spec
     assert_nil states[15]
   end
 
+  it "Iteration::Set" do
+    states, lanes_sorted, lanes_cfg = self.class.states
+
+    iteration_set = Trailblazer::Workflow::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
+
+    testing_json = JSON.pretty_generate(iteration_set.to_hash)
+    # File.write "test/iteration_json.json",  testing_json
+    assert_equal testing_json, File.read("test/iteration_json.json")
+
+
+    # assert_equal iteration_set.to_hash, %(asdf)
+  end
+
   # Asserts
   #   * that positions are always sorted by activity.
   def assert_position_before(actual_positions, expected_ids, start_id:, lanes:)
@@ -231,9 +244,6 @@ class DiscoveryTest < Minitest::Spec
 
   it "{#render_cli_state_table}" do
     states, lanes_sorted, lanes_cfg = self.class.states()
-
-        # DISCUSS: technically, this is an event table, not a state table.
-    # state_table = Trailblazer::Workflow::State::Discovery.generate_state_table(states, lanes: lanes_cfg)
 
     cli_state_table = Trailblazer::Workflow::Discovery::Present::StateTable.(states, lanes_cfg: lanes_cfg)
     puts cli_state_table
