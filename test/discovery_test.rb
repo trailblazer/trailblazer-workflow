@@ -278,7 +278,9 @@ class DiscoveryTest < Minitest::Spec
   it "{Present::EventTable.call}" do
     states, lanes_sorted, lanes_cfg = self.class.states()
 
-    cli_state_table_with_ids = Trailblazer::Workflow::Discovery::Present::EventTable.(states, render_ids: true, hide_lanes: ["approver"], lanes_cfg: lanes_cfg)
+    iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
+
+    cli_state_table_with_ids = Trailblazer::Workflow::Introspect::EventTable.(iteration_set, render_ids: true, hide_lanes: ["approver"], lanes_cfg: lanes_cfg)
 puts cli_state_table_with_ids
 assert_equal cli_state_table_with_ids,
 %(+-------------------------------+---------------------------------------------+---------------------------------------------+
