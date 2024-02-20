@@ -6,7 +6,7 @@ module Trailblazer
 
         # Code fragment with assertions for the discovered/configured test plan.
         def for(iteration_set, input:, **options)
-          code_string = iteration_set.to_a.collect do |iteration|
+          code_string = iteration_set.collect do |iteration|
             event_label = iteration.event_label
 
             %(
@@ -17,23 +17,21 @@ assert_exposes ctx, seq: [:revise, :revise], reader: :[]
           end
         end
 
-        def render_comment_header(discovered_states, **options)
-          CommentHeader.(discovered_states, **options)
+        def render_comment_header(iteration_set, **options)
+          CommentHeader.(iteration_set, **options)
         end
 
         module CommentHeader
           module_function
 
-          def call(discovered_states, **options)
-            start_position_combined_column    = render_combined_column_labels(discovered_states.collect { |row| row[:positions_before][0] }, **options)
-            expected_position_combined_column = render_combined_column_labels(discovered_states.collect { |row| row[:suspend_configuration].lane_positions }, **options)
+          def call(iteration_set, **options)
+            start_position_combined_column    = render_combined_column_labels(iteration_set.collect { |iteration| iteration.start_positions }, **options)
+            expected_position_combined_column = render_combined_column_labels(iteration_set.collect { |iteration| iteration.suspend_positions }, **options)
 
-            rows = discovered_states.collect.with_index do |row, index|
-              positions_before, start_position = row[:positions_before]
-
+            rows = iteration_set.collect.with_index do |iteration, index|
               Hash[
                 "triggered catch",
-                start_position_label(start_position, row, **options),
+                start_position_label(iteration.start_task_position, iteration, **options),
 
                 "start configuration",
                 start_position_combined_column[index],

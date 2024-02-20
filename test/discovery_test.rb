@@ -322,8 +322,10 @@ class DiscoveryTestPlanTest < Minitest::Spec
   it "render comment header for test plan" do
     states, lanes_sorted, lanes_cfg = DiscoveryTest.states()
 
+    iteration_set = Trailblazer::Workflow::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
+
     # this usually happens straight after discovery:
-    test_plan_comment_header = Trailblazer::Workflow::Test::Plan.render_comment_header(states, lanes_cfg: lanes_cfg)
+    test_plan_comment_header = Trailblazer::Workflow::Test::Plan.render_comment_header(iteration_set, lanes_cfg: lanes_cfg)
     puts test_plan_comment_header
     assert_equal test_plan_comment_header,
 %(+----------------------+---------------------------------------------------------------------------------+---------------------------------------------------------------------------------+

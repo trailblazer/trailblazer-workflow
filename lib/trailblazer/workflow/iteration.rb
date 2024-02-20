@@ -35,7 +35,12 @@ module Trailblazer
         end
 
         def to_a
+          # FIXME: remove?
           @iterations
+        end
+
+        def collect(&block)
+          @iterations.collect(&block)
         end
 
         module Serialize
