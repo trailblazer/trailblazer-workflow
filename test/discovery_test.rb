@@ -205,12 +205,20 @@ class DiscoveryTest < Minitest::Spec
 
     iteration_set = Trailblazer::Workflow::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
 
-    testing_json = JSON.pretty_generate(iteration_set.to_hash)
+    testing_json = JSON.pretty_generate(Trailblazer::Workflow::Iteration::Set::Serialize.(iteration_set, lanes_cfg: lanes_cfg))
     # File.write "test/iteration_json.json",  testing_json
     assert_equal testing_json, File.read("test/iteration_json.json")
 
+    iteration_set_from_json = Trailblazer::Workflow::Iteration::Set::Deserialize.(JSON.parse(testing_json), lanes_cfg: lanes_cfg)
 
-    # assert_equal iteration_set.to_hash, %(asdf)
+    assert_equal JSON.pretty_generate(Trailblazer::Workflow::Iteration::Set::Serialize.(iteration_set, lanes_cfg: lanes_cfg)), JSON.pretty_generate(Trailblazer::Workflow::Iteration::Set::Serialize.(iteration_set_from_json, lanes_cfg: lanes_cfg))
+
+    # assert_equal iteration_set_from_json.to_a.collect { |iteration| iteration.to_h }, iteration_set.to_a.collect { |iteration| iteration.to_h }
+
+    # pp iteration_set_from_json.to_a.collect { |iteration| iteration.to_h }[0]
+
+    # TODO: test {Set#to_a}
+    assert_equal iteration_set_from_json.to_a.size, 15
   end
 
   # Asserts

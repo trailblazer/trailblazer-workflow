@@ -36,35 +36,6 @@ assert_exposes ctx, seq: [:revise, :revise], reader: :[]
               }
             end
           end
-
-          def deserialize(id_structure, lanes_cfg:, **)
-            # DISCUSS: don't unserialize the entire thing at once, presently we only allow "lookups".
-            Deserialized.new(id_structure, lanes_cfg)
-          end
-
-          class Deserialized
-            def initialize(id_structure, lanes_cfg)
-              @id_structure = id_structure
-              @lanes_cfg = lanes_cfg
-
-              @lane_label_2_activity = lanes_cfg.values.collect { |cfg| [cfg[:label], cfg[:activity]] }.to_h
-            end
-
-            def [](event_label)
-              @id_structure.find { |row| row[:event_label] == event_label } || raise
-            end
-
-            # "Deserialize" a {Position} from a serialized tuple.
-            # Opposite of {#id_tuple_for}.
-            def position_from_tuple(lane_label, task_id)
-              lane_activity = @lane_label_2_activity[lane_label]
-              task = Trailblazer::Activity::Introspect.Nodes(lane_activity, id: task_id).task
-
-              Collaboration::Position.new(lane_activity, task)
-            end
-          end
-
-
         end
 
         def render_comment_header(discovered_states, **options)

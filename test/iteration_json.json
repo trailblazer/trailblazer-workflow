@@ -2,7 +2,7 @@
   {
     "id": "catch-before-Activity_0wc2mcq",
     "event_label": "☝ ⏵︎Create form",
-    "start_task": {
+    "start_task_position": {
       "tuple": [
         "UI",
         "catch-before-Activity_0wc2mcq"
@@ -81,7 +81,7 @@
   {
     "id": "catch-before-Activity_1psp91r",
     "event_label": "☝ ⏵︎Create",
-    "start_task": {
+    "start_task_position": {
       "tuple": [
         "UI",
         "catch-before-Activity_1psp91r"
@@ -160,7 +160,7 @@
   {
     "id": "catch-before-Activity_1psp91r",
     "event_label": "☝ ⏵︎Create ⛞",
-    "start_task": {
+    "start_task_position": {
       "tuple": [
         "UI",
         "catch-before-Activity_1psp91r"
@@ -239,7 +239,7 @@
   {
     "id": "catch-before-Activity_1165bw9",
     "event_label": "☝ ⏵︎Update form",
-    "start_task": {
+    "start_task_position": {
       "tuple": [
         "UI",
         "catch-before-Activity_1165bw9"
@@ -318,7 +318,7 @@
   {
     "id": "catch-before-Activity_1dt5di5",
     "event_label": "☝ ⏵︎Notify approver",
-    "start_task": {
+    "start_task_position": {
       "tuple": [
         "UI",
         "catch-before-Activity_1dt5di5"
@@ -397,7 +397,7 @@
   {
     "id": "catch-before-Activity_0j78uzd",
     "event_label": "☝ ⏵︎Update",
-    "start_task": {
+    "start_task_position": {
       "tuple": [
         "UI",
         "catch-before-Activity_0j78uzd"
@@ -476,7 +476,7 @@
   {
     "id": "catch-before-Activity_1dt5di5",
     "event_label": "☝ ⏵︎Notify approver ⛞",
-    "start_task": {
+    "start_task_position": {
       "tuple": [
         "UI",
         "catch-before-Activity_1dt5di5"
@@ -555,7 +555,7 @@
   {
     "id": "catch-before-Activity_0ha7224",
     "event_label": "☝ ⏵︎Delete? form",
-    "start_task": {
+    "start_task_position": {
       "tuple": [
         "UI",
         "catch-before-Activity_0ha7224"
@@ -634,7 +634,7 @@
   {
     "id": "catch-before-Activity_0bsjggk",
     "event_label": "☝ ⏵︎Publish",
-    "start_task": {
+    "start_task_position": {
       "tuple": [
         "UI",
         "catch-before-Activity_0bsjggk"
@@ -713,7 +713,7 @@
   {
     "id": "catch-before-Activity_0j78uzd",
     "event_label": "☝ ⏵︎Update ⛞",
-    "start_task": {
+    "start_task_position": {
       "tuple": [
         "UI",
         "catch-before-Activity_0j78uzd"
@@ -792,7 +792,7 @@
   {
     "id": "catch-before-Activity_0zsock2",
     "event_label": "☝ ⏵︎Revise form",
-    "start_task": {
+    "start_task_position": {
       "tuple": [
         "UI",
         "catch-before-Activity_0zsock2"
@@ -871,7 +871,7 @@
   {
     "id": "catch-before-Activity_15nnysv",
     "event_label": "☝ ⏵︎Delete",
-    "start_task": {
+    "start_task_position": {
       "tuple": [
         "UI",
         "catch-before-Activity_15nnysv"
@@ -950,7 +950,7 @@
   {
     "id": "catch-before-Activity_1uhozy1",
     "event_label": "☝ ⏵︎Cancel",
-    "start_task": {
+    "start_task_position": {
       "tuple": [
         "UI",
         "catch-before-Activity_1uhozy1"
@@ -1029,7 +1029,7 @@
   {
     "id": "catch-before-Activity_0fy41qq",
     "event_label": "☝ ⏵︎Archive",
-    "start_task": {
+    "start_task_position": {
       "tuple": [
         "UI",
         "catch-before-Activity_0fy41qq"
@@ -1108,7 +1108,7 @@
   {
     "id": "catch-before-Activity_1wiumzv",
     "event_label": "☝ ⏵︎Revise",
-    "start_task": {
+    "start_task_position": {
       "tuple": [
         "UI",
         "catch-before-Activity_1wiumzv"

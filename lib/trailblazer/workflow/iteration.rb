@@ -7,7 +7,7 @@ module Trailblazer
     #
     # DISCUSS: maybe the naming/namespace will change.
     #          maybe Introspect::Iteration?
-    class Iteration < Struct.new(:id, :event_label, :start_position, :start_positions, :suspend_positions, :outcome)
+    class Iteration < Struct.new(:id, :event_label, :start_task_position, :start_positions, :suspend_positions, :outcome)
       class Set
         def self.from_discovered_states(discovered_states, **options)
           iterations = discovered_states.collect do |row|
@@ -34,23 +34,27 @@ module Trailblazer
           @lanes_cfg  = lanes_cfg
         end
 
-        # An Iteration::Set is usually serialized to a JSON document, so we don't have
-        # to re-run the discovery every time we use the collaboration.
-        def to_hash()
-          @iterations.collect do |iteration|
-            attributes = {
-              id: iteration.id,
-              event_label: iteration.event_label,
-              start_task: Serialize.serialize_position(*iteration.start_position.to_a, lanes_cfg: @lanes_cfg),
-              start_positions: Serialize.serialize_suspend_positions(iteration.start_positions, lanes_cfg: @lanes_cfg),
-              suspend_positions: Serialize.serialize_suspend_positions(iteration.suspend_positions, lanes_cfg: @lanes_cfg),
-              outcome: iteration.outcome,
-            }
-          end
+        def to_a
+          @iterations
         end
 
         module Serialize
           module_function
+
+          # An Iteration::Set is usually serialized to a JSON document, so we don't have
+          # to re-run the discovery every time we use the collaboration.
+          def call(iterations, **options)
+            iterations.to_a.collect do |iteration|
+              attributes = {
+                id: iteration.id,
+                event_label: iteration.event_label,
+                start_task_position: Serialize.serialize_position(*iteration.start_task_position.to_a, **options),
+                start_positions: Serialize.serialize_suspend_positions(iteration.start_positions, **options),
+                suspend_positions: Serialize.serialize_suspend_positions(iteration.suspend_positions, **options),
+                outcome: iteration.outcome,
+              }
+            end
+          end
 
           def serialize_suspend_positions(start_positions, **options)
             start_positions.collect do |activity, suspend|
@@ -92,6 +96,42 @@ module Trailblazer
               tuple: position_tuple,
               comment: comment,
             }
+          end
+        end
+
+        module Deserialize
+          module_function
+
+          def call(structure, lanes_cfg:)
+            iterations = structure.collect do |attributes|
+              label_2_activity = lanes_cfg.values.collect { |cfg| [cfg[:label], cfg[:activity]] }.to_h
+
+              Iteration.new(
+                attributes["id"],
+                attributes["event_label"],
+                position_from_tuple(*attributes["start_task_position"]["tuple"], label_2_activity: label_2_activity),
+                positions_from(attributes["start_positions"], label_2_activity: label_2_activity),
+                positions_from(attributes["suspend_positions"], label_2_activity: label_2_activity),
+                attributes["outcome"],
+              )
+            end
+
+            Iteration::Set.new(iterations, lanes_cfg: lanes_cfg)
+          end
+
+          # "Deserialize" a {Position} from a serialized tuple.
+          # Opposite of {#id_tuple_for}.
+          def position_from_tuple(lane_label, task_id, label_2_activity:)
+            lane_activity = label_2_activity[lane_label]
+            task = Trailblazer::Activity::Introspect.Nodes(lane_activity, id: task_id).task
+
+            Collaboration::Position.new(lane_activity, task)
+          end
+
+          def positions_from(positions, **options)
+            Collaboration::Positions.new(
+              positions.collect { |attributes| position_from_tuple(*attributes["tuple"], **options) }
+            )
           end
         end
       end
