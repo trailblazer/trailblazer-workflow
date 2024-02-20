@@ -203,15 +203,15 @@ class DiscoveryTest < Minitest::Spec
   it "Iteration::Set" do
     states, lanes_sorted, lanes_cfg = self.class.states
 
-    iteration_set = Trailblazer::Workflow::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
+    iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
 
-    testing_json = JSON.pretty_generate(Trailblazer::Workflow::Iteration::Set::Serialize.(iteration_set, lanes_cfg: lanes_cfg))
+    testing_json = JSON.pretty_generate(Trailblazer::Workflow::Introspect::Iteration::Set::Serialize.(iteration_set, lanes_cfg: lanes_cfg))
     # File.write "test/iteration_json.json",  testing_json
     assert_equal testing_json, File.read("test/iteration_json.json")
 
-    iteration_set_from_json = Trailblazer::Workflow::Iteration::Set::Deserialize.(JSON.parse(testing_json), lanes_cfg: lanes_cfg)
+    iteration_set_from_json = Trailblazer::Workflow::Introspect::Iteration::Set::Deserialize.(JSON.parse(testing_json), lanes_cfg: lanes_cfg)
 
-    assert_equal JSON.pretty_generate(Trailblazer::Workflow::Iteration::Set::Serialize.(iteration_set, lanes_cfg: lanes_cfg)), JSON.pretty_generate(Trailblazer::Workflow::Iteration::Set::Serialize.(iteration_set_from_json, lanes_cfg: lanes_cfg))
+    assert_equal JSON.pretty_generate(Trailblazer::Workflow::Introspect::Iteration::Set::Serialize.(iteration_set, lanes_cfg: lanes_cfg)), JSON.pretty_generate(Trailblazer::Workflow::Introspect::Iteration::Set::Serialize.(iteration_set_from_json, lanes_cfg: lanes_cfg))
 
     # assert_equal iteration_set_from_json.to_a.collect { |iteration| iteration.to_h }, iteration_set.to_a.collect { |iteration| iteration.to_h }
 
@@ -253,7 +253,7 @@ class DiscoveryTest < Minitest::Spec
   it "{#render_cli_state_table}" do
     states, lanes_sorted, lanes_cfg = self.class.states()
 
-    iteration_set = Trailblazer::Workflow::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
+    iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
 
     cli_state_table = Trailblazer::Workflow::Discovery::Present::StateTable.(iteration_set, lanes_cfg: lanes_cfg)
     puts cli_state_table
@@ -322,7 +322,7 @@ class DiscoveryTestPlanTest < Minitest::Spec
   it "render comment header for test plan" do
     states, lanes_sorted, lanes_cfg = DiscoveryTest.states()
 
-    iteration_set = Trailblazer::Workflow::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
+    iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
 
     # this usually happens straight after discovery:
     test_plan_comment_header = Trailblazer::Workflow::Test::Plan.render_comment_header(iteration_set, lanes_cfg: lanes_cfg)
@@ -375,7 +375,7 @@ class TestPlanExecutionTest < Minitest::Spec
   it "run test plan" do
     states, lanes_sorted, lanes_cfg, schema, message_flow = DiscoveryTest.states()
 
-    iteration_set = Trailblazer::Workflow::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
+    iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
 
     #@ Test plan
     # FIXME: properly test this output!
