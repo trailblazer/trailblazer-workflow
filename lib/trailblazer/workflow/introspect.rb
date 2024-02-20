@@ -1,6 +1,6 @@
 module Trailblazer
   module Workflow
-    module Discovery
+    module Introspect
       # Rendering-specific code using {Discovery:states}.
       # https://stackoverflow.com/questions/22885702/html-for-the-pause-symbol-in-audio-and-video-control
       module Present

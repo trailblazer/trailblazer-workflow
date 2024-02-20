@@ -41,7 +41,7 @@ assert_exposes ctx, seq: [:revise, :revise], reader: :[]
               ]
             end
 
-            Discovery::Present::Table.render(["triggered catch", "start configuration", "expected reached configuration"], rows)
+            Introspect::Present::Table.render(["triggered catch", "start configuration", "expected reached configuration"], rows)
           end
 
           def start_position_label(start_position, row, **options)
@@ -51,9 +51,9 @@ assert_exposes ctx, seq: [:revise, :revise], reader: :[]
           end
 
           def start_position_label_for(position, expected_outcome:, **options)
-            event_label = Discovery::Present.readable_name_for_catch_event(*position.to_a, **options)
+            event_label = Introspect::Present.readable_name_for_catch_event(*position.to_a, **options)
 
-            event_label += " #{Discovery::Present::ICONS[:failure]}" if expected_outcome == :failure # FIXME: what happens to :symbol after serialization?
+            event_label += " #{Introspect::Present::ICONS[:failure]}" if expected_outcome == :failure # FIXME: what happens to :symbol after serialization?
 
             event_label
           end
@@ -67,7 +67,7 @@ assert_exposes ctx, seq: [:revise, :revise], reader: :[]
               positions.collect do |activity, task|
                 [
                   activity,
-                  Discovery::Present.readable_name_for_suspend_or_terminus(activity, task, **options)
+                  Introspect::Present.readable_name_for_suspend_or_terminus(activity, task, **options)
                 ]
               end
             end
@@ -76,7 +76,7 @@ assert_exposes ctx, seq: [:revise, :revise], reader: :[]
           end
 
           def compute_combined_column_widths(position_rows, lanes_cfg:, **)
-            chars_to_filter = Discovery::Present::ICONS.values + lanes_cfg.collect { |_, cfg| cfg[:icon] } # TODO: do this way up in the code path.
+            chars_to_filter = Introspect::Present::ICONS.values + lanes_cfg.collect { |_, cfg| cfg[:icon] } # TODO: do this way up in the code path.
 
             # Find out the longest entry per lane.
             columns = lanes_cfg.collect { |_, cfg| [cfg[:activity], []] }.to_h # {<lifecycle> => [], ...}

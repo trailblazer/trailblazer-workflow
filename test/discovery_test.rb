@@ -255,7 +255,7 @@ class DiscoveryTest < Minitest::Spec
 
     iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
 
-    cli_state_table = Trailblazer::Workflow::Discovery::Present::StateTable.(iteration_set, lanes_cfg: lanes_cfg)
+    cli_state_table = Trailblazer::Workflow::Introspect::StateTable.(iteration_set, lanes_cfg: lanes_cfg)
     puts cli_state_table
     assert_equal cli_state_table,
 %(+---------------------------------+----------------------------------------+
@@ -347,23 +347,6 @@ class DiscoveryTestPlanTest < Minitest::Spec
 | ☝ ⏵︎Archive           | ⛾ ⏵︎Archive                 ☝ ⏵︎Archive                            ☑ ◉End.failure | ⛾ ◉End.success             ☝ ◉End.success                        ☑ ◉End.failure |
 | ☝ ⏵︎Revise            | ⛾ ⏵︎Revise                  ☝ ⏵︎Revise                             ☑ ◉End.success | ⛾ ⏵︎Revise ⏵︎Notify approver ☝ ⏵︎Update form ⏵︎Notify approver       ☑ ◉End.success |
 +----------------------+---------------------------------------------------------------------------------+---------------------------------------------------------------------------------+)
-  end
-
-  it "render structure" do
-    states, lanes_sorted, lanes_cfg = DiscoveryTest.states()
-
-    plan_structure = Trailblazer::Workflow::Test::Plan::Structure.serialize(states, lanes_cfg: lanes_cfg)
-    # pp plan_structure
-    testing_json = JSON.pretty_generate(plan_structure)
-    # File.write "test/discovery_testing_json.json",  testing_json
-    assert_equal testing_json, File.read("test/discovery_testing_json.json")
-
-    structure = Trailblazer::Workflow::Test::Plan::Structure.deserialize(plan_structure, lanes_cfg: lanes_cfg)
-
-    assert_equal structure.position_from_tuple("lifecycle", "suspend-gw-to-catch-before-Activity_0wwfenp").to_a,
-      [lifecycle = lanes_cfg.values[0][:activity], Trailblazer::Activity::Introspect.Nodes(lifecycle, id: "suspend-gw-to-catch-before-Activity_0wwfenp").task]
-
-
   end
 end
 

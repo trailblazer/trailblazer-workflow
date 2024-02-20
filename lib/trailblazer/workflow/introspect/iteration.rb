@@ -14,7 +14,7 @@ module Trailblazer
             iterations = discovered_states.collect do |row|
               triggered_catch_event_position = row[:positions_before][1]
 
-              id          = Discovery::Present.id_for_task(triggered_catch_event_position)
+              id          = Introspect::Present.id_for_task(triggered_catch_event_position)
               event_label = Test::Plan::CommentHeader.start_position_label(row[:positions_before][1], row, **options)
 
               Iteration.new(
@@ -83,7 +83,7 @@ module Trailblazer
                 if suspend.to_h["resumes"].nil? # FIXME: for termini.
                   comment = [:terminus, suspend.to_h[:semantic]]
                 else
-                  [:before, Discovery::Present.readable_name_for_suspend_or_terminus(activity, suspend, **options)]
+                  [:before, Introspect::Present.readable_name_for_suspend_or_terminus(activity, suspend, **options)]
                 end
 
               {
@@ -96,7 +96,7 @@ module Trailblazer
             def serialize_position(activity, catch_event, **options)
               position_tuple = id_tuple_for(activity, catch_event, **options)
 
-              comment = [:before, Discovery::Present.readable_name_for_catch_event(activity, catch_event, **options)]
+              comment = [:before, Introspect::Present.readable_name_for_catch_event(activity, catch_event, **options)]
 
               {
                 tuple: position_tuple,
