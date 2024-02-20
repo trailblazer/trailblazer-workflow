@@ -5,36 +5,15 @@ module Trailblazer
         module_function
 
         # Code fragment with assertions for the discovered/configured test plan.
-        def for(discovered_states, input:, **options)
-          code_string = discovered_states.collect do |row|
-
-          # TODO: introduce a "test structure" that computes event label, and then links to the specific row of the {discovered_states}.
-          #       that way, we only compute the "ID" once.
-          event_label = CommentHeader.start_position_label(row[:positions_before][1], row, **options)
+        def for(iteration_set, input:, **options)
+          code_string = iteration_set.to_a.collect do |iteration|
+            event_label = iteration.event_label
 
             %(
 # test: #{event_label}
 ctx = assert_advance "#{event_label}", expected_ctx: {}, test_plan: test_plan_structure, lanes_cfg: lanes_cfg, schema: schema, message_flow: message_flow
 assert_exposes ctx, seq: [:revise, :revise], reader: :[]
 )
-          end
-        end
-
-        # Render a test plan JSON structure that can be checked in so the assertions
-        # don't change with code modifications.
-        module Structure
-          module_function
-
-          def serialize(discovered_states, **options)
-            discovered_states.collect do |row|
-              {
-                event_label:            CommentHeader.start_position_label(row[:positions_before][1], row, **options),
-                start_position:         serialize_position(*row[:positions_before][1].to_a, **options),
-                start_configuration:    serialize_configuration(row[:positions_before][0], **options),
-                suspend_configuration:  serialize_configuration(row[:suspend_configuration].lane_positions, **options),
-                outcome:                row[:outcome],
-              }
-            end
           end
         end
 

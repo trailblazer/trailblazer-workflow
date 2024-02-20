@@ -253,7 +253,9 @@ class DiscoveryTest < Minitest::Spec
   it "{#render_cli_state_table}" do
     states, lanes_sorted, lanes_cfg = self.class.states()
 
-    cli_state_table = Trailblazer::Workflow::Discovery::Present::StateTable.(states, lanes_cfg: lanes_cfg)
+    iteration_set = Trailblazer::Workflow::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
+
+    cli_state_table = Trailblazer::Workflow::Discovery::Present::StateTable.(iteration_set, lanes_cfg: lanes_cfg)
     puts cli_state_table
     assert_equal cli_state_table,
 %(+---------------------------------+----------------------------------------+
@@ -371,16 +373,18 @@ class TestPlanExecutionTest < Minitest::Spec
   it "run test plan" do
     states, lanes_sorted, lanes_cfg, schema, message_flow = DiscoveryTest.states()
 
+    iteration_set = Trailblazer::Workflow::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
+
     #@ Test plan
-    puts Trailblazer::Workflow::Test::Plan.for(states, lanes_cfg: lanes_cfg, input: {})
+    # FIXME: properly test this output!
+    puts Trailblazer::Workflow::Test::Plan.for(iteration_set, lanes_cfg: lanes_cfg, input: {})
 
 
     # TODO: encapsulate
-    plan_structure = Trailblazer::Workflow::Test::Plan::Structure.serialize(states, lanes_cfg: lanes_cfg)
-    testing_json = JSON.pretty_generate(plan_structure)
-    test_plan_structure = Trailblazer::Workflow::Test::Plan::Structure.deserialize(plan_structure, lanes_cfg: lanes_cfg)
-
-
+    # plan_structure = Trailblazer::Workflow::Test::Plan::Structure.serialize(states, lanes_cfg: lanes_cfg)
+    # testing_json = JSON.pretty_generate(plan_structure)
+    # test_plan_structure = Trailblazer::Workflow::Test::Plan::Structure.deserialize(plan_structure, lanes_cfg: lanes_cfg)
+    test_plan_structure = iteration_set
 
     # test: ☝ ⏵︎Create form
     ctx = assert_advance "☝ ⏵︎Create form", expected_ctx: {}, test_plan: test_plan_structure, lanes_cfg: lanes_cfg, schema: schema, message_flow: message_flow
