@@ -21,7 +21,7 @@ class AdvanceTest < Minitest::Spec
       **schema.to_h,
       message_flow: message_flow,
       event_label: "☝ ⏵︎Update",
-      lanes_cfg: lanes_cfg, # TODO: make this part of {schema}.
+      # lanes_cfg: lanes_cfg, # TODO: make this part of {schema}.
 
       iteration_set: iteration_set, # this is basically the "dictionary" for lookups of positions.
       state_guards: {}, # TODO: design/implement this.
@@ -30,5 +30,17 @@ class AdvanceTest < Minitest::Spec
     )
 
     assert_equal signal.inspect, %(Trailblazer::Activity::Right)
+
+    #@ update invalid
+    signal, (ctx, flow_options) = Trailblazer::Workflow::Advance.(
+      {update: false, seq: []},
+      **schema.to_h,
+      message_flow: message_flow,
+      event_label: "☝ ⏵︎Update",
+      iteration_set: iteration_set, # this is basically the "dictionary" for lookups of positions.
+      state_guards: {}, # TODO: design/implement this.
+    )
+
+    assert_equal signal.inspect, %(Trailblazer::Activity::Left)
   end
 end
