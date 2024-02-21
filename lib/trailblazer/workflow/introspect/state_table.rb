@@ -9,26 +9,7 @@ module Trailblazer
         # The state knows its possible resume events.
         #   does the state know which state fields belong to it?
         def call(iteration_set, lanes_cfg:)
-          # raise discovery_state_table.inspect
-          start_position_to_catch = {}
-
-          # Key by lane_positions, which represent a state.
-          # State (lane_positions) => [events (start position)]
-          states = {}
-
-          # Collect the invoked start positions per Positions configuration.
-          # This implies the possible "catch events" per configuration.
-          iteration_set.collect do |iteration|
-            start_positions = iteration.start_positions
-            start_task_position = iteration.start_task_position
-
-            events = states[start_positions]
-            events = [] if events.nil?
-
-            events += [start_task_position]
-
-            states[start_positions] = events
-          end
+          states = aggregate_by_state(iteration_set)
 
           # render
           cli_rows = states.flat_map do |positions, catch_events|
@@ -53,6 +34,28 @@ module Trailblazer
 
           columns = ["state name", "triggerable events"]
           Present::Table.render(columns, cli_rows)
+        end
+
+        def aggregate_by_state(iteration_set)
+          # Key by lane_positions, which represent a state.
+          # State (lane_positions) => [events (start position)]
+          states = {}
+
+          # Collect the invoked start positions per Positions configuration.
+          # This implies the possible "catch events" per configuration.
+          iteration_set.collect do |iteration|
+            start_positions = iteration.start_positions
+            start_task_position = iteration.start_task_position
+
+            events = states[start_positions]
+            events = [] if events.nil?
+
+            events += [start_task_position]
+
+            states[start_positions] = events
+          end
+
+          states
         end
 
         # @private
