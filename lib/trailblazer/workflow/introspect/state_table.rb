@@ -86,13 +86,34 @@ module Trailblazer
             states    = StateTable.aggregate_by_state(iteration_set)
             cli_rows  = StateTable.render_data(states, **options)
 
-            cli_rows.collect do |row|
+            available_states = cli_rows.collect do |row|
               {
                 suggested_state_name: row["state name"],
                 key: row[:catch_events].collect { |position| Present.id_for_position(position) }.uniq.sort
-
               }
+            end
+
+            # user_configuration = available_states.collect do |row|
+            #   [
+            #     row["state_name"],
+            #     {
+            #       guard: %()
+            #     }
+            #   ]
+            # end
+
+            # formatting, find longest state name.
+            max_length = available_states.collect { |row| row[:suggested_state_name].length }.max
+
+            state_guard_rows = available_states.collect do |row|
+              %(  #{row[:suggested_state_name].ljust(max_length).inspect} => {guard: ->(ctx, process_model:, **) { raise "implement me!" }})
             end.join("\n")
+
+            snippet = %(
+state_guards: {
+#{state_guard_rows}
+}
+)
           end
         end
       end
