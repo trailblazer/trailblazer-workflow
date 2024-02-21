@@ -5,6 +5,7 @@ module Trailblazer
       # It is usually generated from a discovery process.
       # A {Set} of {Iteration}s comprises of all possible events and outcomes. This is the interface
       # for higher-level tools such as Advance, state tables, test plans or outcome deciders to work with.
+      # While this set can be auto-discovered, it technically could be hand-crafted, but, why?
       #
       # DISCUSS: maybe the naming/namespace will change.
       #          maybe Introspect::Iteration?
@@ -14,7 +15,7 @@ module Trailblazer
             iterations = discovered_states.collect do |row|
               triggered_catch_event_position = row[:positions_before][1]
 
-              id          = Introspect::Present.id_for_task(triggered_catch_event_position)
+              id          = Introspect::Present.id_for_position(triggered_catch_event_position)
               event_label = Test::Plan::CommentHeader.start_position_label(row[:positions_before][1], row, **options)
 
               Iteration.new(

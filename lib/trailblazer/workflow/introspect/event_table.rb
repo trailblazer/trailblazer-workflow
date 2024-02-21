@@ -26,7 +26,7 @@ module Trailblazer
             # FIXME: use developer for coloring.
             # def bg_gray(str);        "\e[47m#{str}\e[0m" end
             if render_ids
-              triggered_event_id_column = {"triggered event" => Present.id_for_task(start_task_position)}
+              triggered_event_id_column = {"triggered event" => Present.id_for_position(start_task_position)}
 
               rows << render_lane_position_id_columns(start_positions, lanes_cfg: lanes_cfg)
                 .merge(triggered_event_id_column)
@@ -62,7 +62,7 @@ module Trailblazer
           lane_position_ids = start_positions.to_a.flat_map do |lane_position|
             # Present.readable_id_label(*lane_position.to_a, **options)
             lane_label = lane_label_for(lane_position, **options) # FIXME: redundant in {#render_lane_position_columns}
-            id = Present.id_for_task(lane_position)
+            id = Present.id_for_position(lane_position)
 
             [
               lane_label, # column name

@@ -212,11 +212,11 @@ class DiscoveryTest < Minitest::Spec
 +---------------------------------+----------------------------------------+
 | "⏸︎ Create form"                 | "☝ ⏵︎Create form"                       |
 | "⏸︎ Create"                      | "☝ ⏵︎Create"                            |
-| "⏸︎ Update form/Notify approver" | "☝ ⏵︎Update form", "☝ ⏵︎Notify approver" |
+| "⏸︎ Update form♦Notify approver" | "☝ ⏵︎Update form", "☝ ⏵︎Notify approver" |
 | "⏸︎ Update"                      | "☝ ⏵︎Update"                            |
-| "⏸︎ Delete? form/Publish"        | "☝ ⏵︎Delete? form", "☝ ⏵︎Publish"        |
+| "⏸︎ Delete? form♦Publish"        | "☝ ⏵︎Delete? form", "☝ ⏵︎Publish"        |
 | "⏸︎ Revise form"                 | "☝ ⏵︎Revise form"                       |
-| "⏸︎ Delete/Cancel"               | "☝ ⏵︎Delete", "☝ ⏵︎Cancel"               |
+| "⏸︎ Delete♦Cancel"               | "☝ ⏵︎Delete", "☝ ⏵︎Cancel"               |
 | "⏸︎ Archive"                     | "☝ ⏵︎Archive"                           |
 | "⏸︎ Revise"                      | "☝ ⏵︎Revise"                            |
 +---------------------------------+----------------------------------------+)

@@ -11,7 +11,7 @@ class AdvanceTest < Minitest::Spec
 
     iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
     # "states"
-    positions_to_iteration_table = Trailblazer::Workflow::Introspect::StateTable.aggregate_by_state(iteration_set)
+    state_table = Trailblazer::Workflow::Introspect::StateTable.aggregate_by_state(iteration_set)
 
     ctx = {params: [], seq: []}
 
@@ -26,7 +26,7 @@ class AdvanceTest < Minitest::Spec
       iteration_set: iteration_set, # this is basically the "dictionary" for lookups of positions.
       state_guards: {}, # TODO: design/implement this.
 
-      positions_to_iteration_table: positions_to_iteration_table,
+      state_table: state_table,
     )
 
     assert_equal signal.inspect, %(Trailblazer::Activity::Right)

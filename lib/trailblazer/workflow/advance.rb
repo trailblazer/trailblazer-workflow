@@ -21,7 +21,7 @@ module Trailblazer
             message_flow: message_flow,
           )
 
-        signal = return_signal_for(configuration, iteration_set, **position_options)
+        signal = return_signal_for(configuration, iteration_set, **position_options,)
 
         return signal, [ctx, flow_options]
       end
@@ -41,8 +41,7 @@ module Trailblazer
         # Find all recorded iterations that started with our {start_task_position}.
         iterations = iteration_set.to_a.find_all { |iteration| iteration.start_task_position == start_task_position }
 
-        # raise positions_to_iteration_table.inspect
-
+        # raise state_table[start_task_position].inspect
 
         travelled_iteration = iterations.find { |iteration| configuration.lane_positions == iteration.suspend_positions } or raise "no matching travelled path found"
 

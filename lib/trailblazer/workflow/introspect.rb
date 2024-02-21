@@ -65,7 +65,7 @@ module Trailblazer
           lane_options_for(activity, task, lanes_cfg: lanes_cfg)[:icon]
         end
 
-        def id_for_task(lane_position)
+        def id_for_position(lane_position)
           Trailblazer::Activity::Introspect.Nodes(lane_position.activity, task: lane_position.task).id
         end
 

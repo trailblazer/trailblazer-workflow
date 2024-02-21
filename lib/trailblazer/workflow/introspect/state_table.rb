@@ -11,26 +11,7 @@ module Trailblazer
         def call(iteration_set, lanes_cfg:)
           states = aggregate_by_state(iteration_set)
 
-          # render
-          cli_rows = states.flat_map do |positions, catch_events|
-            suggested_state_name = suggested_state_name_for(catch_events)
-
-            suggested_state_name = "⏸︎ #{suggested_state_name}".inspect
-
-            triggerable_events = catch_events
-              .collect { |event_position| Present.readable_name_for_catch_event(*event_position.to_a, lanes_cfg: lanes_cfg).inspect }
-              .uniq
-              .join(", ")
-
-
-            Hash[
-              "state name",
-              suggested_state_name,
-
-              "triggerable events",
-              triggerable_events
-            ]
-          end
+          cli_rows = render_data(states, lanes_cfg: lanes_cfg)
 
           columns = ["state name", "triggerable events"]
           Present::Table.render(columns, cli_rows)
@@ -58,13 +39,59 @@ module Trailblazer
           states
         end
 
+        def render_data(states, lanes_cfg:)
+          cli_rows = states.flat_map do |positions, catch_events|
+            suggested_state_name = suggested_state_name_for(catch_events)
+
+            suggested_state_name = "⏸︎ #{suggested_state_name}".inspect
+
+            triggerable_events = catch_events
+              .collect { |event_position| Present.readable_name_for_catch_event(*event_position.to_a, lanes_cfg: lanes_cfg).inspect }
+              .uniq
+              .join(", ")
+
+
+            Hash[
+              "state name",
+              suggested_state_name,
+
+              "triggerable events",
+              triggerable_events,
+
+              :positions,
+              positions,
+
+              :catch_events,
+              catch_events
+            ]
+          end
+        end
+
         # @private
         # TODO: move to StateTable
         def suggested_state_name_for(catch_events)
           catch_events
             .collect { |event_position| Present.label_for_next_task(*event_position.to_a) }
             .uniq
-            .join("/")
+            .join("♦")
+        end
+
+        # Generate code stubs for a state guard class.
+        module Generate
+          module_function
+
+          def call(iteration_set, **options)
+            states    = StateTable.aggregate_by_state(iteration_set)
+            cli_rows  = StateTable.render_data(states, **options)
+
+            cli_rows.collect do |row|
+              {
+                suggested_state_name: row["state name"],
+                id: row[:catch_events].collect { |position| Present.id_for_position(position) }.sort
+
+              }
+            end.join("\n")
+          end
         end
       end
     end
