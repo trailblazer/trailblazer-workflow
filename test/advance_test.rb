@@ -6,27 +6,29 @@ class AdvanceTest < Minitest::Spec
   include DiscoveredStates
 
   it "what" do
-    schema, lanes, message_flow, initial_lane_positions, lanes_cfg = build_schema()
-
     # TODO: this is something that shouldn't be done every time.
-    states, lanes_sorted, lanes_cfg = states()
+    states, lanes_sorted, lanes_cfg, schema, message_flow = states()
 
     iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
     # "states"
-    position_to_iterations_table = Trailblazer::Workflow::Introspect::StateTable.aggregate_by_state(iteration_set)
+    positions_to_iteration_table = Trailblazer::Workflow::Introspect::StateTable.aggregate_by_state(iteration_set)
 
     ctx = {params: [], seq: []}
 
     # TODO: this should be suitable to be dropped into an endpoint.
-
     signal, (ctx, flow_options) = Trailblazer::Workflow::Advance.(
-      schema,
       ctx,
+      **schema.to_h,
+      message_flow: message_flow,
       event_label: "☝ ⏵︎Update",
       lanes_cfg: lanes_cfg, # TODO: make this part of {schema}.
 
       iteration_set: iteration_set, # this is basically the "dictionary" for lookups of positions.
-      state_guards: {} # TODO: design/implement this.
+      state_guards: {}, # TODO: design/implement this.
+
+      positions_to_iteration_table: positions_to_iteration_table,
     )
+
+    assert_equal signal.inspect, %(Trailblazer::Activity::Right)
   end
 end
