@@ -73,7 +73,6 @@ module Trailblazer
           discovered_state = discovered_state.merge(ctx_before: [ctx.inspect])
 
           configuration, (ctx, flow) = Trailblazer::Workflow::Collaboration::Synchronous.advance(
-            collaboration,
             [ctx, {throw: []}],
             {}, # circuit_options
 

@@ -38,7 +38,7 @@ module Trailblazer
           ctx_for_advance = ctx
 
           configuration, (ctx, flow) = Trailblazer::Workflow::Collaboration::Synchronous.advance(
-            schema,
+            # schema,
             [ctx_for_advance, {throw: []}],
             {}, # circuit_options
 

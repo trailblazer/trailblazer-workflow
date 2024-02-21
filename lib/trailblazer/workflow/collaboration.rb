@@ -127,7 +127,7 @@ module Trailblazer
         # Triggers the {start_task} event and runs the entire collaboration until message is sent and
         # the throwing activity stops in a suspend or End terminus.
         # @private
-        def advance(collaboration, (ctx, flow), circuit_options, lane_positions:, start_task_position:, message_flow:)
+        def advance((ctx, flow), circuit_options, lane_positions:, start_task_position:, message_flow:)
           signal = nil
 
           # start_task, activity,
