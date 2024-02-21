@@ -127,42 +127,42 @@ module Trailblazer
         # Triggers the {start_task} event and runs the entire collaboration until message is sent and
         # the throwing activity stops in a suspend or End terminus.
         # @private
-        def advance(collaboration, (ctx, flow), circuit_options, lane_positions:, start_position:, message_flow:)
+        def advance(collaboration, (ctx, flow), circuit_options, lane_positions:, start_task_position:, message_flow:)
           signal = nil
 
           # start_task, activity,
           loop do
-            start_position = start_position.to_h
+            start_task_position = start_task_position.to_h
 
-            Synchronous.validate_targeted_position(lane_positions, **start_position)
+            Synchronous.validate_targeted_position(lane_positions, **start_task_position)
 
-            circuit_options = circuit_options.merge(start_task: start_position[:task])
+            circuit_options = circuit_options.merge(start_task: start_task_position[:task])
 
-            # signal, (ctx, flow) = Activity::TaskWrap.invoke(start_position[:activity], [ctx, flow], **circuit_options)
-            signal, (ctx, flow) = Trailblazer::Developer.wtf?(start_position[:activity], [ctx, flow], **circuit_options)
+            # signal, (ctx, flow) = Activity::TaskWrap.invoke(start_task_position[:activity], [ctx, flow], **circuit_options)
+            signal, (ctx, flow) = Trailblazer::Developer.wtf?(start_task_position[:activity], [ctx, flow], **circuit_options)
 
             # now we have :throw, or not
             # @returns Event::Throw::Queued
 
             # now, "log" the collaboration's state.
-            lane_positions = advance_position(lane_positions, start_position[:activity], signal)
+            lane_positions = advance_position(lane_positions, start_task_position[:activity], signal)
 
             break unless flow[:throw].any?
             # break if (@options[:skip_message_from] || []).include?(flow[:throw][-1][0]) # FIXME: untested!
 
-            debug_points_to = start_position[:activity].to_h[:circuit].to_h[:map][start_position[:task]]
-            Trailblazer::Activity::Introspect.Nodes(start_position[:activity], task: start_position[:task]).data
+            debug_points_to = start_task_position[:activity].to_h[:circuit].to_h[:map][start_task_position[:task]]
+            Trailblazer::Activity::Introspect.Nodes(start_task_position[:activity], task: start_task_position[:task]).data
             puts "
 >>>>>>>>> FROM \033[1msuspend ---> #{debug_points_to}\033[0m"
 
-            flow, start_position = receiver_task(flow, message_flow)
+            flow, start_task_position = receiver_task(flow, message_flow)
             # every time we "deliver" a message, we should check if it's allowed (meaning the receiving activity is actually in the targeted catch event)
           end
 
           return Configuration.new(
             lane_positions: lane_positions,
             signal:         signal,
-            last_lane:      start_position[:activity], # DISCUSS: do we need that, or should we infer that using {signal}?
+            last_lane:      start_task_position[:activity], # DISCUSS: do we need that, or should we infer that using {signal}?
           ),
           [ctx, flow]
         end

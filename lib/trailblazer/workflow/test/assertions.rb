@@ -32,7 +32,7 @@ module Trailblazer
         def assert_advance(event_label, test_plan:, lanes_cfg:, schema:, message_flow:, expected_ctx:, ctx: {seq: []}, **) # TODO: allow {ctx}
           iteration = test_plan.to_a.find { |iteration| iteration.event_label == event_label } or raise
 
-          start_position = iteration.start_task_position
+          start_task_position = iteration.start_task_position
 
           # current position.
           #DISCUSS: here, we could also ask the State layer for the start configuration, on a different level.
@@ -45,7 +45,7 @@ module Trailblazer
             [ctx_for_advance, {throw: []}],
             {}, # circuit_options
 
-            start_position: start_position,
+            start_task_position: start_task_position,
             lane_positions: lane_positions, # current position/"state"
 
             message_flow: message_flow,

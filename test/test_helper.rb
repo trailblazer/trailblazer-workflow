@@ -187,13 +187,13 @@ module DiscoveredStates
 
     # TODO: do this in the State layer.
     start_task = Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_create_form}").task # catch-before-Activity_0wc2mcq
-    start_position = Trailblazer::Workflow::Collaboration::Position.new(lane_activity_ui, start_task)
+    start_task_position = Trailblazer::Workflow::Collaboration::Position.new(lane_activity_ui, start_task)
 
 
     states = Trailblazer::Workflow::Discovery.(
       schema,
       initial_lane_positions: initial_lane_positions,
-      start_position: start_position,
+      start_task_position: start_task_position,
       message_flow: message_flow,
 
       # TODO: allow translating the original "id" (?) to the stubbed.

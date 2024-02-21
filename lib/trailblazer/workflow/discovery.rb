@@ -6,7 +6,7 @@ module Trailblazer
 
       # Find all possible configurations for a {collaboration} by replacing
       # its tasks with mocks, and run through all possible paths.
-      def call(collaboration, start_position:, run_multiple_times: {}, initial_lane_positions: Collaboration::Synchronous.initial_lane_positions(collaboration), message_flow:)
+      def call(collaboration, start_task_position:, run_multiple_times: {}, initial_lane_positions: Collaboration::Synchronous.initial_lane_positions(collaboration), message_flow:)
         # State discovery:
     # The idea is that we collect suspend events and follow up on all their resumes (catch) events.
     # We can't see into {Collaboration.call}, meaning we can really only collect public entry points,
@@ -22,7 +22,7 @@ module Trailblazer
 
         original_lanes = collaboration.to_h[:lanes] # this dictates the order within created Positions.
 
-        collaboration, message_flow, start_position, initial_lane_positions, activity_2_stub, original_task_2_stub_task = stub_tasks_for(collaboration, message_flow: message_flow, start_position: start_position, initial_lane_positions: initial_lane_positions)
+        collaboration, message_flow, start_task_position, initial_lane_positions, activity_2_stub, original_task_2_stub_task = stub_tasks_for(collaboration, message_flow: message_flow, start_task_position: start_task_position, initial_lane_positions: initial_lane_positions)
 
         # pp collaboration.to_h[:lanes][:ui].to_h
         # raise
@@ -30,7 +30,7 @@ module Trailblazer
 
         resumes_to_invoke = [
           [
-            start_position,
+            start_task_position,
             initial_lane_positions,
             {}, # ctx_merge
             {outcome: :success} # config_payload
@@ -44,15 +44,15 @@ module Trailblazer
 
         while resumes_to_invoke.any?
 
-          (start_position, lane_positions, ctx_merge, config_payload) = resumes_to_invoke.shift
+          (start_task_position, lane_positions, ctx_merge, config_payload) = resumes_to_invoke.shift
           puts "~~~~~~~~~"
 
           ctx = {seq: []}.merge(ctx_merge)
-          start_task = start_position.to_h[:task]
+          start_task = start_task_position.to_h[:task]
           if (do_again_config = run_multiple_times[start_task]) && !already_visited_catch_events_again[start_task] # TODO: do this by keying by resume event and ctx variable(s).
 
             resumes_to_invoke << [
-              start_position,
+              start_task_position,
               lane_positions, # same positions as the original situation.
               do_again_config[:ctx_merge],
               do_again_config[:config_payload]
@@ -66,8 +66,8 @@ module Trailblazer
           discovered_state = {}
 
           discovered_state = discovered_state.merge(
-            stubbed_positions_before: [lane_positions, start_position],
-            positions_before:         [unstub_positions(activity_2_stub, original_task_2_stub_task, lane_positions, lanes: original_lanes), *unstub_positions(activity_2_stub, original_task_2_stub_task, [start_position], lanes: Hash.new(0))]
+            stubbed_positions_before: [lane_positions, start_task_position],
+            positions_before:         [unstub_positions(activity_2_stub, original_task_2_stub_task, lane_positions, lanes: original_lanes), *unstub_positions(activity_2_stub, original_task_2_stub_task, [start_task_position], lanes: Hash.new(0))]
           )
 
           discovered_state = discovered_state.merge(ctx_before: [ctx.inspect])
@@ -77,7 +77,7 @@ module Trailblazer
             [ctx, {throw: []}],
             {}, # circuit_options
 
-            start_position: start_position,
+            start_task_position: start_task_position,
             lane_positions: lane_positions, # current position/"state"
 
             message_flow: message_flow,
@@ -127,7 +127,7 @@ module Trailblazer
         return discovered_states
       end
 
-      def stub_tasks_for(collaboration, ignore_class: Trailblazer::Activity::End, message_flow:, start_position:, initial_lane_positions:)
+      def stub_tasks_for(collaboration, ignore_class: Trailblazer::Activity::End, message_flow:, start_task_position:, initial_lane_positions:)
         collected = collaboration.to_h[:lanes].collect do |lane_id, activity|
           circuit  = activity.to_h[:circuit]
           lane_map = circuit.to_h[:map].clone
@@ -190,7 +190,7 @@ module Trailblazer
 
         new_message_flow = message_flow.collect { |throw_evt, (activity, catch_evt)| [throw_evt, [activity_2_stub[activity], catch_evt]] }.to_h
 
-        new_start_position = Collaboration::Position.new(activity_2_stub.fetch(start_position.activity), start_position.task)
+        new_start_task_position = Collaboration::Position.new(activity_2_stub.fetch(start_task_position.activity), start_task_position.task)
 
         new_initial_lane_positions = initial_lane_positions.collect do |position|
           # TODO: make lane_positions {Position} instances, too.
@@ -199,7 +199,7 @@ module Trailblazer
 
         new_initial_lane_positions = Collaboration::Positions.new(new_initial_lane_positions)
 
-        return Collaboration::Schema.new(lanes: stubbed_lanes, message_flow: new_message_flow), new_message_flow, new_start_position, new_initial_lane_positions, activity_2_stub, original_task_2_stub_task
+        return Collaboration::Schema.new(lanes: stubbed_lanes, message_flow: new_message_flow), new_message_flow, new_start_task_position, new_initial_lane_positions, activity_2_stub, original_task_2_stub_task
       end
 
       # Get the original lane activity and tasks for a {Positions} set from the stubbed ones.
