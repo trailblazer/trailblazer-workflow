@@ -10,35 +10,53 @@ class AdvanceTest < Minitest::Spec
     states, lanes_sorted, lanes_cfg, schema, message_flow = states()
 
     iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
-    # "states"
-    state_table = Trailblazer::Workflow::Introspect::StateTable.aggregate_by_state(iteration_set)
 
-    ctx = {params: [], seq: []}
+    state_guards_from_user = {state_guards: {
+  "⏸︎ Create form                " => {guard: ->(ctx, process_model:, **) { true }, id: ["catch-before-Activity_0wc2mcq"]},
+  "⏸︎ Create                     " => {guard: ->(ctx, process_model:, **) { true }, id: ["catch-before-Activity_1psp91r"]},
+  "⏸︎ Update form♦Notify approver" => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_1165bw9", "catch-before-Activity_1dt5di5"]},
+  "⏸︎ Update                     " => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_0j78uzd"]},
+  "⏸︎ Delete? form♦Publish       " => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_0bsjggk", "catch-before-Activity_0ha7224"]},
+  "⏸︎ Revise form                " => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_0zsock2"]},
+  "⏸︎ Delete♦Cancel              " => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_15nnysv", "catch-before-Activity_1uhozy1"]},
+  "⏸︎ Archive                    " => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_0fy41qq"]},
+  "⏸︎ Revise                     " => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_1wiumzv"]},
+}}[:state_guards]
+
+    state_guards = Trailblazer::Workflow::Collaboration::StateGuards.from_user_hash(
+      state_guards_from_user,
+      iteration_set: iteration_set
+    )
+
+
+
+
+
+
+    ctx = {params: [], seq: [], process_model: nil}
 
     # TODO: this should be suitable to be dropped into an endpoint.
     signal, (ctx, flow_options) = Trailblazer::Workflow::Advance.(
       ctx,
       **schema.to_h,
       message_flow: message_flow,
-      event_label: "☝ ⏵︎Update",
+      event_label: "☝ ⏵︎Create",
       # lanes_cfg: lanes_cfg, # TODO: make this part of {schema}.
 
       iteration_set: iteration_set, # this is basically the "dictionary" for lookups of positions.
-      state_guards: {}, # TODO: design/implement this.
-
-      state_table: state_table,
+      state_guards: state_guards,
     )
 
     assert_equal signal.inspect, %(Trailblazer::Activity::Right)
 
     #@ update invalid
     signal, (ctx, flow_options) = Trailblazer::Workflow::Advance.(
-      {update: false, seq: []},
+      {create: false, seq: [], process_model: nil},
       **schema.to_h,
       message_flow: message_flow,
-      event_label: "☝ ⏵︎Update",
+      event_label: "☝ ⏵︎Create",
       iteration_set: iteration_set, # this is basically the "dictionary" for lookups of positions.
-      state_guards: {}, # TODO: design/implement this.
+      state_guards: state_guards,
     )
 
     assert_equal signal.inspect, %(Trailblazer::Activity::Left)

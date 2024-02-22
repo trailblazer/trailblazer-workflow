@@ -35,7 +35,7 @@ module Trailblazer
 
             events += [start_task_position]
 
-            states[start_positions] = events
+            states[start_positions] = events.uniq # TODO: this {uniq} is not explicitly tested.
           end
 
           states
@@ -49,7 +49,6 @@ module Trailblazer
 
             triggerable_events = catch_events
               .collect { |event_position| Present.readable_name_for_catch_event(*event_position.to_a, lanes_cfg: lanes_cfg).inspect }
-              .uniq
               .join(", ")
 
 
@@ -99,7 +98,7 @@ module Trailblazer
             state_guard_rows = available_states.collect do |row|
               id_snippet = %(, id: #{row[:key].inspect}) # TODO: move me to serializer code.
 
-              %(  #{row[:suggested_state_name].ljust(max_length).inspect} => {guard: ->(ctx, process_model:, **) { raise "implement me!" }}#{id_snippet})
+              %(  #{row[:suggested_state_name].ljust(max_length).inspect} => {guard: ->(ctx, process_model:, **) { raise "implement me!" }#{id_snippet}},)
             end.join("\n")
 
             snippet = %(

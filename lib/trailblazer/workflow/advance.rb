@@ -4,14 +4,17 @@ module Trailblazer
     module Advance
       module_function
 
-      def call(ctx, event_label:, iteration_set:, message_flow:, **)
-        planned_iteration = iteration_set.to_a.find { |iteration| iteration.event_label == event_label }
+      UNAUTHORIZED_SIGNAL = "unauthorized"
 
-        # TODO: run the state guard here.
+      def call(ctx, event_label:, iteration_set:, message_flow:, state_guards:, **)
+        planned_iteration = iteration_set.to_a.find { |iteration| iteration.event_label == event_label }
 
         # TODO: those positions could also be passed in manually, without using an Iteration::Set.
         position_options = position_options_from_iteration(planned_iteration) # :start_task_position and :start_positions
 
+        # TODO: run the state guard here.
+        # FIXME: fix flow_options!
+        return UNAUTHORIZED_SIGNAL, [ctx, {}] unless state_guards.(ctx, start_task_position: position_options[:start_task_position])
 
         configuration, (ctx, flow_options) = Trailblazer::Workflow::Collaboration::Synchronous.advance(
             [ctx, {throw: []}],
