@@ -93,20 +93,13 @@ module Trailblazer
               }
             end
 
-            # user_configuration = available_states.collect do |row|
-            #   [
-            #     row["state_name"],
-            #     {
-            #       guard: %()
-            #     }
-            #   ]
-            # end
-
             # formatting, find longest state name.
             max_length = available_states.collect { |row| row[:suggested_state_name].length }.max
 
             state_guard_rows = available_states.collect do |row|
-              %(  #{row[:suggested_state_name].ljust(max_length).inspect} => {guard: ->(ctx, process_model:, **) { raise "implement me!" }})
+              id_snippet = %(, id: #{row[:key].inspect}) # TODO: move me to serializer code.
+
+              %(  #{row[:suggested_state_name].ljust(max_length).inspect} => {guard: ->(ctx, process_model:, **) { raise "implement me!" }}#{id_snippet})
             end.join("\n")
 
             snippet = %(
