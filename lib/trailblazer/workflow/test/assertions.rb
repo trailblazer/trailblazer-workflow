@@ -17,12 +17,12 @@ module Trailblazer
         end
 
         # Compile error message when the expected lane position doesn't match the actual one.
-        def self.error_message_for(position, expected_position, lanes_cfg:) # TODO: test me.
+        def self.error_message_for(position, expected_position, **options) # TODO: test me.
           # TODO: make the labels use UTF8 icons etc, as in the CLI rendering code.
-          expected_label = Introspect::Present.readable_name_for_suspend_or_terminus(*position.to_a, lanes_cfg: lanes_cfg)
-          actual_label   = Introspect::Present.readable_name_for_suspend_or_terminus(*expected_position.to_a, lanes_cfg: lanes_cfg)
+          expected_label = Introspect::Present.readable_name_for_suspend_or_terminus(*position.to_a, **options)
+          actual_label   = Introspect::Present.readable_name_for_suspend_or_terminus(*expected_position.to_a, **options)
 
-          lane_label = Introspect::Present.lane_options_for(*position.to_a, lanes_cfg: lanes_cfg)[:label]
+          lane_label = Introspect::Present.lane_options_for_position(position, **options)[:label]
 
           "Lane #{lane_label}:\n   expected #{expected_label}\n   actual   #{actual_label}"
         end

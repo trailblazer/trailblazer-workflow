@@ -56,4 +56,36 @@ class StructuresTest < Minitest::Spec
     assert_equal some_hash[positions], true
     assert_equal some_hash[positions_2], true
   end
+
+  it "Introspect::Lanes" do
+    lane_activity = Module.new
+    lane_activity_ui = Class.new
+
+    lanes_cfg = Trailblazer::Workflow::Introspect::Lanes.new(
+      lanes_data =
+      {
+        "article moderation"    => {
+          label: "lifecycle",
+          icon:  "⛾",
+          activity: lane_activity, # this is copied here after the activity has been compiled in {Schema.build}.
+
+        },
+        "<ui> author workflow"  => {
+          label: "UI",
+          icon:  "☝",
+          activity: lane_activity_ui,
+        },
+      }
+    )
+
+    assert_equal lanes_cfg.(json_id: "article moderation")[:activity], lane_activity
+    assert_equal lanes_cfg.(activity: lane_activity_ui)[:label], "UI"
+    assert_equal lanes_cfg.(activity: lane_activity_ui)[:icon], "☝"
+
+    assert_equal lanes_cfg.(label: "UI")[:activity], lane_activity_ui
+
+    assert_equal lanes_cfg.to_h.inspect,
+      %({"article moderation"=>{:label=>"lifecycle", :icon=>"⛾", :activity=>#{lane_activity.inspect}, :json_id=>"article moderation"}, "<ui> author workflow"=>{:label=>"UI", :icon=>"☝", :activity=>#{lane_activity_ui.inspect}, :json_id=>\"<ui> author workflow\"}})
+    # assert_equal lanes_cfg.json_id("article moderatoin")[:activity], lane_activity
+  end
 end

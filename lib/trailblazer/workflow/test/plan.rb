@@ -76,10 +76,10 @@ assert_exposes ctx, seq: [:revise, :revise], reader: :[]
           end
 
           def compute_combined_column_widths(position_rows, lanes_cfg:, **)
-            chars_to_filter = Introspect::Present::ICONS.values + lanes_cfg.collect { |_, cfg| cfg[:icon] } # TODO: do this way up in the code path.
+            chars_to_filter = Introspect::Present::ICONS.values + lanes_cfg.to_h.collect { |_, cfg| cfg[:icon] } # TODO: do this way up in the code path.
 
             # Find out the longest entry per lane.
-            columns = lanes_cfg.collect { |_, cfg| [cfg[:activity], []] }.to_h # {<lifecycle> => [], ...}
+            columns = lanes_cfg.to_h.collect { |_, cfg| [cfg[:activity], []] }.to_h # {<lifecycle> => [], ...}
 
             position_rows.each do |event_labels|
               event_labels.each do |(activity, suspend_label)|

@@ -5,7 +5,7 @@ class DiscoveryTest < Minitest::Spec
   extend DiscoveredStates
 
   it "Discovery.call" do
-    states, lanes_sorted, lanes_cfg = self.class.states
+    states, schema, lanes_cfg = self.class.states
 
     # pp states
     # TODO: should we really assert the state table manually?
@@ -14,143 +14,143 @@ class DiscoveryTest < Minitest::Spec
     assert_position_before states[0][:positions_before],
       ["suspend-gw-to-catch-before-Activity_0wwfenp", "suspend-gw-to-catch-before-Activity_0wc2mcq", "~suspend~"],
       start_id: "catch-before-Activity_0wc2mcq",
-      lanes: lanes_sorted
+      lanes: lanes_cfg
 
     assert_position_after states[0][:suspend_configuration],
       ["suspend-gw-to-catch-before-Activity_0wwfenp", "suspend-Gateway_14h0q7a", "~suspend~"],
-      lanes: lanes_sorted
+      lanes: lanes_cfg
 
     assert_position_before states[1][:positions_before],
       ["suspend-gw-to-catch-before-Activity_0wwfenp", "suspend-Gateway_14h0q7a", "~suspend~"],
       start_id: "catch-before-Activity_1psp91r",
-      lanes: lanes_sorted
+      lanes: lanes_cfg
 
     assert_position_after states[1][:suspend_configuration],
       ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0kknfje", "~suspend~"],
-      lanes: lanes_sorted
+      lanes: lanes_cfg
 
     assert_position_before states[2][:positions_before],
       ["suspend-gw-to-catch-before-Activity_0wwfenp", "suspend-Gateway_14h0q7a", "~suspend~"],
       start_id: "catch-before-Activity_1psp91r",
-      lanes: lanes_sorted
+      lanes: lanes_cfg
 
     assert_position_after states[2][:suspend_configuration],
       ["suspend-gw-to-catch-before-Activity_0wwfenp", "suspend-Gateway_14h0q7a", "~suspend~"],
-      lanes: lanes_sorted
+      lanes: lanes_cfg
 
     assert_position_before states[3][:positions_before],
       ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0kknfje", "~suspend~"],
       start_id: "catch-before-Activity_1165bw9",
-      lanes: lanes_sorted
+      lanes: lanes_cfg
 
     assert_position_after states[3][:suspend_configuration],
       ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0nxerxv", "~suspend~"],
-      lanes: lanes_sorted
+      lanes: lanes_cfg
 
     assert_position_before states[4][:positions_before],
       ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0kknfje", "~suspend~"],
       start_id: "catch-before-Activity_1dt5di5",
-      lanes: lanes_sorted
+      lanes: lanes_cfg
 
     assert_position_after states[4][:suspend_configuration],
       ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "End.failure"],
-      lanes: lanes_sorted
+      lanes: lanes_cfg
 
     assert_position_before states[5][:positions_before],
       ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0nxerxv", "~suspend~"],
       start_id: "catch-before-Activity_0j78uzd",
-      lanes: lanes_sorted
+      lanes: lanes_cfg
 
     assert_position_after states[5][:suspend_configuration],
       ["suspend-Gateway_1wzosup", "suspend-Gateway_1g3fhu2", "~suspend~"],
-      lanes: lanes_sorted
+      lanes: lanes_cfg
 
     assert_position_before states[6][:positions_before],
       ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0kknfje", "~suspend~"],
       start_id: "catch-before-Activity_1dt5di5",
-      lanes: lanes_sorted
+      lanes: lanes_cfg
 
     assert_position_after states[6][:suspend_configuration],
       ["suspend-Gateway_01p7uj7", "suspend-gw-to-catch-before-Activity_0zsock2", "End.success"],
-      lanes: lanes_sorted
+      lanes: lanes_cfg
 
     assert_position_before states[7][:positions_before],
       ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "End.failure"],
       start_id: "catch-before-Activity_0ha7224",
-      lanes: lanes_sorted
+      lanes: lanes_cfg
 
     assert_position_after states[7][:suspend_configuration],
       ["suspend-Gateway_1hp2ssj", "suspend-Gateway_100g9dn", "End.failure"],
-      lanes: lanes_sorted
+      lanes: lanes_cfg
 
     assert_position_before states[8][:positions_before],
       ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "End.failure"],
       start_id: "catch-before-Activity_0bsjggk",
-      lanes: lanes_sorted
+      lanes: lanes_cfg
 
     assert_position_after states[8][:suspend_configuration],
       ["suspend-gw-to-catch-before-Activity_1hgscu3", "suspend-gw-to-catch-before-Activity_0fy41qq", "End.failure"],
-      lanes: lanes_sorted
+      lanes: lanes_cfg
 
     assert_position_before states[9][:positions_before],
       ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0nxerxv", "~suspend~"],
       start_id: "catch-before-Activity_0j78uzd",
-      lanes: lanes_sorted
+      lanes: lanes_cfg
 
     assert_position_after states[9][:suspend_configuration],
       ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0nxerxv", "~suspend~"],
-      lanes: lanes_sorted
+      lanes: lanes_cfg
 
     assert_position_before states[10][:positions_before],
       ["suspend-Gateway_01p7uj7", "suspend-gw-to-catch-before-Activity_0zsock2", "End.success"],
       start_id: "catch-before-Activity_0zsock2",
-      lanes: lanes_sorted
+      lanes: lanes_cfg
 
     assert_position_after states[10][:suspend_configuration],
       ["suspend-Gateway_01p7uj7", "suspend-Gateway_1xs96ik", "End.success"],
-      lanes: lanes_sorted
+      lanes: lanes_cfg
 
     assert_position_before states[11][:positions_before],
       ["suspend-Gateway_1hp2ssj", "suspend-Gateway_100g9dn", "End.failure"],
       start_id: "catch-before-Activity_15nnysv",
-      lanes: lanes_sorted
+      lanes: lanes_cfg
 
     assert_position_after states[11][:suspend_configuration],
       ["Event_1p8873y", "Event_0h6yhq6", "End.failure"],
-      lanes: lanes_sorted
+      lanes: lanes_cfg
 
     assert_position_before states[12][:positions_before],
       ["suspend-Gateway_1hp2ssj", "suspend-Gateway_100g9dn", "End.failure"],
       start_id: "catch-before-Activity_1uhozy1",
-      lanes: lanes_sorted
+      lanes: lanes_cfg
 
     assert_position_after states[12][:suspend_configuration],
       ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "End.failure"],
-      lanes: lanes_sorted
+      lanes: lanes_cfg
 
     assert_position_before states[13][:positions_before],
       ["suspend-gw-to-catch-before-Activity_1hgscu3", "suspend-gw-to-catch-before-Activity_0fy41qq", "End.failure"],
       start_id: "catch-before-Activity_0fy41qq",
-      lanes: lanes_sorted
+      lanes: lanes_cfg
 
     assert_position_after states[13][:suspend_configuration],
       ["Event_1p8873y", "Event_0h6yhq6", "End.failure"],
-      lanes: lanes_sorted
+      lanes: lanes_cfg
 
     assert_position_before states[14][:positions_before],
       ["suspend-Gateway_01p7uj7", "suspend-Gateway_1xs96ik", "End.success"],
       start_id: "catch-before-Activity_1wiumzv",
-      lanes: lanes_sorted
+      lanes: lanes_cfg
 
     assert_position_after states[14][:suspend_configuration],
       ["suspend-Gateway_1kl7pnm", "suspend-Gateway_1g3fhu2", "End.success"],
-      lanes: lanes_sorted
+      lanes: lanes_cfg
 
     assert_nil states[15]
   end
 
   it "Iteration::Set" do
-    states, lanes_sorted, lanes_cfg = self.class.states
+    states, schema, lanes_cfg = self.class.states
 
     iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
 
@@ -182,6 +182,7 @@ class DiscoveryTest < Minitest::Spec
 
   def assert_positions_for(actual_lane_positions, expected_ids, lanes:)
     # puts actual_lane_positions.collect { |(a, t)| Trailblazer::Activity::Introspect.Nodes(a, task: t).id }.inspect
+    lanes = lanes.to_h.collect { |_, cfg| cfg[:activity] }
 
     actual_lane_positions.collect.with_index do |actual_position, index|
       actual_activity, actual_task = actual_position.to_a
@@ -200,7 +201,7 @@ class DiscoveryTest < Minitest::Spec
   end
 
   it "{#render_cli_state_table}" do
-    states, lanes_sorted, lanes_cfg = self.class.states()
+    states, schema, lanes_cfg = self.class.states()
 
     iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
 
@@ -225,7 +226,7 @@ class DiscoveryTest < Minitest::Spec
 
   # DISCUSS: currently, this event table doesn't make a lot of sense.
   it "{Present::EventTable.call}" do
-    states, lanes_sorted, lanes_cfg = self.class.states()
+    states, schema, lanes_cfg = self.class.states()
 
     iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
 
@@ -271,7 +272,7 @@ end
 
 class DiscoveryTestPlanTest < Minitest::Spec
   it "render comment header for test plan" do
-    states, lanes_sorted, lanes_cfg = DiscoveryTest.states()
+    states, schema, lanes_cfg = DiscoveryTest.states()
 
     iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
 
@@ -307,7 +308,7 @@ class TestPlanExecutionTest < Minitest::Spec
   include Trailblazer::Test::Assertions # DISCUSS: this is for assert_advance and friends.
 
   it "run test plan" do
-    states, lanes_sorted, lanes_cfg, schema, message_flow = DiscoveryTest.states()
+    states, schema, lanes_cfg, message_flow = DiscoveryTest.states()
 
     iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
 

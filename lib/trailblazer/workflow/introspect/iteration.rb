@@ -70,7 +70,7 @@ module Trailblazer
             end
 
             def id_tuple_for(activity, task, lanes_cfg:)
-              activity_id = lanes_cfg.values.find { |cfg| cfg[:activity] == activity }[:label]
+              activity_id = lanes_cfg.(activity: activity)[:label]
               task_id = Trailblazer::Activity::Introspect.Nodes(activity, task: task).id
 
               return activity_id, task_id
@@ -111,7 +111,7 @@ module Trailblazer
 
             def call(structure, lanes_cfg:)
               iterations = structure.collect do |attributes|
-                label_2_activity = lanes_cfg.values.collect { |cfg| [cfg[:label], cfg[:activity]] }.to_h
+                label_2_activity = lanes_cfg.to_h.values.collect { |cfg| [cfg[:label], cfg[:activity]] }.to_h
 
                 Iteration.new(
                   attributes["id"],

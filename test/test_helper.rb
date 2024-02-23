@@ -64,60 +64,48 @@ module BuildSchema
       # "Reject" => implementing.method(:reject),
     )
 
-    # TODO: move this into the Schema-build process.
-    # This is needed to translate the JSON message structure to Ruby,
-    # where we reference lanes by their {Activity} instance.
-    json_id_to_lane = {
-      "article moderation"    => lane_activity,
-      "<ui> author workflow"  => lane_activity_ui,
-    }
-
     # lane_icons: lane_icons = {"UI" => "☝", "lifecycle" => "⛾", "approver" => "☑"},
-    lanes_cfg = {
-      "article moderation"    => {
-        label: "lifecycle",
-        icon:  "⛾",
-        activity: lane_activity, # this is copied here after the activity has been compiled in {Schema.build}.
-      },
-      "<ui> author workflow"  => {
-        label: "UI",
-        icon:  "☝",
-        activity: lane_activity_ui,
-      },
-      # TODO: add editor/approver lane.
-    }
+    lanes_cfg = Trailblazer::Workflow::Introspect::Lanes.new(
+      {
+        "article moderation"    => {
+          label: "lifecycle",
+          icon:  "⛾",
+          activity: lane_activity, # this is copied here after the activity has been compiled in {Schema.build}.
+        },
+        "<ui> author workflow"  => {
+          label: "UI",
+          icon:  "☝",
+          activity: lane_activity_ui,
+        },
+        # TODO: add editor/approver lane.
+      }
+    )
 
     # pp ctx[:structure].lanes
     message_flow = Trailblazer::Workflow::Collaboration.Messages(
       ctx[:structure].messages,
-      json_id_to_lane
+      lanes_cfg
     )
 
-    # DISCUSS: {lanes} is always ID to activity?
-    lanes = {
-      lifecycle:  lane_activity,
-      ui:         lane_activity_ui,
-    }
+    approver_activity, extended_message_flow, extended_initial_lane_positions = build_custom_editor_lane(lanes_cfg, message_flow)
 
-    approver_activity, extended_message_flow, extended_initial_lane_positions = build_custom_editor_lane(lanes, message_flow)
-
-    lanes_cfg = lanes_cfg.merge(
-      "approver" => {
-        label: "approver",
-        icon: "☑",
-        activity: approver_activity
-      }
+    lanes_cfg = lanes_cfg = Trailblazer::Workflow::Introspect::Lanes.new(
+      lanes_cfg.to_h.merge(
+        "approver" => {
+          label: "approver",
+          icon: "☑",
+          activity: approver_activity
+        }
+      )
     )
-
-    lanes = lanes.merge(approver: approver_activity)
 
     # TODO: add {lanes_cfg}.
     schema = Trailblazer::Workflow::Collaboration::Schema.new(
-      lanes: lanes,
+      lanes: lanes_cfg,
       message_flow: message_flow,
     )
 
-    return schema, lanes, extended_message_flow, extended_initial_lane_positions, lanes_cfg
+    return schema, lanes_cfg, extended_message_flow, extended_initial_lane_positions
   end
 
   # DISCUSS: this is mostly to play around with the "API" of building a Collaboration.
@@ -125,7 +113,7 @@ module BuildSchema
     approve_id = "Activity_1qrkaz0"
     reject_id = "Activity_0d9yewp"
 
-    lifecycle_activity = lanes[:lifecycle]
+    lifecycle_activity = lanes.(label: "lifecycle")[:activity]
 
     missing_throw_from_notify_approver = Trailblazer::Activity::Introspect.Nodes(lifecycle_activity, id: "throw-after-Activity_0wr78cv").task
 
@@ -176,13 +164,9 @@ module DiscoveredStates
     ui_notify_approver = "Activity_1dt5di5"
 
     # TODO: either {lanes} or {lanes_cfg}.
-    schema, lanes, message_flow, initial_lane_positions, lanes_cfg = build_schema()
+    schema, lanes_cfg, message_flow, initial_lane_positions = build_schema()
 
-    lane_activity = lanes[:lifecycle]
-    lane_activity_ui = lanes[:ui]
-    approver_activity = lanes[:approver]
-
-    lanes_sorted = [lane_activity, lane_activity_ui, approver_activity]
+    lane_activity_ui = lanes_cfg.(label: "UI")[:activity]
 
 
     # TODO: do this in the State layer.
@@ -218,6 +202,6 @@ module DiscoveredStates
       }
     )
 
-    return states, lanes_sorted, lanes_cfg, schema, message_flow
+    return states, schema, lanes_cfg, message_flow
   end
 end

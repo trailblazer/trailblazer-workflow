@@ -24,9 +24,6 @@ module Trailblazer
 
         collaboration, message_flow, start_task_position, initial_lane_positions, activity_2_stub, original_task_2_stub_task = stub_tasks_for(collaboration, message_flow: message_flow, start_task_position: start_task_position, initial_lane_positions: initial_lane_positions)
 
-        # pp collaboration.to_h[:lanes][:ui].to_h
-        # raise
-
 
         resumes_to_invoke = [
           [
@@ -127,7 +124,10 @@ module Trailblazer
       end
 
       def stub_tasks_for(collaboration, ignore_class: Trailblazer::Activity::End, message_flow:, start_task_position:, initial_lane_positions:)
-        collected = collaboration.to_h[:lanes].collect do |lane_id, activity|
+        lanes = collaboration.to_h[:lanes].to_h.values # FIXME: don't use {collaboration} here!
+
+        collected = lanes.collect do |lane_cfg|
+          activity = lane_cfg[:activity]
           circuit  = activity.to_h[:circuit]
           lane_map = circuit.to_h[:map].clone
 
@@ -138,7 +138,7 @@ module Trailblazer
             node  = Activity::Introspect.Nodes(activity, task: task)
             label = node.data[:label] || node.id # TODO: test this case, when there's no {:label}.
 
-            stub_task_name = "#{lane_id}:#{label}".to_sym
+            stub_task_name = "#{lane_cfg[:label]}:#{label}".to_sym
             stub_task = Activity::Testing.def_tasks(stub_task_name).method(stub_task_name)
 
             # raise label.inspect
@@ -177,15 +177,15 @@ module Trailblazer
 
           lane = Activity.new(Activity::Schema.new(new_circuit, activity.to_h[:outputs], new_nodes, activity.to_h[:config])) # FIXME: breaking taskWrap here (which is no problem, actually).
 
-          [[lane_id, lane], replaced_tasks]
+          [[lane_cfg[:label], lane], replaced_tasks]
         end
 
         # DISCUSS: interestingly, we don't need this map as all stubbed tasks are user tasks, and positions always reference suspends or catch events, which arent' stubbed.
         original_task_2_stub_task = collected.inject({}) { |memo, (_, replaced_tasks)| memo.merge(replaced_tasks) }
 
-        stubbed_lanes = collected.collect { |lane, _| lane }.to_h
+        stubbed_lanes = collected.collect { |lane_label_2_activity, _| lane_label_2_activity }.to_h
 
-        activity_2_stub = collaboration.to_h[:lanes].collect { |lane_id, activity| [activity, stubbed_lanes[lane_id]] }.to_h
+        activity_2_stub = lanes.collect { |lane_cfg| [lane_cfg[:activity], stubbed_lanes[lane_cfg[:label]]] }.to_h
 
         new_message_flow = message_flow.collect { |throw_evt, (activity, catch_evt)| [throw_evt, [activity_2_stub[activity], catch_evt]] }.to_h
 
@@ -203,17 +203,20 @@ module Trailblazer
 
       # Get the original lane activity and tasks for a {Positions} set from the stubbed ones.
       def unstub_positions(activity_2_stub, original_task_2_stub_task, positions, lanes: {})
+        lane_activities = lanes.to_h.collect { |_, lane_cfg| lane_cfg[:activity] }
+
         real_positions = positions.to_a.collect do |position|
           Collaboration::Position.new(
             activity_2_stub.invert.fetch(position.activity),
             position.task # since the task will always be a suspend, a resume or terminus, we can safely use the stubbed one, which is identical to the original.
           )
-        end.sort { |a, b| lanes.values.index(a.activity) <=> lanes.values.index(b.activity) }
+        end.sort { |a, b| lane_activities.index(a.activity) <=> lane_activities.index(b.activity) }
 
         Collaboration::Positions.new(real_positions)
       end
 
       def unstub_configuration(activity_2_stub, configuration, lanes:)
+        puts "@@@@@ #{lanes.inspect}"
         real_lane_positions = unstub_positions(activity_2_stub, nil, configuration.lane_positions, lanes: lanes)
 
         real_last_lane = activity_2_stub[configuration.last_lane]

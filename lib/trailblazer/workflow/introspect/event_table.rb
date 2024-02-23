@@ -36,7 +36,7 @@ module Trailblazer
           end
 
 
-          lane_labels = lanes_cfg.collect { |id, cfg| cfg[:label] }
+          lane_labels = lanes_cfg.to_h.collect { |_, cfg| cfg[:label] }
 
           lane_labels = lane_labels - hide_lanes # TODO: extract, new feature.
 
@@ -47,7 +47,7 @@ module Trailblazer
         # @private
         def render_lane_position_columns(start_positions, **options)
           lane_positions = start_positions.to_a.flat_map do |lane_position|
-            lane_label = Present.lane_options_for(*lane_position.to_a, **options)[:label]
+            lane_label = Present.lane_options_for_position(lane_position, **options)[:label]
 
             readable_lane_position = Present.readable_name_for_suspend_or_terminus(*lane_position.to_a, **options)
 
@@ -77,7 +77,7 @@ module Trailblazer
 
 
         def lane_label_for(lane_position, **options)
-          Present.lane_options_for(*lane_position.to_a, **options)[:label]
+          Present.lane_options_for_position(lane_position, **options)[:label]
         end
       end
     end # Introspect

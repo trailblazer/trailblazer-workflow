@@ -7,7 +7,7 @@ class AdvanceTest < Minitest::Spec
 
   it "what" do
     # TODO: this is something that shouldn't be done every time.
-    states, lanes_sorted, lanes_cfg, schema, message_flow = states()
+    states, schema, lanes_cfg, message_flow = states()
 
     iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
 

@@ -1,6 +1,24 @@
 module Trailblazer
   module Workflow
     module Introspect
+      class Lanes
+        def initialize(lanes_cfg)
+          ary = lanes_cfg.collect { |json_id, cfg| cfg.merge(json_id: json_id) }
+
+          @ary = ary
+        end
+
+        def call(**options)
+          key, value = options.keys[0], options.values[0]
+
+          @ary.find { |options| options[key] == value } or raise
+        end
+
+        def to_h
+          @ary.collect { |cfg| [cfg[:json_id], cfg] }.to_h
+        end
+      end
+
       # Rendering-specific code using {Discovery:states}.
       # https://stackoverflow.com/questions/22885702/html-for-the-pause-symbol-in-audio-and-video-control
       module Present
@@ -56,13 +74,14 @@ module Trailblazer
           end
         end
 
-        def lane_options_for(activity, task, lanes_cfg:)
-          lanes_cfg.values.find { |options| options[:activity] == activity } or raise
-        end
-
         #if lane_icons.key?(lane_name) # TODO: handle default!
         def lane_label_for(activity, task, lanes_cfg:, show_icon: true)
-          lane_options_for(activity, task, lanes_cfg: lanes_cfg)[:icon]
+          lanes_cfg.(activity: activity)[:icon]
+        end
+
+        def lane_options_for_position(position, lanes_cfg:, **)
+          activity, _ = position.to_a
+          lanes_cfg.(activity: activity)
         end
 
         def id_for_position(lane_position)
