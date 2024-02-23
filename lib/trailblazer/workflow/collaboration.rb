@@ -1,12 +1,50 @@
 module Trailblazer
   module Workflow
+    # User-friendly builder.
+    def self.Collaboration(json_file:, lanes:)
+      json_from_pro = File.read(json_file)
+      signal, (ctx, _) = Trailblazer::Workflow::Generate.invoke([{json_document: json_from_pro}, {}])
+
+      lanes_options = lanes.collect do |json_id, user_options|
+        lane_options = normalize_lane_options(**user_options)
+
+        activity = build_lane_for(**ctx, **user_options, json_id: json_id)
+
+        [json_id, lane_options.merge(activity: activity)]
+      end.to_h
+
+      lanes_cfg = Introspect::Lanes.new(lanes_options)
+
+       message_flow = Trailblazer::Workflow::Collaboration.Messages(
+        ctx[:structure].messages,
+        lanes_cfg
+      )
+
+      Trailblazer::Workflow::Collaboration::Schema.new(
+        lanes: lanes_cfg,
+        message_flow: message_flow,
+      )
+    end
+
+    # DISCUSS: use Activity here?
+    def self.normalize_lane_options(label:, icon:, **)
+      {label: label, icon: icon}
+    end
+
+    def self.build_lane_for(intermediates:, implementation:, json_id:, **)
+      intermediate = intermediates.fetch(json_id)
+
+      _lane_activity = Trailblazer::Workflow::Collaboration.Lane(
+        intermediate,
+        **implementation
+      )
+    end
+
     class Collaboration
       class Schema
         def initialize(lanes:, message_flow:, options:{})
           @lanes                  = lanes
           @message_flow           = message_flow
-          # @initial_lane_positions = Synchronous.initial_lane_positions(lanes.values)
-          # @options = options # FIXME: test me!!!
 
           # TODO: define what we need here, for runtime.
           #    1. a Collaboration doesn't mandatorily need its initial_lane_positions, that's only relevant for state discovery or State layer.
@@ -15,8 +53,7 @@ module Trailblazer
         def to_h
           {
             message_flow: @message_flow,
-            # initial_lane_positions: @initial_lane_positions, # DISCUSS: do we really nee
-            lanes: @lanes,
+            lanes:        @lanes,
           }
         end
       end # Schema
@@ -91,20 +128,6 @@ module Trailblazer
 
       module Synchronous # DISCUSS: (file) location.
         module_function
-
-        # @private
-        # Returns a fake Suspend event that maintains the actual start events in its {:resume_events}.
-        def ___FIXME_2BRM_initial_lane_positions(lanes)
-          lanes.collect do |activity|
-            catch_id = Trailblazer::Activity::Introspect.Nodes(activity, task: activity.to_h[:circuit].to_h[:start_task]).id # DISCUSS: store IDs or the actual catch event in {:resumes}?
-
-            [
-              activity,
-              {"resumes" => [catch_id], semantic: [:suspend, "from initial_lane_positions"]} # We deliberately have *one* position per lane, we're Synchronous. # TODO: use a real {Event::Suspend} here.
-            ]
-          end
-          .to_h
-        end
 
         def initial_lane_positions(lanes)
           lanes.to_h.keys.collect do |activity|
@@ -193,10 +216,6 @@ module Trailblazer
         def advance_position(lane_positions, activity, suspend_event)
           lane_positions.replace(activity, suspend_event)
         end
-
-
-
-
 
         # @private
         def receiver_task(flow, message_flow)

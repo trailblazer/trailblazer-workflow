@@ -13,80 +13,59 @@ end
 
 module BuildSchema
   def build_schema()
-    moderation_json = File.read("test/fixtures/v1/moderation.json")
-    signal, (ctx, _) = Trailblazer::Workflow::Generate.invoke([{json_document: moderation_json}, {}])
-
-    article_moderation_intermediate = ctx[:intermediates]["article moderation"]
-    # pp article_moderation_intermediate
-
     implementing = Trailblazer::Activity::Testing.def_steps(:create, :update, :notify_approver, :reject, :approve, :revise, :publish, :archive, :delete)
 
-    lane_activity = Trailblazer::Workflow::Collaboration.Lane(
-      article_moderation_intermediate,
-
-      "Create" => implementing.method(:create),
-      "Update" => implementing.method(:update),
-      "Approve" => implementing.method(:approve),
-      "Notify approver" => implementing.method(:notify_approver),
-      "Revise" => implementing.method(:revise),
-      "Reject" => implementing.method(:reject),
-      "Publish" => implementing.method(:publish),
-      "Archive" => implementing.method(:archive),
-      "Delete" => implementing.method(:delete),
-    )
-
-
-    article_moderation_intermediate = ctx[:intermediates]["<ui> author workflow"]
-    # pp article_moderation_intermediate
-
-    implementing = Trailblazer::Activity::Testing.def_steps(:create_form, :ui_create, :update_form, :ui_update, :notify_approver, :reject, :approve, :revise, :publish, :archive, :delete, :delete_form, :cancel, :revise_form,
+    implementing_ui = Trailblazer::Activity::Testing.def_steps(:create_form, :ui_create, :update_form, :ui_update, :notify_approver, :reject, :approve, :revise, :publish, :archive, :delete, :delete_form, :cancel, :revise_form,
       :create_form_with_errors, :update_form_with_errors, :revise_form_with_errors)
 
-    lane_activity_ui = Trailblazer::Workflow::Collaboration.Lane(
-      article_moderation_intermediate,
-
-      "Create form" => implementing.method(:create_form),
-      "Create" => implementing.method(:ui_create),
-      "Update form" => implementing.method(:update_form),
-      "Update" => implementing.method(:ui_update),
-      "Notify approver" => implementing.method(:notify_approver),
-      "Publish" => implementing.method(:publish),
-      "Delete" => implementing.method(:delete),
-      "Delete? form" => implementing.method(:delete_form),
-      "Cancel" => implementing.method(:cancel),
-      "Revise" => implementing.method(:revise),
-      "Revise form" => implementing.method(:revise_form),
-      "Create form with errors" => implementing.method(:create_form_with_errors),
-      "Update form with errors" => implementing.method(:update_form_with_errors),
-      "Revise form with errors" => implementing.method(:revise_form_with_errors),
-      "Archive" => implementing.method(:archive),
-      # "Approve" => implementing.method(:approve),
-      # "Reject" => implementing.method(:reject),
-    )
-
-    # lane_icons: lane_icons = {"UI" => "☝", "lifecycle" => "⛾", "approver" => "☑"},
-    lanes_cfg = Trailblazer::Workflow::Introspect::Lanes.new(
-      {
+    schema = Trailblazer::Workflow.Collaboration(
+      json_file: "test/fixtures/v1/moderation.json",
+      lanes: {
         "article moderation"    => {
           label: "lifecycle",
           icon:  "⛾",
-          activity: lane_activity, # this is copied here after the activity has been compiled in {Schema.build}.
+          implementation: {
+            "Create" => implementing.method(:create),
+            "Update" => implementing.method(:update),
+            "Approve" => implementing.method(:approve),
+            "Notify approver" => implementing.method(:notify_approver),
+            "Revise" => implementing.method(:revise),
+            "Reject" => implementing.method(:reject),
+            "Publish" => implementing.method(:publish),
+            "Archive" => implementing.method(:archive),
+            "Delete" => implementing.method(:delete),
+          }
         },
         "<ui> author workflow"  => {
           label: "UI",
           icon:  "☝",
-          activity: lane_activity_ui,
+          implementation: {
+            "Create form" => implementing_ui.method(:create_form),
+            "Create" => implementing_ui.method(:ui_create),
+            "Update form" => implementing_ui.method(:update_form),
+            "Update" => implementing_ui.method(:ui_update),
+            "Notify approver" => implementing_ui.method(:notify_approver),
+            "Publish" => implementing_ui.method(:publish),
+            "Delete" => implementing_ui.method(:delete),
+            "Delete? form" => implementing_ui.method(:delete_form),
+            "Cancel" => implementing_ui.method(:cancel),
+            "Revise" => implementing_ui.method(:revise),
+            "Revise form" => implementing_ui.method(:revise_form),
+            "Create form with errors" => implementing_ui.method(:create_form_with_errors),
+            "Update form with errors" => implementing_ui.method(:update_form_with_errors),
+            "Revise form with errors" => implementing_ui.method(:revise_form_with_errors),
+            "Archive" => implementing_ui.method(:archive),
+
+          }
         },
-        # TODO: add editor/approver lane.
       }
     )
 
-    # pp ctx[:structure].lanes
-    message_flow = Trailblazer::Workflow::Collaboration.Messages(
-      ctx[:structure].messages,
-      lanes_cfg
-    )
+    lanes_cfg    = schema.to_h[:lanes]
+    message_flow = schema.to_h[:message_flow]
 
+    # It's possible to extend a collaboration manually.
+    # DISCUSS: make this an officially documented/tested interface?
     approver_activity, extended_message_flow, extended_initial_lane_positions = build_custom_editor_lane(lanes_cfg, message_flow)
 
     lanes_cfg = lanes_cfg = Trailblazer::Workflow::Introspect::Lanes.new(
@@ -99,7 +78,6 @@ module BuildSchema
       )
     )
 
-    # TODO: add {lanes_cfg}.
     schema = Trailblazer::Workflow::Collaboration::Schema.new(
       lanes: lanes_cfg,
       message_flow: message_flow,
