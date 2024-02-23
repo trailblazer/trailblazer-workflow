@@ -203,7 +203,7 @@ module Trailblazer
 
       # Get the original lane activity and tasks for a {Positions} set from the stubbed ones.
       def unstub_positions(activity_2_stub, original_task_2_stub_task, positions, lanes: {})
-        lane_activities = lanes.to_h.collect { |_, lane_cfg| lane_cfg[:activity] }
+        lane_activities = lanes.to_h.values
 
         real_positions = positions.to_a.collect do |position|
           Collaboration::Position.new(
@@ -216,7 +216,6 @@ module Trailblazer
       end
 
       def unstub_configuration(activity_2_stub, configuration, lanes:)
-        puts "@@@@@ #{lanes.inspect}"
         real_lane_positions = unstub_positions(activity_2_stub, nil, configuration.lane_positions, lanes: lanes)
 
         real_last_lane = activity_2_stub[configuration.last_lane]

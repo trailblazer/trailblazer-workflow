@@ -182,7 +182,7 @@ class DiscoveryTest < Minitest::Spec
 
   def assert_positions_for(actual_lane_positions, expected_ids, lanes:)
     # puts actual_lane_positions.collect { |(a, t)| Trailblazer::Activity::Introspect.Nodes(a, task: t).id }.inspect
-    lanes = lanes.to_h.collect { |_, cfg| cfg[:activity] }
+    lanes = lanes.to_h.keys
 
     actual_lane_positions.collect.with_index do |actual_position, index|
       actual_activity, actual_task = actual_position.to_a

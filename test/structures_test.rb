@@ -85,7 +85,7 @@ class StructuresTest < Minitest::Spec
     assert_equal lanes_cfg.(label: "UI")[:activity], lane_activity_ui
 
     assert_equal lanes_cfg.to_h.inspect,
-      %({"article moderation"=>{:label=>"lifecycle", :icon=>"⛾", :activity=>#{lane_activity.inspect}, :json_id=>"article moderation"}, "<ui> author workflow"=>{:label=>"UI", :icon=>"☝", :activity=>#{lane_activity_ui.inspect}, :json_id=>\"<ui> author workflow\"}})
+      %({#{lane_activity.inspect}=>{:label=>"lifecycle", :icon=>"⛾", :activity=>#{lane_activity.inspect}, :json_id=>"article moderation"}, #{lane_activity_ui.inspect}=>{:label=>"UI", :icon=>"☝", :activity=>#{lane_activity_ui.inspect}, :json_id=>\"<ui> author workflow\"}})
     # assert_equal lanes_cfg.json_id("article moderatoin")[:activity], lane_activity
   end
 end

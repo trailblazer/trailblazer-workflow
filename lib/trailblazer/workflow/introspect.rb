@@ -15,7 +15,7 @@ module Trailblazer
         end
 
         def to_h
-          @ary.collect { |cfg| [cfg[:json_id], cfg] }.to_h
+          @ary.collect { |cfg| [cfg[:activity], cfg] }.to_h
         end
       end
 
