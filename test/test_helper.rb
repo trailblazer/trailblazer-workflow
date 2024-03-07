@@ -69,7 +69,7 @@ module BuildSchema
     approver_activity, extended_message_flow, extended_initial_lane_positions = build_custom_editor_lane(lanes_cfg, message_flow)
 
     lanes_cfg = lanes_cfg = Trailblazer::Workflow::Introspect::Lanes.new(
-      lanes_cfg.to_h.merge(
+      lanes_cfg.to_h.collect { |_, cfg| [cfg[:json_id], cfg] }.to_h.merge(
         "approver" => {
           label: "approver",
           icon: "☑",
