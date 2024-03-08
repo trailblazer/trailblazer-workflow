@@ -39,7 +39,6 @@ class AdvanceTest < Minitest::Spec
     signal, (ctx, flow_options) = Trailblazer::Workflow::Advance.(
       ctx,
       **schema.to_h,
-      message_flow: message_flow,
       event_label: "☝ ⏵︎Create",
       # lanes_cfg: lanes_cfg, # TODO: make this part of {schema}.
 
@@ -53,7 +52,6 @@ class AdvanceTest < Minitest::Spec
     signal, (ctx, flow_options) = Trailblazer::Workflow::Advance.(
       {create: false, seq: [], process_model: nil},
       **schema.to_h,
-      message_flow: message_flow,
       event_label: "☝ ⏵︎Create",
       iteration_set: iteration_set, # this is basically the "dictionary" for lookups of positions.
       state_guards: state_guards,

@@ -129,8 +129,8 @@ module Trailblazer
       module Synchronous # DISCUSS: (file) location.
         module_function
 
-        def initial_lane_positions(lanes)
-          lanes.to_h.keys.collect do |activity|
+        def initial_lane_positions(lanes_cfg)
+          lanes_cfg.to_h.keys.collect do |activity|
             # start_catch_event_task = activity.to_h[:circuit].to_h[:start_task]
             # FIXME: in the next pro version, the "start suspend" will be here instead of its catch event.
             start_catch_event_id = Trailblazer::Activity::Introspect.Nodes(activity, task: activity.to_h[:circuit].to_h[:start_task]).id # DISCUSS: store IDs or the actual catch event in {:resumes}?

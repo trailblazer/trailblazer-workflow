@@ -25,3 +25,4 @@ require "trailblazer/workflow/introspect/event_table"
 
 # runtime
 require "trailblazer/workflow/advance"
+require "trailblazer/workflow/task/discover"
