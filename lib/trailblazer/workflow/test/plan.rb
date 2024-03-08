@@ -11,7 +11,7 @@ module Trailblazer
 
             %(
 # test: #{event_label}
-ctx = assert_advance "#{event_label}", expected_ctx: {}, test_plan: test_plan_structure, schema: schema
+ctx = assert_advance "#{event_label}", expected_ctx: {}, test_plan: test_plan, schema: schema
 assert_exposes ctx, seq: [:revise, :revise], reader: :[]
 )
           end

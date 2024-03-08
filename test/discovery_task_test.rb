@@ -4,6 +4,7 @@ require "test_helper"
 
 class DiscoveryTaskTest < Minitest::Spec
   before { `rm test/tmp/bla.json` }
+  before { `rm test/tmp/bla_test.rb` }
 
   def build_schema()
     implementing = Trailblazer::Activity::Testing.def_steps(:create, :update, :notify_approver, :reject, :approve, :revise, :publish, :archive, :delete)
@@ -68,7 +69,8 @@ class DiscoveryTaskTest < Minitest::Spec
     # states, schema, lanes_cfg = self.class.states
     schema = build_schema()
 
-    Trailblazer::Workflow::Task::Discover.(schema: schema, start_activity_json_id: "<ui> author workflow", iteration_set_filename: "test/tmp/bla.json")
+    Trailblazer::Workflow::Task::Discover.(schema: schema, start_activity_json_id: "<ui> author workflow", iteration_set_filename: "test/tmp/bla.json", test_filename: "test/tmp/bla_test.rb",
+      collaboration_constant: "Bla")
 
     #@ We serialized the discovered iterations, so we don't need to run discovery on every startup.
     assert_equal (serialized_iteration_set = File.read("test/tmp/bla.json")).size, 20925
@@ -81,5 +83,15 @@ class DiscoveryTaskTest < Minitest::Spec
 
     # TODO: test {Set#to_a}
     assert_equal iteration_set_from_json.to_a.size, 14
+
+    #@ Assert test plan
+
+  end
+
+  it "Test plan " do
+    # schema = build_schema()
+
+    # Trailblazer::Workflow::Task::Discover::RenderTestPlan.(iteration_set: "test/tmp/bla.json")
+
   end
 end

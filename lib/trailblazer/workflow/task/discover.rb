@@ -6,7 +6,7 @@ module Trailblazer
         module_function
 
         # DISCUSS: what about running this before we have a schema?
-        def call(schema:, start_activity_json_id:, iteration_set_filename:, run_multiple_times: {})
+        def call(schema:, start_activity_json_id:, iteration_set_filename:, run_multiple_times: {}, test_filename:, collaboration_constant:)
           lanes_cfg = schema.to_h[:lanes]
 
           start_task_position = find_start_task_position(start_activity_json_id, lanes_cfg) # FIXME: handle nil case
@@ -25,6 +25,13 @@ module Trailblazer
          iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
 
          create_serialized_iteration_set(iteration_set, iteration_set_filename: iteration_set_filename, lanes_cfg: lanes_cfg)
+
+         RenderTestPlan.(iteration_set, lanes_cfg: lanes_cfg,
+          test_filename: test_filename,
+          collaboration_name: collaboration_constant.to_s,
+          collaboration_constant: collaboration_constant,
+          iteration_set_filename: iteration_set_filename
+        )
         end
 
 
@@ -51,19 +58,31 @@ module Trailblazer
         module RenderTestPlan
           module_function
 
-          def call(iteration_set, lanes_cfg:, test_filename:, collaboration_name:)
+          def call(iteration_set, lanes_cfg:, test_filename:, collaboration_name:, input: {}, iteration_set_filename:, collaboration_constant:)
             test_plan_comment_header = Trailblazer::Workflow::Test::Plan.render_comment_header(iteration_set, lanes_cfg: lanes_cfg)
 
-            test_plan_comment_header = "
-=begin
+            assertions = Trailblazer::Workflow::Test::Plan.for(iteration_set, lanes_cfg: lanes_cfg, input: input)
+
+
+            test_content = %(=begin
 #{test_plan_comment_header}
 =end
 
-
 class #{collaboration_name.capitalize}CollaborationTest < Minitest::Spec
+  include Trailblazer::Workflow::Test::Assertions
+  require "trailblazer/test/assertions"
+  include Trailblazer::Test::Assertions # DISCUSS: this is for assert_advance and friends.
 
+  it "can run the collaboration" do
+    schema = #{collaboration_constant}
+    test_plan = Trailblazer::Workflow::Introspect::Iteration::Set::Deserialize.(JSON.parse(File.read("#{iteration_set_filename}")), lanes_cfg: schema.to_h[:lanes])
+
+    #{assertions.join("\n")}
+  end
 end
-"
+)
+
+            File.write(test_filename, test_content)
 
 
           end
