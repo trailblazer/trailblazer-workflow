@@ -2,14 +2,14 @@ module Trailblazer
   module Workflow
     module Test
       module Assertions
-        def assert_positions(asserted_positions, expected_positions, lanes_cfg:, test_plan:)
+        def assert_positions(asserted_positions, expected_positions, lanes:, test_plan:, **)
           # FIXME: make 100% sure that row_position etc are always sorted.
 
           expected_positions_ary = expected_positions.to_a
 
           asserted_positions.to_a.collect.with_index do |position, index|
             assert_equal position, expected_positions_ary[index],
-              Assertions.error_message_for(position, expected_positions_ary[index], lanes_cfg: lanes_cfg)
+              Assertions.error_message_for(position, expected_positions_ary[index], lanes_cfg: lanes)
           end
 
           # FIXME: figure out why we can't just compare the entire array!
@@ -29,7 +29,7 @@ module Trailblazer
 
         # Grab the start_position and expected_lane_positions from the discovered plan, run
         # the collaboration from there and check if it actually reached the expected configuration.
-        def assert_advance(event_label, test_plan:, lanes_cfg:, schema:, message_flow:, expected_ctx:, ctx: {seq: []}, **) # TODO: allow {ctx}
+        def assert_advance(event_label, test_plan:, schema:, expected_ctx:, ctx: {seq: []}, **) # TODO: allow {ctx}
           iteration = test_plan.to_a.find { |iteration| iteration.event_label == event_label } or raise
 
           position_options = Advance.position_options_from_iteration(iteration)
@@ -44,10 +44,10 @@ module Trailblazer
 
             **position_options,
 
-            message_flow: message_flow,
+            **schema.to_h
           )
 
-          assert_positions configuration[:lane_positions], iteration.suspend_positions, lanes_cfg: lanes_cfg, test_plan: test_plan
+          assert_positions configuration[:lane_positions], iteration.suspend_positions, test_plan: test_plan, **schema.to_h
 
           # assert_equal ctx.inspect, expected_ctx.inspect
           ctx

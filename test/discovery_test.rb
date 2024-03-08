@@ -310,6 +310,8 @@ class TestPlanExecutionTest < Minitest::Spec
   it "run test plan" do
     states, schema, lanes_cfg, message_flow = DiscoveryTest.states()
 
+    schema = schema.to_h.merge(message_flow: message_flow)
+
     iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
 
     #@ Test plan
@@ -324,63 +326,63 @@ class TestPlanExecutionTest < Minitest::Spec
     test_plan_structure = iteration_set
 
     # test: ☝ ⏵︎Create form
-    ctx = assert_advance "☝ ⏵︎Create form", expected_ctx: {}, test_plan: test_plan_structure, lanes_cfg: lanes_cfg, schema: schema, message_flow: message_flow
+    ctx = assert_advance "☝ ⏵︎Create form", expected_ctx: {}, test_plan: test_plan_structure, schema: schema
     assert_exposes ctx, seq: [:create_form], reader: :[]
 
     # test: ☝ ⏵︎Create
-    ctx = assert_advance "☝ ⏵︎Create", expected_ctx: {}, test_plan: test_plan_structure, lanes_cfg: lanes_cfg, schema: schema, message_flow: message_flow
+    ctx = assert_advance "☝ ⏵︎Create", expected_ctx: {}, test_plan: test_plan_structure, schema: schema
     assert_exposes ctx, seq: [:ui_create, :create], reader: :[]
 
     # test: ☝ ⏵︎Create ⛞
-    ctx = assert_advance "☝ ⏵︎Create ⛞", ctx: {create: false, seq: []}, expected_ctx: {}, test_plan: test_plan_structure, lanes_cfg: lanes_cfg, schema: schema, message_flow: message_flow
+    ctx = assert_advance "☝ ⏵︎Create ⛞", ctx: {create: false, seq: []}, expected_ctx: {}, test_plan: test_plan_structure, schema: schema
     assert_exposes ctx, seq: [:ui_create, :create, :create_form_with_errors], reader: :[]
 
     # test: ☝ ⏵︎Update form
-    ctx = assert_advance "☝ ⏵︎Update form", expected_ctx: {}, test_plan: test_plan_structure, lanes_cfg: lanes_cfg, schema: schema, message_flow: message_flow
+    ctx = assert_advance "☝ ⏵︎Update form", expected_ctx: {}, test_plan: test_plan_structure, schema: schema
     assert_exposes ctx, seq: [:update_form], reader: :[]
 
     # test: ☝ ⏵︎Notify approver
-    ctx = assert_advance "☝ ⏵︎Notify approver", expected_ctx: {}, test_plan: test_plan_structure, lanes_cfg: lanes_cfg, schema: schema, message_flow: message_flow
+    ctx = assert_advance "☝ ⏵︎Notify approver", expected_ctx: {}, test_plan: test_plan_structure, schema: schema
     assert_exposes ctx, seq: [:notify_approver, :notify_approver, :approve], reader: :[]
 
     # test: ☝ ⏵︎Update
-    ctx = assert_advance "☝ ⏵︎Update", expected_ctx: {}, test_plan: test_plan_structure, lanes_cfg: lanes_cfg, schema: schema, message_flow: message_flow
+    ctx = assert_advance "☝ ⏵︎Update", expected_ctx: {}, test_plan: test_plan_structure, schema: schema
     assert_exposes ctx, seq: [:ui_update, :update], reader: :[]
 
     # test: ☝ ⏵︎Notify approver ⛞
-    ctx = assert_advance "☝ ⏵︎Notify approver ⛞", ctx: {decision: false, seq: []}, expected_ctx: {}, test_plan: test_plan_structure, lanes_cfg: lanes_cfg, schema: schema, message_flow: message_flow
+    ctx = assert_advance "☝ ⏵︎Notify approver ⛞", ctx: {decision: false, seq: []}, expected_ctx: {}, test_plan: test_plan_structure, schema: schema
     assert_exposes ctx, seq: [:notify_approver, :notify_approver, :reject], reader: :[]
 
     # test: ☝ ⏵︎Delete? form
-    ctx = assert_advance "☝ ⏵︎Delete? form", expected_ctx: {}, test_plan: test_plan_structure, lanes_cfg: lanes_cfg, schema: schema, message_flow: message_flow
+    ctx = assert_advance "☝ ⏵︎Delete? form", expected_ctx: {}, test_plan: test_plan_structure, schema: schema
     assert_exposes ctx, seq: [:delete_form], reader: :[]
 
     # test: ☝ ⏵︎Publish
-    ctx = assert_advance "☝ ⏵︎Publish", expected_ctx: {}, test_plan: test_plan_structure, lanes_cfg: lanes_cfg, schema: schema, message_flow: message_flow
+    ctx = assert_advance "☝ ⏵︎Publish", expected_ctx: {}, test_plan: test_plan_structure, schema: schema
     assert_exposes ctx, seq: [:publish, :publish], reader: :[]
 
     # test: ☝ ⏵︎Update ⛞
-    ctx = assert_advance "☝ ⏵︎Update ⛞", ctx: {update: false, seq: []}, expected_ctx: {}, test_plan: test_plan_structure, lanes_cfg: lanes_cfg, schema: schema, message_flow: message_flow
+    ctx = assert_advance "☝ ⏵︎Update ⛞", ctx: {update: false, seq: []}, expected_ctx: {}, test_plan: test_plan_structure, schema: schema
     assert_exposes ctx, seq: [:ui_update, :update, :update_form_with_errors], reader: :[]
 
     # test: ☝ ⏵︎Revise form
-    ctx = assert_advance "☝ ⏵︎Revise form", expected_ctx: {}, test_plan: test_plan_structure, lanes_cfg: lanes_cfg, schema: schema, message_flow: message_flow
+    ctx = assert_advance "☝ ⏵︎Revise form", expected_ctx: {}, test_plan: test_plan_structure, schema: schema
     assert_exposes ctx, seq: [:revise_form], reader: :[]
 
     # test: ☝ ⏵︎Delete
-    ctx = assert_advance "☝ ⏵︎Delete", expected_ctx: {}, test_plan: test_plan_structure, lanes_cfg: lanes_cfg, schema: schema, message_flow: message_flow
+    ctx = assert_advance "☝ ⏵︎Delete", expected_ctx: {}, test_plan: test_plan_structure, schema: schema
     assert_exposes ctx, seq: [:delete, :delete], reader: :[]
 
     # test: ☝ ⏵︎Cancel
-    ctx = assert_advance "☝ ⏵︎Cancel", expected_ctx: {}, test_plan: test_plan_structure, lanes_cfg: lanes_cfg, schema: schema, message_flow: message_flow
+    ctx = assert_advance "☝ ⏵︎Cancel", expected_ctx: {}, test_plan: test_plan_structure, schema: schema
     assert_exposes ctx, seq: [:cancel], reader: :[]
 
     # test: ☝ ⏵︎Archive
-    ctx = assert_advance "☝ ⏵︎Archive", expected_ctx: {}, test_plan: test_plan_structure, lanes_cfg: lanes_cfg, schema: schema, message_flow: message_flow
+    ctx = assert_advance "☝ ⏵︎Archive", expected_ctx: {}, test_plan: test_plan_structure, schema: schema
     assert_exposes ctx, seq: [:archive, :archive], reader: :[]
 
     # test: ☝ ⏵︎Revise
-    ctx = assert_advance "☝ ⏵︎Revise", expected_ctx: {}, test_plan: test_plan_structure, lanes_cfg: lanes_cfg, schema: schema, message_flow: message_flow
+    ctx = assert_advance "☝ ⏵︎Revise", expected_ctx: {}, test_plan: test_plan_structure, schema: schema
     assert_exposes ctx, seq: [:revise, :revise], reader: :[]
 
   end

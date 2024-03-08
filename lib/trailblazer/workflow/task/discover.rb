@@ -47,6 +47,27 @@ module Trailblazer
 
           File.write iteration_set_filename,  interation_set_json
         end
+
+        module RenderTestPlan
+          module_function
+
+          def call(iteration_set, lanes_cfg:, test_filename:, collaboration_name:)
+            test_plan_comment_header = Trailblazer::Workflow::Test::Plan.render_comment_header(iteration_set, lanes_cfg: lanes_cfg)
+
+            test_plan_comment_header = "
+=begin
+#{test_plan_comment_header}
+=end
+
+
+class #{collaboration_name.capitalize}CollaborationTest < Minitest::Spec
+
+end
+"
+
+
+          end
+        end
       end
     end # Task
   end
