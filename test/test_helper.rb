@@ -12,6 +12,11 @@ class Minitest::Spec
 end
 
 module BuildSchema
+  class Create < Trailblazer::Activity::Railway
+    step :create
+    include Trailblazer::Activity::Testing.def_steps(:create)
+  end
+
   def build_schema()
     implementing = Trailblazer::Activity::Testing.def_steps(:create, :update, :notify_approver, :reject, :approve, :revise, :publish, :archive, :delete)
 
@@ -25,7 +30,7 @@ module BuildSchema
           label: "lifecycle",
           icon:  "⛾",
           implementation: {
-            "Create" => implementing.method(:create),
+            "Create" => Trailblazer::Activity::Railway.Subprocess(Create),
             "Update" => implementing.method(:update),
             "Approve" => implementing.method(:approve),
             "Notify approver" => implementing.method(:notify_approver),

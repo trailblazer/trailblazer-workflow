@@ -123,6 +123,34 @@ module Trailblazer
         return discovered_states
       end
 
+      def stub_task(activity, task, lane_cfg:)
+        node  = Activity::Introspect.Nodes(activity, task: task)
+        label = node.data[:label] || node.id # TODO: test this case, when there's no {:label}.
+
+        stub_task_name = "#{lane_cfg[:label]}:#{label}".to_sym
+        stub_task = Activity::Testing.def_tasks(stub_task_name).method(stub_task_name)
+
+        signal_2_semantic = {
+          Trailblazer::Activity::Right => :success,
+          Trailblazer::Activity::Left => :failure,
+        }
+
+        stubbed_task = ->(args, **circuit_options) do
+          signal, (ctx, flow_options) = stub_task.(args, **circuit_options)
+
+          # Translate signal.
+          # The now stubbed task of the activity might be a nested operation, so we need to return the original signal, e.g. the Success end.
+          original_signal =
+            if returned_semantic = signal_2_semantic[signal]
+              node.outputs.find { |output| output.to_h[:semantic] == returned_semantic }.signal
+            else
+              signal # FIXME: test more than two outputs.
+            end
+
+          return original_signal, [ctx, flow_options]
+        end
+      end
+
       def stub_tasks_for(collaboration, ignore_class: Trailblazer::Activity::End, message_flow:, start_task_position:, initial_lane_positions:)
         lanes = collaboration.to_h[:lanes].to_h.values # FIXME: don't use {collaboration} here!
 
@@ -132,17 +160,13 @@ module Trailblazer
           lane_map = circuit.to_h[:map].clone
 
           # Filter out all termini and events.
-          tasks_to_stub = lane_map.reject { |task, links| task.is_a?(ignore_class) }
+          tasks_to_stub = lane_map.reject { |task, _| task.is_a?(ignore_class) }
 
-          replaced_tasks = tasks_to_stub.collect do |task, links|
-            node  = Activity::Introspect.Nodes(activity, task: task)
-            label = node.data[:label] || node.id # TODO: test this case, when there's no {:label}.
-
-            stub_task_name = "#{lane_cfg[:label]}:#{label}".to_sym
-            stub_task = Activity::Testing.def_tasks(stub_task_name).method(stub_task_name)
+          replaced_tasks = tasks_to_stub.collect do |task, _|
+            stubbed_task = stub_task(activity, task, lane_cfg: lane_cfg)
 
             # raise label.inspect
-            [task, stub_task]
+            [task, stubbed_task]
           end.to_h
 
           # TODO: really remove original tasks from the circuit, as this causes confusion.
