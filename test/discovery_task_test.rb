@@ -70,7 +70,7 @@ class DiscoveryTaskTest < Minitest::Spec
     schema = build_schema()
 
     Trailblazer::Workflow::Task::Discover.(schema: schema, start_activity_json_id: "<ui> author workflow", iteration_set_filename: "test/tmp/bla.json", test_filename: "test/tmp/bla_test.rb",
-      collaboration_constant: "Bla")
+      collaboration_name: "App::Bla")
 
     #@ We serialized the discovered iterations, so we don't need to run discovery on every startup.
     assert_equal (serialized_iteration_set = File.read("test/tmp/bla.json")).size, 20925

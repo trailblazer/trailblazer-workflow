@@ -29,7 +29,7 @@ module Trailblazer
 
         # Grab the start_position and expected_lane_positions from the discovered plan, run
         # the collaboration from there and check if it actually reached the expected configuration.
-        def assert_advance(event_label, test_plan:, schema:, expected_ctx:, ctx: {seq: []}, **) # TODO: allow {ctx}
+        def assert_advance(event_label, test_plan:, schema:, ctx: {seq: []}, **) # TODO: allow {ctx}
           iteration = test_plan.to_a.find { |iteration| iteration.event_label == event_label } or raise
 
           position_options = Advance.position_options_from_iteration(iteration)
