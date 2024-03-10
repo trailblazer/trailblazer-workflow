@@ -171,17 +171,15 @@ module DiscoveredStates
               :"approver:xxx" => Trailblazer::Activity::Left, # FIXME: {:decision} must be translated to {:"approver:xxx"}
             }, config_payload: {outcome: :failure}},
 
-          # Click [UI Create] again, with invalid data.
-          Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_create}").task => {ctx_merge: {
-              # create: false
-              :"lifecycle:Create" => Trailblazer::Activity::Left,
-            }, config_payload: {outcome: :failure}}, # lifecycle create is supposed to fail.
-
-          # Click [UI Update] again, with invalid data.
-          Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_update}").task => {ctx_merge: {
-              # update: false
-              :"lifecycle:Update" => Trailblazer::Activity::Left,
-            }, config_payload: {outcome: :failure}}, # lifecycle create is supposed to fail.
+        **Trailblazer::Workflow::Discovery::DSL.configuration_for_branching(
+          {
+            # Click [UI Create] again, with invalid data.
+            ["UI", "Create"] => {ctx_merge: {:"lifecycle:Create" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
+            # Click [UI Update] again, with invalid data.
+            ["UI", "Update"] => {ctx_merge: {:"lifecycle:Update" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
+          },
+          **schema.to_h
+        )
       }
     )
 

@@ -250,6 +250,25 @@ module Trailblazer
           last_lane: real_last_lane
         )
       end
+
+      module DSL
+        module_function
+
+        def configuration_for_branching(branch_cfg, lanes:, **)
+          branch_cfg.collect do |(lane_label, cdt_task_label), cfg|
+            activity = lanes.(label: lane_label)[:activity]
+
+            # Find the catch event for the CDT task.
+            # TODO: in workflow, we should have an abstraction for label search.
+            cdt_task, _ = Activity::Introspect.Nodes(activity).find { |task, node| node.data[:label] == cdt_task_label }
+
+            # FIXME: what if there are more than one incoming link into {cdt_task}? do we even have something like that after exporting?
+            catch_event, _ = activity.to_h[:circuit].to_h[:map].find { |task, links| links.find { |_, target| target == cdt_task } }
+
+            [catch_event, cfg]
+          end.to_h
+        end
+      end
     end
   end
 end
