@@ -162,7 +162,10 @@ module Trailblazer
             circuit_options = circuit_options.merge(start_task: start_task_position[:task])
 
             # signal, (ctx, flow) = Activity::TaskWrap.invoke(start_task_position[:activity], [ctx, flow], **circuit_options)
-            signal, (ctx, flow) = Trailblazer::Developer.wtf?(start_task_position[:activity], [ctx, flow], **circuit_options)
+            signal, (ctx, flow) = Trailblazer::Developer.wtf?(start_task_position[:activity], [ctx, flow],
+              exec_context: nil, # FIXME: this is needed for Proc tasks. since we don't use Strategy.call, we never inject {:exec_context}. TODO: test with a ->(*) { snippet } task in Lane().
+              **circuit_options
+            )
 
             # now we have :throw, or not
             # @returns Event::Throw::Queued
