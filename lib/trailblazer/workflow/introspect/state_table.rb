@@ -81,7 +81,7 @@ module Trailblazer
         module Generate
           module_function
 
-          def call(iteration_set, **options)
+          def call(iteration_set, namespace:, **options)
             states    = StateTable.aggregate_by_state(iteration_set)
             cli_rows  = StateTable.render_data(states, **options)
 
@@ -93,16 +93,15 @@ module Trailblazer
             end
 
             # formatting, find longest state name.
-            max_length = available_states.collect { |row| row[:suggested_state_name].length }.max
+            max_length = available_states.collect { |row| row[:suggested_state_name].inspect.length }.max
 
             state_guard_rows = available_states.collect do |row|
               id_snippet = %(, id: #{row[:key].inspect}) # TODO: move me to serializer code.
 
-              %(  #{row[:suggested_state_name].ljust(max_length).inspect} => {guard: ->(ctx, process_model:, **) { raise "implement me!" }#{id_snippet}},)
+              %(  #{row[:suggested_state_name].inspect.ljust(max_length)} => {guard: ->(ctx, process_model:, **) { raise "implement me!" }#{id_snippet}},)
             end.join("\n")
 
-            snippet = %(
-state_guards: {
+            snippet = %(#{namespace}::StateGuards = {
 #{state_guard_rows}
 }
 )
