@@ -23,7 +23,7 @@ class AdvanceTest < Minitest::Spec
   "⏸︎ Revise                     " => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_1wiumzv"]},
 }}[:state_guards]
 
-    state_guards = Trailblazer::Workflow::Collaboration::StateGuards.from_user_hash(
+    state_guards = Trailblazer::Workflow::Collaboration::StateGuards.from_user_hash( # TODO: unify naming, DSL.state_guards_from_user or something like that.
       state_guards_from_user,
       iteration_set: iteration_set
     )

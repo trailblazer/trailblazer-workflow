@@ -6,7 +6,7 @@ module Trailblazer
         module_function
 
         # DISCUSS: what about running this before we have a schema?
-        def call(schema:, start_activity_json_id:, iteration_set_filename:, run_multiple_times: {}, test_filename:, collaboration_name:)
+        def call(schema:, start_activity_json_id:, iteration_set_filename:, run_multiple_times: {}, test_filename:, state_guard_filename: default_filename_for_state_guards(iteration_set_filename), collaboration_namespace:)
           lanes_cfg = schema.to_h[:lanes]
 
           start_task_position = find_start_task_position(start_activity_json_id, lanes_cfg) # FIXME: handle nil case
@@ -22,15 +22,25 @@ module Trailblazer
             run_multiple_times: run_multiple_times,
           )
 
-         iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
+          iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
 
-         create_serialized_iteration_set(iteration_set, iteration_set_filename: iteration_set_filename, lanes_cfg: lanes_cfg)
+          create_serialized_iteration_set(iteration_set, iteration_set_filename: iteration_set_filename, lanes_cfg: lanes_cfg)
 
-         RenderTestPlan.(iteration_set, lanes_cfg: lanes_cfg,
-          test_filename: test_filename,
-          collaboration_name: collaboration_name,
-          iteration_set_filename: iteration_set_filename
-        )
+          Produce::TestPlan.(iteration_set, lanes_cfg: lanes_cfg,
+            test_filename: test_filename,
+            collaboration_namespace: collaboration_namespace,
+            iteration_set_filename: iteration_set_filename
+          )
+
+          Produce::StateGuards.(iteration_set, lanes_cfg: lanes_cfg,
+            filename: state_guard_filename,
+            namespace: collaboration_namespace,
+          )
+        end
+
+        # TODO: move to {generator}.
+        def default_filename_for_state_guards(iteration_set_filename, filename: "state_guards.rb")
+          File.join(File.dirname(iteration_set_filename), filename)
         end
 
 
@@ -54,38 +64,51 @@ module Trailblazer
           File.write iteration_set_filename,  interation_set_json
         end
 
-        module RenderTestPlan
-          module_function
 
-          def call(iteration_set, lanes_cfg:, test_filename:, collaboration_name:, input: {}, iteration_set_filename:)
-            test_plan_comment_header = Trailblazer::Workflow::Test::Plan.render_comment_header(iteration_set, lanes_cfg: lanes_cfg)
+        module Produce
+          module TestPlan
+            module_function
 
-            assertions = Trailblazer::Workflow::Test::Plan.for(iteration_set, lanes_cfg: lanes_cfg, input: input)
+            def call(iteration_set, lanes_cfg:, test_filename:, collaboration_namespace:, input: {}, iteration_set_filename:)
+              test_plan_comment_header = Trailblazer::Workflow::Test::Plan.render_comment_header(iteration_set, lanes_cfg: lanes_cfg)
+
+              assertions = Trailblazer::Workflow::Test::Plan.for(iteration_set, lanes_cfg: lanes_cfg, input: input)
 
 
-            test_content = %(=begin
-#{test_plan_comment_header}
-=end
+              test_content = %(=begin
+  #{test_plan_comment_header}
+  =end
 
-require "test_helper"
+  require "test_helper"
 
-class #{collaboration_name.gsub("::", "_")}CollaborationTest < Minitest::Spec
-  include Trailblazer::Workflow::Test::Assertions
-  require "trailblazer/test/assertions"
-  include Trailblazer::Test::Assertions # DISCUSS: this is for assert_advance and friends.
+  class #{collaboration_namespace.gsub("::", "_")}CollaborationTest < Minitest::Spec
+    include Trailblazer::Workflow::Test::Assertions
+    require "trailblazer/test/assertions"
+    include Trailblazer::Test::Assertions # DISCUSS: this is for assert_advance and friends.
 
-  it "can run the collaboration" do
-    schema = #{collaboration_name}
-    test_plan = Trailblazer::Workflow::Introspect::Iteration::Set::Deserialize.(JSON.parse(File.read("#{iteration_set_filename}")), lanes_cfg: schema.to_h[:lanes])
+    it "can run the collaboration" do
+      schema = #{collaboration_namespace}::Schema
+      test_plan = Trailblazer::Workflow::Introspect::Iteration::Set::Deserialize.(JSON.parse(File.read("#{iteration_set_filename}")), lanes_cfg: schema.to_h[:lanes])
 
-    #{assertions.join("\n")}
+      #{assertions.join("\n")}
+    end
   end
-end
-)
+  )
 
-            File.write(test_filename, test_content)
+              File.write(test_filename, test_content)
 
 
+            end
+          end
+
+          module StateGuards
+            module_function
+
+            def call(iteration_set, filename:, lanes_cfg:, namespace:, **)
+              ruby_output = Trailblazer::Workflow::Introspect::StateTable::Generate.(iteration_set, lanes_cfg: lanes_cfg, namespace: namespace)
+
+              File.write(filename, ruby_output)
+            end
           end
         end
       end

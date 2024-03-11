@@ -171,7 +171,7 @@ module DiscoveredStates
               :"approver:xxx" => Trailblazer::Activity::Left, # FIXME: {:decision} must be translated to {:"approver:xxx"}
             }, config_payload: {outcome: :failure}},
 
-        **Trailblazer::Workflow::Discovery::DSL.configuration_for_branching(
+        **Trailblazer::Workflow::Discovery::DSL.configuration_for_branching_from_user_hash(
           {
             # Click [UI Create] again, with invalid data.
             ["UI", "Create"] => {ctx_merge: {:"lifecycle:Create" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},

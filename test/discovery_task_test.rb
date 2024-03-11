@@ -70,7 +70,7 @@ class DiscoveryTaskTest < Minitest::Spec
     schema = build_schema()
 
     Trailblazer::Workflow::Task::Discover.(schema: schema, start_activity_json_id: "<ui> author workflow", iteration_set_filename: "test/tmp/bla.json", test_filename: "test/tmp/bla_test.rb",
-      collaboration_name: "App::Bla")
+      collaboration_namespace: "App::Bla")
 
     #@ We serialized the discovered iterations, so we don't need to run discovery on every startup.
     assert_equal (serialized_iteration_set = File.read("test/tmp/bla.json")).size, 20925
@@ -85,6 +85,22 @@ class DiscoveryTaskTest < Minitest::Spec
     assert_equal iteration_set_from_json.to_a.size, 14
 
     #@ Assert test plan
+
+    #@ Assert {state_guards.rb}
+    assert_equal File.read("test/tmp/state_guards.rb"),
+%(App::Bla::StateGuards = {
+  "⏸︎ Create form"                 => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_0wc2mcq"]},
+  "⏸︎ Create"                      => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_1psp91r"]},
+  "⏸︎ Update form♦Notify approver" => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_1165bw9", "catch-before-Activity_1dt5di5"]},
+  "⏸︎ Update"                      => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_0j78uzd"]},
+  "⏸︎ Approve♦Reject"              => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_13fw5nm", "catch-before-Activity_1j7d8sd"]},
+  "⏸︎ Delete? form♦Publish"        => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_0bsjggk", "catch-before-Activity_0ha7224"]},
+  "⏸︎ Revise form"                 => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_0zsock2"]},
+  "⏸︎ Delete♦Cancel"               => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_15nnysv", "catch-before-Activity_1uhozy1"]},
+  "⏸︎ Archive"                     => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_0fy41qq"]},
+  "⏸︎ Revise"                      => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_1wiumzv"]},
+}
+)
 
   end
 

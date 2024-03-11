@@ -254,7 +254,7 @@ module Trailblazer
       module DSL
         module_function
 
-        def configuration_for_branching(branch_cfg, lanes:, **)
+        def configuration_for_branching_from_user_hash(branch_cfg, lanes:, **)
           branch_cfg.collect do |(lane_label, cdt_task_label), cfg|
             activity = lanes.(label: lane_label)[:activity]
 
