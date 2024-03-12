@@ -6,8 +6,13 @@ module Trailblazer
         module_function
 
         # DISCUSS: what about running this before we have a schema?
-        def call(schema:, start_activity_json_id:, iteration_set_filename:, run_multiple_times: {}, test_filename:, state_guard_filename: default_filename_for_state_guards(iteration_set_filename), collaboration_namespace:)
+        def call(schema:, namespace:, target_dir:, start_activity_json_id:, run_multiple_times: {}, test_filename:)
           lanes_cfg = schema.to_h[:lanes]
+
+          filepath = Filepath.new(target_dir)
+
+          state_guard_filename    = filepath.("generated/state_guards.rb")
+          iteration_set_filename  = filepath.("generated/iteration_set.json")
 
           start_task_position = find_start_task_position(start_activity_json_id, lanes_cfg) # FIXME: handle nil case
 
@@ -24,23 +29,24 @@ module Trailblazer
 
           iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
 
+          create_directory_for_generated_files(filepath.("generated"))
+
           create_serialized_iteration_set(iteration_set, iteration_set_filename: iteration_set_filename, lanes_cfg: lanes_cfg)
 
-          Produce::TestPlan.(iteration_set, lanes_cfg: lanes_cfg,
+          Produce::TestPlan.(
+            iteration_set,
+            lanes_cfg: lanes_cfg,
             test_filename: test_filename,
-            collaboration_namespace: collaboration_namespace,
+            namespace: namespace,
             iteration_set_filename: iteration_set_filename
           )
 
-          Produce::StateGuards.(iteration_set, lanes_cfg: lanes_cfg,
+          Produce::StateGuards.(
+            iteration_set,
+            lanes_cfg: lanes_cfg,
             filename: state_guard_filename,
-            namespace: collaboration_namespace,
+            namespace: namespace,
           )
-        end
-
-        # TODO: move to {generator}.
-        def default_filename_for_state_guards(iteration_set_filename, filename: "state_guards.rb")
-          File.join(File.dirname(iteration_set_filename), filename)
         end
 
 
@@ -61,7 +67,11 @@ module Trailblazer
         def create_serialized_iteration_set(iteration_set, iteration_set_filename:, lanes_cfg:)
           interation_set_json = JSON.pretty_generate(Trailblazer::Workflow::Introspect::Iteration::Set::Serialize.(iteration_set, lanes_cfg: lanes_cfg))
 
-          File.write iteration_set_filename,  interation_set_json
+          File.write(iteration_set_filename, interation_set_json)
+        end
+
+        def create_directory_for_generated_files(target_path)
+          FileUtils.mkdir_p(target_path)
         end
 
 
@@ -69,7 +79,7 @@ module Trailblazer
           module TestPlan
             module_function
 
-            def call(iteration_set, lanes_cfg:, test_filename:, collaboration_namespace:, input: {}, iteration_set_filename:)
+            def call(iteration_set, lanes_cfg:, test_filename:, namespace:, input: {}, iteration_set_filename:)
               test_plan_comment_header = Trailblazer::Workflow::Test::Plan.render_comment_header(iteration_set, lanes_cfg: lanes_cfg)
 
               assertions = Trailblazer::Workflow::Test::Plan.for(iteration_set, lanes_cfg: lanes_cfg, input: input)
@@ -81,13 +91,13 @@ module Trailblazer
 
   require "test_helper"
 
-  class #{collaboration_namespace.gsub("::", "_")}CollaborationTest < Minitest::Spec
+  class #{namespace.gsub("::", "_")}CollaborationTest < Minitest::Spec
     include Trailblazer::Workflow::Test::Assertions
     require "trailblazer/test/assertions"
     include Trailblazer::Test::Assertions # DISCUSS: this is for assert_advance and friends.
 
     it "can run the collaboration" do
-      schema = #{collaboration_namespace}::Schema
+      schema = #{namespace}::Schema
       test_plan = Trailblazer::Workflow::Introspect::Iteration::Set::Deserialize.(JSON.parse(File.read("#{iteration_set_filename}")), lanes_cfg: schema.to_h[:lanes])
 
       #{assertions.join("\n")}
@@ -96,8 +106,6 @@ module Trailblazer
   )
 
               File.write(test_filename, test_content)
-
-
             end
           end
 
@@ -109,6 +117,17 @@ module Trailblazer
 
               File.write(filename, ruby_output)
             end
+          end
+        end
+
+        class Filepath
+          def initialize(base_path)
+            @base_path = base_path
+            freeze
+          end
+
+          def call(filename) # TODO: defaulting?
+            File.join(@base_path, filename)
           end
         end
       end

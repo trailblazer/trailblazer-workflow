@@ -3,8 +3,8 @@ require "test_helper"
 # TODO: test when {start_activity_json_id} is wrong
 
 class DiscoveryTaskTest < Minitest::Spec
-  before { `rm test/tmp/bla.json` }
-  before { `rm test/tmp/bla_test.rb` }
+  after { `rm -r test/tmp/app/concepts/posting/collaboration/generated` }
+  after { `rm test/tmp/test/bla_test.rb` }
 
   def build_schema()
     implementing = Trailblazer::Activity::Testing.def_steps(:create, :update, :notify_approver, :reject, :approve, :revise, :publish, :archive, :delete)
@@ -69,8 +69,16 @@ class DiscoveryTaskTest < Minitest::Spec
     # states, schema, lanes_cfg = self.class.states
     schema = build_schema()
 
-    Trailblazer::Workflow::Task::Discover.(schema: schema, start_activity_json_id: "<ui> author workflow", iteration_set_filename: "test/tmp/bla.json", test_filename: "test/tmp/bla_test.rb",
-      collaboration_namespace: "App::Bla")
+    Dir.chdir("test/tmp") do
+      Trailblazer::Workflow::Task::Discover.(
+        schema: schema,
+        namespace: "Posting::Collaboration",
+        target_dir: "app/concepts/posting/collaboration",
+        start_activity_json_id: "<ui> author workflow",
+        # iteration_set_filename: "test/tmp/bla.json",
+        test_filename: "test/bla_test.rb",
+      )
+    end
 
     #@ We serialized the discovered iterations, so we don't need to run discovery on every startup.
     assert_equal (serialized_iteration_set = File.read("test/tmp/bla.json")).size, 20925
@@ -88,7 +96,7 @@ class DiscoveryTaskTest < Minitest::Spec
 
     #@ Assert {state_guards.rb}
     assert_equal File.read("test/tmp/state_guards.rb"),
-%(App::Bla::StateGuards = {
+%(App::Bla::StateGuards = Trailblazer::Workflow::Collaboration::StateGuards.from_user_hash({
   "⏸︎ Create form"                 => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_0wc2mcq"]},
   "⏸︎ Create"                      => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_1psp91r"]},
   "⏸︎ Update form♦Notify approver" => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_1165bw9", "catch-before-Activity_1dt5di5"]},
@@ -99,7 +107,7 @@ class DiscoveryTaskTest < Minitest::Spec
   "⏸︎ Delete♦Cancel"               => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_15nnysv", "catch-before-Activity_1uhozy1"]},
   "⏸︎ Archive"                     => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_0fy41qq"]},
   "⏸︎ Revise"                      => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_1wiumzv"]},
-}
+})
 )
 
   end
