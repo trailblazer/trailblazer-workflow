@@ -13,13 +13,16 @@ module Trailblazer
           state_guard_rows = rows.collect do |row|
             # id_snippet = %(, id: #{row[:key].inspect}) # TODO: move me to serializer code.
 
-            %(  #{row["state name"].inspect.ljust(max_length)} => {guard: ->(ctx, process_model:, **) { raise "implement me!" }},)
+            %(      #{row["state name"].inspect.ljust(max_length)} => {guard: ->(ctx, process_model:, **) { raise "implement me!" }},)
           end.join("\n")
 
           snippet = %(module #{namespace}::StateGuards
-  Decider = Trailblazer::Workflow::Collaboration::StateGuards.from_user_hash({
+  Decider = Trailblazer::Workflow::Collaboration::StateGuards.from_user_hash(
+    {
 #{state_guard_rows}
-  })
+    },
+    state_table: StateTable,
+  )
 end
 )
 
