@@ -1,7 +1,7 @@
 module Trailblazer
   module Workflow
     # User-friendly builder.
-    def self.Collaboration(json_file:, lanes:)
+    def self.Collaboration(json_file:, lanes:, state_guards: nil)
       json_from_pro = File.read(json_file)
       signal, (ctx, _) = Trailblazer::Workflow::Generate.invoke([{json_document: json_from_pro}, {}])
 
@@ -23,6 +23,7 @@ module Trailblazer
       Trailblazer::Workflow::Collaboration::Schema.new(
         lanes: lanes_cfg,
         message_flow: message_flow,
+        state_guards: state_guards
       )
     end
 
@@ -42,9 +43,10 @@ module Trailblazer
 
     class Collaboration
       class Schema
-        def initialize(lanes:, message_flow:, options:{})
-          @lanes                  = lanes
-          @message_flow           = message_flow
+        def initialize(lanes:, message_flow:, state_guards: {}, options:{})
+          @lanes        = lanes
+          @message_flow = message_flow
+          @state_guards = state_guards
 
           # TODO: define what we need here, for runtime.
           #    1. a Collaboration doesn't mandatorily need its initial_lane_positions, that's only relevant for state discovery or State layer.
@@ -54,6 +56,7 @@ module Trailblazer
           {
             message_flow: @message_flow,
             lanes:        @lanes,
+            state_guards: @state_guards,
           }
         end
       end # Schema
