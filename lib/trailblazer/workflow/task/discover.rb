@@ -11,7 +11,8 @@ module Trailblazer
 
           filepath = Filepath.new(target_dir)
 
-          state_guard_filename    = filepath.("generated/state_guards.rb")
+          state_guard_filename    = filepath.("state_guards.rb")
+          state_table_filename    = filepath.("generated/state_table.rb")
           iteration_set_filename  = filepath.("generated/iteration_set.json")
 
           start_task_position = find_start_task_position(start_activity_json_id, lanes_cfg) # FIXME: handle nil case

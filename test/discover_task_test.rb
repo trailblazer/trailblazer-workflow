@@ -2,7 +2,7 @@ require "test_helper"
 
 # TODO: test when {start_activity_json_id} is wrong
 
-class DiscoveryTaskTest < Minitest::Spec
+class DiscoverTaskTest < Minitest::Spec
   after { `rm -r test/tmp/app/concepts/posting/collaboration/generated` }
   after { `rm test/tmp/test/bla_test.rb` }
 
@@ -65,11 +65,13 @@ class DiscoveryTaskTest < Minitest::Spec
     )
   end
 
+  TEST_ROOT = "test/tmp"
+
   it "Discovery task: discover, serialize, create test plan, create state table/state guards" do
     # states, schema, lanes_cfg = self.class.states
     schema = build_schema()
 
-    Dir.chdir("test/tmp") do
+    Dir.chdir(TEST_ROOT) do
       Trailblazer::Workflow::Task::Discover.(
         schema: schema,
         namespace: "Posting::Collaboration",
@@ -95,19 +97,24 @@ class DiscoveryTaskTest < Minitest::Spec
     #@ Assert test plan
 
     #@ Assert {state_guards.rb}
-    assert_equal File.read("test/tmp/state_guards.rb"),
-%(App::Bla::StateGuards = Trailblazer::Workflow::Collaboration::StateGuards.from_user_hash({
-  "⏸︎ Create form"                 => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_0wc2mcq"]},
-  "⏸︎ Create"                      => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_1psp91r"]},
-  "⏸︎ Update form♦Notify approver" => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_1165bw9", "catch-before-Activity_1dt5di5"]},
-  "⏸︎ Update"                      => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_0j78uzd"]},
-  "⏸︎ Approve♦Reject"              => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_13fw5nm", "catch-before-Activity_1j7d8sd"]},
-  "⏸︎ Delete? form♦Publish"        => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_0bsjggk", "catch-before-Activity_0ha7224"]},
-  "⏸︎ Revise form"                 => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_0zsock2"]},
-  "⏸︎ Delete♦Cancel"               => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_15nnysv", "catch-before-Activity_1uhozy1"]},
-  "⏸︎ Archive"                     => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_0fy41qq"]},
-  "⏸︎ Revise"                      => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_1wiumzv"]},
-})
+    assert_equal File.read("#{TEST_ROOT}/app/concepts/posting/collaboration/state_guards.rb"),
+%(module App::Posting::StateGuards
+  Decider = Trailblazer::Workflow::Collaboration::StateGuards.from_user_hash(
+    {
+      "⏸︎ Create form"                 => {guard: ->(ctx, process_model:, **) { raise "implement me!" }},
+      "⏸︎ Create"                      => {guard: ->(ctx, process_model:, **) { raise "implement me!" }},
+      "⏸︎ Update form♦Notify approver" => {guard: ->(ctx, process_model:, **) { raise "implement me!" }},
+      "⏸︎ Update"                      => {guard: ->(ctx, process_model:, **) { raise "implement me!" }},
+      "⏸︎ Approve♦Reject"              => {guard: ->(ctx, process_model:, **) { raise "implement me!" }},
+      "⏸︎ Delete? form♦Publish"        => {guard: ->(ctx, process_model:, **) { raise "implement me!" }},
+      "⏸︎ Revise form"                 => {guard: ->(ctx, process_model:, **) { raise "implement me!" }},
+      "⏸︎ Delete♦Cancel"               => {guard: ->(ctx, process_model:, **) { raise "implement me!" }},
+      "⏸︎ Archive"                     => {guard: ->(ctx, process_model:, **) { raise "implement me!" }},
+      "⏸︎ Revise"                      => {guard: ->(ctx, process_model:, **) { raise "implement me!" }},
+    },
+    state_table: StateTable,
+  )
+end
 )
 
   end
