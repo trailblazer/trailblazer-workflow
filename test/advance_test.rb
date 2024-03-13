@@ -50,7 +50,7 @@ class AdvanceTest < Minitest::Spec
     ctx = {params: [], seq: [], process_model: nil}
 
     # TODO: this should be suitable to be dropped into an endpoint.
-    signal, (ctx, flow_options) = Trailblazer::Workflow::Advance.(
+    signal, (ctx, flow_options), configuration = Trailblazer::Workflow::Advance.(
       ctx,
       **schema.to_h,
       event_label: "☝ ⏵︎Create",
@@ -61,6 +61,7 @@ class AdvanceTest < Minitest::Spec
     )
 
     assert_equal signal.inspect, %(Trailblazer::Activity::Right)
+    assert_equal configuration.class, Trailblazer::Workflow::Collaboration::Configuration # FIXME: better test.
 
     #@ update invalid
     signal, (ctx, flow_options) = Trailblazer::Workflow::Advance.(

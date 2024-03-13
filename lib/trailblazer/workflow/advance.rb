@@ -6,6 +6,7 @@ module Trailblazer
 
       UNAUTHORIZED_SIGNAL = "unauthorized"
 
+      # Needs Iteration::Set and an {event_label}.
       def call(ctx, event_label:, iteration_set:, message_flow:, state_guards:, **)
         planned_iteration = iteration_set.to_a.find { |iteration| iteration.event_label == event_label }
 
@@ -17,7 +18,7 @@ module Trailblazer
         return UNAUTHORIZED_SIGNAL, [ctx, {}] unless state_guards.(ctx, start_task_position: position_options[:start_task_position])
 
         configuration, (ctx, flow_options) = Trailblazer::Workflow::Collaboration::Synchronous.advance(
-            [ctx, {throw: []}],
+            [ctx, {throw: []}], # FIXME: allow flow_options and circuit_options!!!!!!!!!!!!!!!!!!!!!!!!!!
             {}, # circuit_options
 
             **position_options,
@@ -26,7 +27,7 @@ module Trailblazer
 
         signal = return_signal_for(configuration, iteration_set, **position_options,)
 
-        return signal, [ctx, flow_options]
+        return signal, [ctx, flow_options], configuration
       end
 
       # Computes {:start_task_position} and {:start_positions}.

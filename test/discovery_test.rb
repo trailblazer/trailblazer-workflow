@@ -287,6 +287,7 @@ class TestPlanExecutionTest < Minitest::Spec
     states, schema, lanes_cfg, message_flow = DiscoveryTest.states()
 
     schema = schema.to_h.merge(message_flow: message_flow)
+    schema = schema.to_h.merge(state_guards: ->(*) { true }) # FIXME
 
     iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
 

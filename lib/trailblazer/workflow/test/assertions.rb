@@ -30,22 +30,19 @@ module Trailblazer
         # Grab the start_position and expected_lane_positions from the discovered plan, run
         # the collaboration from there and check if it actually reached the expected configuration.
         def assert_advance(event_label, test_plan:, schema:, ctx: {seq: []}, flow_options: {}, **) # TODO: allow {ctx}
-          iteration = test_plan.to_a.find { |iteration| iteration.event_label == event_label } or raise
-
-          position_options = Advance.position_options_from_iteration(iteration)
-
 # TODO: this is endpoint code!
           ctx_for_advance = Trailblazer::Context(ctx, {}, flow_options[:context_options])
+          flow_options = {throw: []}.merge(flow_options)
 
-          configuration, (ctx, flow) = Trailblazer::Workflow::Collaboration::Synchronous.advance(
-            # schema,
-            [ctx_for_advance, {throw: []}.merge(flow_options)], # TODO: properly test flow_options
-            {}, # circuit_options
-
-            **position_options,
-
+          # configuration, (ctx, flow) = Collaboration::Advance.(
+          signal, (ctx, flow), configuration = Workflow::Advance.(
+            ctx_for_advance, #flow_options, # DISCUSS: add circuit_options? #FIXME: this sucks
+            event_label: event_label,
+            iteration_set: test_plan,
             **schema.to_h
           )
+
+          iteration = test_plan.to_a.find { |iteration| iteration.event_label == event_label }
 
           assert_positions configuration[:lane_positions], iteration.suspend_positions, test_plan: test_plan, **schema.to_h
 
