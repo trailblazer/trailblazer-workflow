@@ -186,3 +186,17 @@ module DiscoveredStates
     return states, schema, lanes_cfg, message_flow
   end
 end
+
+Minitest::Spec.class_eval do
+  include BuildSchema
+  include DiscoveredStates
+
+  def fixtures
+    return @fixtures if @fixtures
+
+    states, lanes_sorted, lanes_cfg, schema, message_flow = states()
+    iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
+
+    @fixtures = [iteration_set, lanes_cfg]
+  end
+end
