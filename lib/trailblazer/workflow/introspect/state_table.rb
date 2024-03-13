@@ -52,7 +52,7 @@ module Trailblazer
               :positions,
               positions,
 
-              :catch_events,
+              :catch_events, # this is triggerable_events as objects, not human-readable.
               catch_events
             ]
           end
@@ -60,8 +60,6 @@ module Trailblazer
           ctx[:rows] = cli_rows
         end
 
-        # @private
-        # TODO: move to StateTable
         def suggested_state_name_for(catch_events)
           catch_events
             .collect { |event_position| Present.label_for_next_task(*event_position.to_a) }

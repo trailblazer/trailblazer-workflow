@@ -25,6 +25,32 @@ module App::Posting::Generated
 end
 )
   end
+
+  it "StateGuards" do
+    iteration_set, lanes_cfg = fixtures()
+    _, (ctx, _) = Trailblazer::Workflow::Generate::StateTable.invoke([{iteration_set: iteration_set, lanes_cfg: lanes_cfg, namespace: "App::Posting"}, {}])
+    _, (ctx, _) = Trailblazer::Workflow::Generate::StateGuards.invoke([{rows: ctx[:rows], namespace: "App::Posting"}, {}])
+
+    # puts ctx[:snippet]
+    assert_equal ctx[:snippet],
+%(module App::Posting::StateGuards
+  Decider = Trailblazer::Workflow::Collaboration::StateGuards.from_user_hash({
+  "⏸︎ Create form"                 => {guard: ->(ctx, process_model:, **) { raise "implement me!" }},
+  "⏸︎ Create"                      => {guard: ->(ctx, process_model:, **) { raise "implement me!" }},
+  "⏸︎ Update form♦Notify approver" => {guard: ->(ctx, process_model:, **) { raise "implement me!" }},
+  "⏸︎ Update"                      => {guard: ->(ctx, process_model:, **) { raise "implement me!" }},
+  "⏸︎ Delete? form♦Publish"        => {guard: ->(ctx, process_model:, **) { raise "implement me!" }},
+  "⏸︎ Revise form"                 => {guard: ->(ctx, process_model:, **) { raise "implement me!" }},
+  "⏸︎ Delete♦Cancel"               => {guard: ->(ctx, process_model:, **) { raise "implement me!" }},
+  "⏸︎ Archive"                     => {guard: ->(ctx, process_model:, **) { raise "implement me!" }},
+  "⏸︎ Revise"                      => {guard: ->(ctx, process_model:, **) { raise "implement me!" }},
+  },
+  iteration_set: IterationSet,
+  state_table: StateTable,
+  )
+end
+)
+  end
 end
 
 class GenerateTest < Minitest::Spec

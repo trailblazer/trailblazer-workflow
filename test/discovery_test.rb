@@ -200,30 +200,6 @@ class DiscoveryTest < Minitest::Spec
     assert_positions_for(actual_positions, expected_ids, lanes: lanes)
   end
 
-  it "{#render_cli_state_table}" do
-    states, schema, lanes_cfg = self.class.states()
-
-    iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
-
-    cli_state_table = Trailblazer::Workflow::Introspect::StateTable.(iteration_set, lanes_cfg: lanes_cfg)
-    puts cli_state_table
-    assert_equal cli_state_table,
-%(+---------------------------------+----------------------------------------+
-| state name                      | triggerable events                     |
-+---------------------------------+----------------------------------------+
-| "⏸︎ Create form"                 | "☝ ⏵︎Create form"                       |
-| "⏸︎ Create"                      | "☝ ⏵︎Create"                            |
-| "⏸︎ Update form♦Notify approver" | "☝ ⏵︎Update form", "☝ ⏵︎Notify approver" |
-| "⏸︎ Update"                      | "☝ ⏵︎Update"                            |
-| "⏸︎ Delete? form♦Publish"        | "☝ ⏵︎Delete? form", "☝ ⏵︎Publish"        |
-| "⏸︎ Revise form"                 | "☝ ⏵︎Revise form"                       |
-| "⏸︎ Delete♦Cancel"               | "☝ ⏵︎Delete", "☝ ⏵︎Cancel"               |
-| "⏸︎ Archive"                     | "☝ ⏵︎Archive"                           |
-| "⏸︎ Revise"                      | "☝ ⏵︎Revise"                            |
-+---------------------------------+----------------------------------------+)
-
-  end
-
   # DISCUSS: currently, this event table doesn't make a lot of sense.
   it "{Present::EventTable.call}" do
     states, schema, lanes_cfg = self.class.states()

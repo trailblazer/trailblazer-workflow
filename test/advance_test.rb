@@ -23,9 +23,23 @@ class AdvanceTest < Minitest::Spec
   "⏸︎ Revise                     " => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_1wiumzv"]},
 }}[:state_guards]
 
+    # auto-generated. this structure could also hold alternative state names, etc.
+    state_table = {
+  "⏸︎ Create form                " => {id: ["catch-before-Activity_0wc2mcq"]},
+  "⏸︎ Create                     " => {id: ["catch-before-Activity_1psp91r"]},
+  "⏸︎ Update form♦Notify approver" => {id: ["catch-before-Activity_1165bw9", "catch-before-Activity_1dt5di5"]},
+  "⏸︎ Update                     " => {id: ["catch-before-Activity_0j78uzd"]},
+  "⏸︎ Delete? form♦Publish       " => {id: ["catch-before-Activity_0bsjggk", "catch-before-Activity_0ha7224"]},
+  "⏸︎ Revise form                " => {id: ["catch-before-Activity_0zsock2"]},
+  "⏸︎ Delete♦Cancel              " => {id: ["catch-before-Activity_15nnysv", "catch-before-Activity_1uhozy1"]},
+  "⏸︎ Archive                    " => {id: ["catch-before-Activity_0fy41qq"]},
+  "⏸︎ Revise                     " => {id: ["catch-before-Activity_1wiumzv"]},
+    }
+
     state_guards = Trailblazer::Workflow::Collaboration::StateGuards.from_user_hash( # TODO: unify naming, DSL.state_guards_from_user or something like that.
       state_guards_from_user,
-      iteration_set: iteration_set
+      # iteration_set: iteration_set,
+      state_table: state_table,
     )
 
 

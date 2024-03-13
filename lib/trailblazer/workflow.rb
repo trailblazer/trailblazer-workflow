@@ -23,6 +23,9 @@ require "trailblazer/workflow/introspect/iteration"
 require "trailblazer/workflow/introspect/state_table"
 require "trailblazer/workflow/introspect/event_table"
 
+require "trailblazer/workflow/generate/state_table"
+require "trailblazer/workflow/generate/state_guards"
+
 # runtime
 require "trailblazer/workflow/advance"
 require "trailblazer/workflow/task/discover"
