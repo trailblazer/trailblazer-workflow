@@ -2,24 +2,14 @@ module Trailblazer
   module Workflow
     module Introspect
       # Rendering-specific code using {Iteration::Set}.
-      module StateTable
-        module_function
-
         # Each row represents a configuration of suspends aka "state".
         # The state knows its possible resume events.
         #   does the state know which state fields belong to it?
-        def call(iteration_set, lanes_cfg:)
-          states = aggregate_by_state(iteration_set)
+      class StateTable < Trailblazer::Activity::Railway
+        step :aggregate_by_state
+        step :render_data
 
-          cli_rows = render_data(states, lanes_cfg: lanes_cfg)
-
-          cli_rows = cli_rows.collect { |row| row.merge("state name" => row["state name"].inspect) }
-
-          columns = ["state name", "triggerable events"]
-          Present::Table.render(columns, cli_rows)
-        end
-
-        def aggregate_by_state(iteration_set)
+        def aggregate_by_state(ctx, iteration_set:, **)
           # Key by lane_positions, which represent a state.
           # State (lane_positions) => [events (start position)]
           states = {}
@@ -38,10 +28,10 @@ module Trailblazer
             states[start_positions] = events.uniq # TODO: this {uniq} is not explicitly tested.
           end
 
-          states
+          ctx[:states] = states
         end
 
-        def render_data(states, lanes_cfg:)
+        def render_data(ctx, states:, lanes_cfg:, **)
           cli_rows = states.flat_map do |positions, catch_events|
             suggested_state_name = suggested_state_name_for(catch_events)
 
@@ -66,6 +56,8 @@ module Trailblazer
               catch_events
             ]
           end
+
+          ctx[:rows] = cli_rows
         end
 
         # @private
@@ -77,37 +69,18 @@ module Trailblazer
             .join("♦")
         end
 
-        # Generate code stubs for a state guard class.
-        module Generate
-          module_function
+        # Render the actual table, for CLI.
+        class Render < Trailblazer::Activity::Railway
+          step Subprocess(StateTable)
+          step :render
+          def render(ctx, rows:, **)
+            cli_rows = rows.collect { |row| row.merge("state name" => row["state name"].inspect) }
 
-          def call(iteration_set, namespace:, **options)
-            states    = StateTable.aggregate_by_state(iteration_set)
-            cli_rows  = StateTable.render_data(states, **options)
-
-            available_states = cli_rows.collect do |row|
-              {
-                suggested_state_name: row["state name"],
-                key: row[:catch_events].collect { |position| Present.id_for_position(position) }.uniq.sort
-              }
-            end
-
-            # formatting, find longest state name.
-            max_length = available_states.collect { |row| row[:suggested_state_name].inspect.length }.max
-
-            state_guard_rows = available_states.collect do |row|
-              id_snippet = %(, id: #{row[:key].inspect}) # TODO: move me to serializer code.
-
-              %(  #{row[:suggested_state_name].inspect.ljust(max_length)} => {guard: ->(ctx, process_model:, **) { raise "implement me!" }#{id_snippet}},)
-            end.join("\n")
-
-            snippet = %(#{namespace}::StateGuards = {
-#{state_guard_rows}
-}
-)
+            columns = ["state name", "triggerable events"]
+            ctx[:table] = Present::Table.render(columns, cli_rows)
           end
         end
       end
-    end
+    end # Introspect
   end
 end
