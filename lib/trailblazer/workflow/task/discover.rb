@@ -89,7 +89,7 @@ module Trailblazer
 
               test_content = %(=begin
   #{test_plan_comment_header}
-  =end
+=end
 
   require "test_helper"
 
