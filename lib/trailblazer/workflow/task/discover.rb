@@ -116,9 +116,9 @@ module Trailblazer
 
             def call(iteration_set, filename:, state_table_filename:, lanes_cfg:, namespace:, **)
               # ruby_output = Trailblazer::Workflow::Introspect::StateTable::Generate.(iteration_set, lanes_cfg: lanes_cfg, namespace: namespace)
-              _, (ctx, _) = Trailblazer::Workflow::Generate::StateTable.invoke([{iteration_set: iteration_set, lanes_cfg: lanes_cfg, namespace: "App::Posting"}, {}])
+              _, (ctx, _) = Trailblazer::Workflow::Generate::StateTable.invoke([{iteration_set: iteration_set, lanes_cfg: lanes_cfg, namespace: namespace}, {}])
               state_table_output = ctx[:snippet]
-              _, (ctx, _) = Trailblazer::Workflow::Generate::StateGuards.invoke([{rows: ctx[:rows], namespace: "App::Posting"}, {}])
+              _, (ctx, _) = Trailblazer::Workflow::Generate::StateGuards.invoke([{rows: ctx[:rows], namespace: namespace}, {}])
               ruby_output = ctx[:snippet]
 
               File.write(state_table_filename, state_table_output)

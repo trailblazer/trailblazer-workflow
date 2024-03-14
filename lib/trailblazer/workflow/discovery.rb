@@ -123,6 +123,7 @@ module Trailblazer
         return discovered_states
       end
 
+      require "trailblazer/activity/testing"
       def stub_task(activity, task, lane_cfg:)
         node  = Activity::Introspect.Nodes(activity, task: task)
         label = node.data[:label] || node.id # TODO: test this case, when there's no {:label}.
