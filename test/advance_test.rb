@@ -10,6 +10,9 @@ class AdvanceTest < Minitest::Spec
     states, schema, lanes_cfg, message_flow = states()
 
     iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
+    # Serialize/deserialize the Set, as this will always be the case in a real environment.
+    serialized_iteration_set = JSON.dump(Trailblazer::Workflow::Introspect::Iteration::Set::Serialize.(iteration_set, lanes_cfg: lanes_cfg))
+    iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set::Deserialize.(JSON.parse(serialized_iteration_set), lanes_cfg: lanes_cfg)
 
     state_guards_from_user = {state_guards: {
   "⏸︎ Create form                " => {guard: ->(ctx, process_model:, **) { true }, id: ["catch-before-Activity_0wc2mcq"]},

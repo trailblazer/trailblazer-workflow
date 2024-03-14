@@ -119,7 +119,7 @@ module Trailblazer
                   position_from_tuple(*attributes["start_task_position"]["tuple"], label_2_activity: label_2_activity),
                   positions_from(attributes["start_positions"], label_2_activity: label_2_activity),
                   positions_from(attributes["suspend_positions"], label_2_activity: label_2_activity),
-                  attributes["outcome"],
+                  attributes["outcome"].to_sym,
                 )
               end
 
