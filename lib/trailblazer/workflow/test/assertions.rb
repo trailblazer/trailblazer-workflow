@@ -29,7 +29,7 @@ module Trailblazer
 
         # Grab the start_position and expected_lane_positions from the discovered plan, run
         # the collaboration from there and check if it actually reached the expected configuration.
-        def assert_advance(event_label, test_plan:, schema:, ctx: {seq: []}, flow_options: {}, **) # TODO: allow {ctx}
+        def assert_advance(event_label, test_plan:, schema:, ctx: {seq: []}, flow_options: {}, invalid: false, **) # TODO: allow {ctx}
 # TODO: this is endpoint code!
           ctx_for_advance = Trailblazer::Context(ctx, {}, flow_options[:context_options])
           flow_options = {throw: []}.merge(flow_options)
@@ -41,6 +41,12 @@ module Trailblazer
             iteration_set: test_plan,
             **schema.to_h
           )
+
+          # we're expecting an invalid transition.
+          if invalid
+            assert_equal signal, Trailblazer::Workflow::Advance::UNAUTHORIZED_SIGNAL
+            return ctx # FIXME: test this!
+          end
 
           iteration = test_plan.to_a.find { |iteration| iteration.event_label == event_label }
 
