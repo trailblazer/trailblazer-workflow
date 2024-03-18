@@ -1,25 +1,41 @@
 # Runtime
 module Trailblazer
   module Workflow
-    module Advance
-      module_function
+    class Advance <  Trailblazer::Activity::Railway
+      # UNAUTHORIZED_SIGNAL = "unauthorized"
+      step task: :find_position_options
+      step task: :event_valid?, Output(:failure) => End(:not_authorized)
+      step task: :advance
 
-      UNAUTHORIZED_SIGNAL = "unauthorized"
+      def find_position_options((ctx, flow_options), **)
+        iteration_set, event_label = flow_options[:iteration_set], flow_options[:event_label]
 
-      # Needs Iteration::Set and an {event_label}.
-      def call(ctx, event_label:, iteration_set:, message_flow:, state_guards:, **)
         planned_iteration = iteration_set.to_a.find { |iteration| iteration.event_label == event_label }
 
         # TODO: those positions could also be passed in manually, without using an Iteration::Set.
-        position_options = position_options_from_iteration(planned_iteration) # :start_task_position and :start_positions
+        flow_options[:position_options] = position_options_from_iteration(planned_iteration) # :start_task_position and :start_positions
 
-        # TODO: run the state guard here.
+        return Activity::Right, [ctx, flow_options]
+      end
+
+      def event_valid?((ctx, flow_options), **)
+        position_options = flow_options[:position_options]
+        state_guards = flow_options[:state_guards]
+
+        result = state_guards.(ctx, start_task_position: position_options[:start_task_position])
+
+        return result ? Activity::Right : Activity::Left, [ctx, flow_options]
+      end
+
+      # Needs Iteration::Set and an {event_label}.
+      def advance((ctx, flow_options), **circuit_options)
+        message_flow, position_options, iteration_set = flow_options[:message_flow], flow_options[:position_options], flow_options[:iteration_set]
+
         # FIXME: fix flow_options!
-        return UNAUTHORIZED_SIGNAL, [ctx, {}] unless state_guards.(ctx, start_task_position: position_options[:start_task_position])
 
         configuration, (ctx, flow_options) = Trailblazer::Workflow::Collaboration::Synchronous.advance(
-            [ctx, {throw: []}], # FIXME: allow flow_options and circuit_options!!!!!!!!!!!!!!!!!!!!!!!!!!
-            {}, # circuit_options
+            [ctx, {throw: []}.merge(flow_options)], # FIXME: allow flow_options, AND TEST IT PROPERLY and circuit_options!!!!!!!!!!!!!!!!!!!!!!!!!!
+            circuit_options, # circuit_options
 
             **position_options,
             message_flow: message_flow,
@@ -27,7 +43,9 @@ module Trailblazer
 
         signal = return_signal_for(configuration, iteration_set, **position_options,)
 
-        return signal, [ctx, flow_options], configuration
+        flow_options[:configuration] = configuration
+
+        return signal, [ctx, flow_options]#, configuration
       end
 
       # Computes {:start_task_position} and {:start_positions}.
