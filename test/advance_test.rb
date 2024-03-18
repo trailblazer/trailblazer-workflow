@@ -155,6 +155,11 @@ class AdvanceTest < Minitest::Spec
     Trailblazer::Endpoint::Runtime.({params: {}, seq: []}, adapter: action_adapter_with_model, default_matcher: default_matcher, matcher_context: self, flow_options: flow_options, &matcher_block)
     assert_equal @render, %(404 not found: )
 
+# {flow_options} is passed correctly through the entire run.
+    flow_options = original_flow_options.merge(event_label: "☝ ⏵︎Update",)
+    signal, (ctx, flow_options) = Trailblazer::Endpoint::Runtime.({params: {id: 1}, seq: []}, adapter: action_adapter_with_model, default_matcher: default_matcher, matcher_context: self, flow_options: flow_options, &matcher_block)
+    assert_equal flow_options[:event_label], "☝ ⏵︎Update"
+
     # advance "☝ ⏵︎Create" do |ctx|
 
     # end.Or() do |ctx|

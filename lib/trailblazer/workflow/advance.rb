@@ -34,7 +34,7 @@ module Trailblazer
         # FIXME: fix flow_options!
 
         configuration, (ctx, flow_options) = Trailblazer::Workflow::Collaboration::Synchronous.advance(
-            [ctx, {throw: []}.merge(flow_options)], # FIXME: allow flow_options, AND TEST IT PROPERLY and circuit_options!!!!!!!!!!!!!!!!!!!!!!!!!!
+            [ctx, {throw: []}.merge(flow_options)], # FIXME: allow circuit_options?
             circuit_options, # circuit_options
 
             **position_options,
