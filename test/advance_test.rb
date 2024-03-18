@@ -150,10 +150,16 @@ class AdvanceTest < Minitest::Spec
     Trailblazer::Endpoint::Runtime.({params: {id: 1}, seq: []}, adapter: action_adapter_with_model, default_matcher: default_matcher, matcher_context: self, flow_options: flow_options, &matcher_block)
     assert_equal @render, %([:ui_update, :update])
 
-# Update doesn't find model
+# Update: Protocol doesn't find model
     flow_options = original_flow_options.merge(event_label: "☝ ⏵︎Update",)
     Trailblazer::Endpoint::Runtime.({params: {}, seq: []}, adapter: action_adapter_with_model, default_matcher: default_matcher, matcher_context: self, flow_options: flow_options, &matcher_block)
     assert_equal @render, %(404 not found: )
+
+# Update is invalid
+    flow_options = original_flow_options.merge(event_label: "☝ ⏵︎Update",)
+    Trailblazer::Endpoint::Runtime.({params: {id: 1}, seq: [], update: false}, adapter: action_adapter_with_model, default_matcher: default_matcher, matcher_context: self, flow_options: flow_options, &matcher_block)
+    assert_equal @render, %(failed: #<struct AdvanceTest::Posting id=1>)
+
 
 # {flow_options} is passed correctly through the entire run.
     flow_options = original_flow_options.merge(event_label: "☝ ⏵︎Update",)
