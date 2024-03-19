@@ -15,3 +15,5 @@ gem "minitest", "~> 5.0"
 # gem "trailblazer-test", path: "../trailblazer-test"
 gem "trailblazer-test", github: "trailblazer/trailblazer-test"
 
+gem "trailblazer-endpoint", path: "../trailblazer-endpoint"
+gem "trailblazer-macro", path: "../trailblazer-macro"

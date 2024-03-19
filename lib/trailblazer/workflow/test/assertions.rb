@@ -30,21 +30,25 @@ module Trailblazer
         # Grab the start_position and expected_lane_positions from the discovered plan, run
         # the collaboration from there and check if it actually reached the expected configuration.
         def assert_advance(event_label, test_plan:, schema:, ctx: {seq: []}, flow_options: {}, invalid: false, **) # TODO: allow {ctx}
-# TODO: this is endpoint code!
+# TODO: this is endpoint code! should we use endpoint here?
           ctx_for_advance = Trailblazer::Context(ctx, {}, flow_options[:context_options])
-          flow_options = {throw: []}.merge(flow_options)
+          flow_options    = {throw: []}.
+            merge(flow_options).
+            merge(
+              event_label: event_label,
+              iteration_set: test_plan,
+              **schema.to_h
+            )
 
-          # configuration, (ctx, flow) = Collaboration::Advance.(
-          signal, (ctx, flow), configuration = Workflow::Advance.(
-            ctx_for_advance, #flow_options, # DISCUSS: add circuit_options? #FIXME: this sucks
-            event_label: event_label,
-            iteration_set: test_plan,
-            **schema.to_h
-          )
+          signal, (ctx, flow_options) = Workflow::Advance.([ctx_for_advance, flow_options], # TODO: use (#invoke)
+          )# DISCUSS: add circuit_options? #FIXME: this sucks
+
+          configuration = flow_options[:configuration]
 
           # we're expecting an invalid transition.
           if invalid
-            assert_equal signal, Trailblazer::Workflow::Advance::UNAUTHORIZED_SIGNAL
+            # assert_equal signal.to_h[:semantic], :failure  # TODO: reuse endpoint/matcher
+            assert [:failure, :not_authorized].include?(signal.to_h[:semantic])  # TODO: reuse endpoint/matcher
             return ctx # FIXME: test this!
           end
 
