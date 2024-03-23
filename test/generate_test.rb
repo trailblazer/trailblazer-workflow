@@ -362,7 +362,7 @@ class GenerateTest < Minitest::Spec
     data={:type=>:catch_event, :label=>"valid?"}>=>
     [#<struct Trailblazer::Activity::Schema::Intermediate::Out
       semantic=:success,
-      target="suspend-Gateway_1g3fhu2">],
+      target="suspend-Gateway_00n4dsm">],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
     id="Event_1wly6jj",
     data={:type=>:catch_event, :label=>"invalid?"}>=>
@@ -675,6 +675,12 @@ class GenerateTest < Minitest::Spec
        ["catch-before-Activity_1165bw9", "catch-before-Activity_1dt5di5"],
       :type=>:suspend}>=>[],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
+    id="suspend-Gateway_00n4dsm",
+    data=
+     {"resumes"=>
+       ["catch-before-Activity_0zsock2", "catch-before-Activity_1dt5di5"],
+      :type=>:suspend}>=>[],
+   #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
     id="suspend-gw-to-Event_1vrfxsv",
     data={"resumes"=>["Event_1vrfxsv"], :type=>:suspend}>=>[],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
@@ -706,6 +712,7 @@ class GenerateTest < Minitest::Spec
    "suspend-Gateway_14h0q7a"=>:suspend,
    "suspend-Gateway_1d05yki"=>:suspend,
    "suspend-Gateway_0kknfje"=>:suspend,
+   "suspend-Gateway_00n4dsm"=>:suspend,
    "suspend-gw-to-Event_1vrfxsv"=>:suspend,
    "suspend-gw-to-Event_0j1jua6"=>:suspend,
    "suspend-gw-to-Event_19ha0ea"=>:suspend,

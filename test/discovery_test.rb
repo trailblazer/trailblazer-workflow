@@ -143,7 +143,7 @@ class DiscoveryTest < Minitest::Spec
       lanes: lanes_cfg
 
     assert_position_after states[14][:suspend_configuration],
-      ["suspend-Gateway_1kl7pnm", "suspend-Gateway_1g3fhu2", "End.success"],
+      ["suspend-Gateway_1kl7pnm", "suspend-Gateway_00n4dsm", "End.success"],
       lanes: lanes_cfg
 
     assert_nil states[15]
@@ -155,7 +155,7 @@ class DiscoveryTest < Minitest::Spec
     iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
 
     testing_json = JSON.pretty_generate(Trailblazer::Workflow::Introspect::Iteration::Set::Serialize.(iteration_set, lanes_cfg: lanes_cfg))
-    # File.write "test/iteration_json.json",  testing_json
+    # File.write("test/iteration_json.json", testing_json)
     assert_equal testing_json, File.read("test/iteration_json.json")
 
     iteration_set_from_json = Trailblazer::Workflow::Introspect::Iteration::Set::Deserialize.(JSON.parse(testing_json), lanes_cfg: lanes_cfg)
@@ -273,7 +273,7 @@ class DiscoveryTestPlanTest < Minitest::Spec
 | ☝ ⏵︎Delete            | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update ☝ ⏵︎Delete ⏵︎Cancel                     ☑ ◉End.failure | ⛾ ◉End.success             ☝ ◉End.success                        ☑ ◉End.failure |
 | ☝ ⏵︎Cancel            | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update ☝ ⏵︎Delete ⏵︎Cancel                     ☑ ◉End.failure | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish ☑ ◉End.failure |
 | ☝ ⏵︎Archive           | ⛾ ⏵︎Archive                 ☝ ⏵︎Archive                            ☑ ◉End.failure | ⛾ ◉End.success             ☝ ◉End.success                        ☑ ◉End.failure |
-| ☝ ⏵︎Revise            | ⛾ ⏵︎Revise                  ☝ ⏵︎Revise                             ☑ ◉End.success | ⛾ ⏵︎Revise ⏵︎Notify approver ☝ ⏵︎Update form ⏵︎Notify approver       ☑ ◉End.success |
+| ☝ ⏵︎Revise            | ⛾ ⏵︎Revise                  ☝ ⏵︎Revise                             ☑ ◉End.success | ⛾ ⏵︎Revise ⏵︎Notify approver ☝ ⏵︎Revise form ⏵︎Notify approver       ☑ ◉End.success |
 +----------------------+---------------------------------------------------------------------------------+---------------------------------------------------------------------------------+)
   end
 end
