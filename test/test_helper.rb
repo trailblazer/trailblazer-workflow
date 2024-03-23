@@ -17,6 +17,10 @@ module BuildSchema
     include Trailblazer::Activity::Testing.def_steps(:create)
   end
 
+  # NOTE: this uses https://bpmn.trailblazer.to/9a6b39 "Workflow in moderation"
+  #
+  # Updating diagram:
+  #   rails g trailblazer:pro:import 9a6b39 ../trailblazer-workflow/test/fixtures/v1/moderation.json
   def build_schema()
     implementing = Trailblazer::Activity::Testing.def_steps(:create, :update, :notify_approver, :reject, :approve, :revise, :publish, :archive, :delete)
 
