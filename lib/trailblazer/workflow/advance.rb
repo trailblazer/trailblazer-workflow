@@ -1,8 +1,12 @@
 # Runtime
 module Trailblazer
   module Workflow
+    # * Advance knows if an iteration was executed successfully or not (=> iteration set),
+    #   hence the success/failure return signal.
+
+    # TODO:
+    # * wire the event_valid? step to {invalid_state} terminus and handle that differently in the endpoint.
     class Advance <  Trailblazer::Activity::Railway
-      # UNAUTHORIZED_SIGNAL = "unauthorized"
       step task: :find_position_options
       step task: :event_valid?, Output(:failure) => End(:not_authorized)
       step task: :advance
@@ -34,8 +38,8 @@ module Trailblazer
         # FIXME: fix flow_options!
 
         configuration, (ctx, flow_options) = Trailblazer::Workflow::Collaboration::Synchronous.advance(
-            [ctx, {throw: []}.merge(flow_options)], # FIXME: allow circuit_options?
-            circuit_options, # circuit_options
+            [ctx, {throw: []}.merge(flow_options)], # FIXME: allow circuit_options? test?
+            circuit_options,
 
             **position_options,
             message_flow: message_flow,
