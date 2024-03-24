@@ -57,6 +57,8 @@ module Trailblazer
             ]
           end
 
+          cli_rows = cli_rows.sort { |a, b| a["state name"] <=> b["state name"] }
+
           ctx[:rows] = cli_rows
         end
 
