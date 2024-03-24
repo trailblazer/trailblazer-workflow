@@ -1183,5 +1183,85 @@
       }
     ],
     "outcome": "success"
-  }
+  },
+  {
+    "id": "catch-before-Activity_1wiumzv",
+    "event_label": "☝ ⏵︎Revise ⛞",
+    "start_task_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_1wiumzv"
+      ],
+      "comment": [
+        "before",
+        "☝ ⏵︎Revise"
+      ]
+    },
+    "start_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_01p7uj7"
+        ],
+        "comment": [
+          "before",
+          "⛾ ⏵︎Revise"
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_1xs96ik"
+        ],
+        "comment": [
+          "before",
+          "☝ ⏵︎Revise"
+        ]
+      },
+      {
+        "tuple": [
+          "approver",
+          "End.success"
+        ],
+        "comment": [
+          "terminus",
+          "success"
+        ]
+      }
+    ],
+    "suspend_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_01p7uj7"
+        ],
+        "comment": [
+          "before",
+          "⛾ ⏵︎Revise"
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_1xs96ik"
+        ],
+        "comment": [
+          "before",
+          "☝ ⏵︎Revise"
+        ]
+      },
+      {
+        "tuple": [
+          "approver",
+          "End.success"
+        ],
+        "comment": [
+          "terminus",
+          "success"
+        ]
+      }
+    ],
+    "outcome": "failure"
+   }
+
 ]

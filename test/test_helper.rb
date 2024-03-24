@@ -181,6 +181,7 @@ module DiscoveredStates
             ["UI", "Create"] => {ctx_merge: {:"lifecycle:Create" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
             # Click [UI Update] again, with invalid data.
             ["UI", "Update"] => {ctx_merge: {:"lifecycle:Update" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
+            ["UI", "Revise"] => {ctx_merge: {:"lifecycle:Revise" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
           },
           **schema.to_h
         )
