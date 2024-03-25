@@ -4,12 +4,12 @@ module Trailblazer
       # Rendering-specific code using {Iteration::Set}.
         # Each row represents a configuration of suspends aka "state".
         # The state knows its possible resume events.
-        #   does the state know which state fields belong to it?
+        # DISCUSS: does the state know which state fields belong to it?
       class StateTable < Trailblazer::Activity::Railway
         step :aggregate_by_state
         step :render_data
 
-        def aggregate_by_state(ctx, iteration_set:, **)
+        def aggregate_by_state(ctx, iteration_set:, lanes_cfg:, **)
           # Key by lane_positions, which represent a state.
           # State (lane_positions) => [events (start position)]
           states = {}
@@ -32,14 +32,33 @@ module Trailblazer
         end
 
         def render_data(ctx, states:, lanes_cfg:, **)
+          suggested_state_names = {}
+
           cli_rows = states.flat_map do |positions, catch_events|
+            suspend_tuples = positions.to_a.collect do |position|
+              Iteration::Set::Serialize.id_tuple_for(*position.to_a, lanes_cfg: lanes_cfg)
+            end
+
             suggested_state_name = suggested_state_name_for(catch_events)
 
             suggested_state_name = "⏸︎ #{suggested_state_name}"
 
+            # add an "ID hint" to the state name (part of the actual suspend gw's ID).
+            if suggested_state_names[suggested_state_name]
+              last_lane = catch_events[0].activity # DISCUSS: could be more explicit.
+              suspend_id_hint = positions[last_lane].to_h[:semantic][1][-8..]
+
+              suggested_state_name = "#{suggested_state_name} (#{suspend_id_hint})"
+            else
+              suggested_state_names[suggested_state_name] = true
+            end
+
             triggerable_events = catch_events
               .collect { |event_position| Present.readable_name_for_catch_event(*event_position.to_a, lanes_cfg: lanes_cfg).inspect }
               .join(", ")
+
+            # key: row[:catch_events].collect { |position| Introspect::Present.id_for_position(position) }.uniq.sort
+
 
 
             Hash[
