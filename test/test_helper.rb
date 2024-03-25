@@ -109,15 +109,15 @@ module BuildSchema
 
     approver_start_suspend = nil
     approver_activity = Class.new(Trailblazer::Activity::Railway) do
-      step task: approver_start_suspend = Trailblazer::Workflow::Event::Suspend.new(semantic: "invented_semantic", "resumes" => ["catch-before-decider-xxx"]), id: "~suspend~"
+      terminus task: approver_start_suspend = Trailblazer::Workflow::Event::Suspend.new(semantic: "invented_semantic", "resumes" => ["catch-before-decider-xxx"]), id: "~suspend~"
 
       fail task: Trailblazer::Workflow::Event::Catch.new(semantic: "xxx --> decider"), id: "catch-before-decider-xxx", Output(:success) => Track(:failure)
       fail :decider, id: "xxx",
         Output(:failure) => Trailblazer::Activity::Railway.Id("xxx_reject")
-      fail task: decision_is_approve_throw = Trailblazer::Workflow::Event::Throw.new(semantic: "xxx_approve")
+      fail task: decision_is_approve_throw = Trailblazer::Workflow::Event::Throw.new(semantic: "xxx_approve"), Output(:success) => Id("~suspend~")
 
       step task: decision_is_reject_throw = Trailblazer::Workflow::Event::Throw.new(semantic: "xxx_reject"),
-        magnetic_to: :reject, id: "xxx_reject"
+        magnetic_to: :reject, id: "xxx_reject", Output(:success) => Id("~suspend~")
 
       def decider(ctx, decision: true, **)
         # raise if !decision
