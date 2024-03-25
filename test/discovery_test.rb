@@ -4,149 +4,200 @@ class DiscoveryTest < Minitest::Spec
   extend BuildSchema
   extend DiscoveredStates
 
+  def render_assert_data_for_iteration_set(states, lanes:, **)
+    output = states.collect do |iteration|
+      actual_lane_positions, actual_start_position = iteration[:positions_before]
+
+      positions_before_readable = actual_lane_positions.collect { |(a, t)| Trailblazer::Workflow::Introspect::Present.readable_name_for_suspend_or_terminus(a, t, lanes_cfg: lanes) }
+      positions_before = actual_lane_positions.collect { |(a, t)| Trailblazer::Activity::Introspect.Nodes(a, task: t).id }
+      start_id = Trailblazer::Activity::Introspect.Nodes(actual_start_position.activity, task: actual_start_position.task).id
+      start_id_readable = Trailblazer::Workflow::Introspect::Present.readable_name_for_catch_event(*actual_start_position.to_a, lanes_cfg: lanes)
+
+      actual_lane_positions = iteration[:suspend_configuration].lane_positions
+
+      positions_after = actual_lane_positions.collect { |(a, t)| Trailblazer::Activity::Introspect.Nodes(a, task: t).id }
+      positions_after_readable = actual_lane_positions.collect { |(a, t)| Trailblazer::Workflow::Introspect::Present.readable_name_for_suspend_or_terminus(a, t, lanes_cfg: lanes) }
+
+%(      [
+        # before: #{positions_before_readable} start:#{start_id_readable}
+        #{positions_before.inspect}, {start_id: #{start_id.inspect}},
+        # after: #{positions_after_readable}
+        #{positions_after.inspect},
+      ],
+)
+    end.join("\n")
+  end
+
   it "Discovery.call" do
     states, schema, lanes_cfg = self.class.states
 
     # pp states
     # TODO: should we really assert the state table manually?
-    assert_equal states.size, 15
+    assert_equal states.size, 21
 
-    assert_position_before states[0][:positions_before],
-      ["suspend-gw-to-catch-before-Activity_0wwfenp", "suspend-gw-to-catch-before-Activity_0wc2mcq", "~suspend~"],
-      start_id: "catch-before-Activity_0wc2mcq",
-      lanes: lanes_cfg
+    # Uncomment next line to render the test below! Hahaha
+    # puts render_assert_data_for_iteration_set(states, **schema.to_h)
+    assert_data_for_iteration_set = [
+      [
+        # before: ["⛾ ⏵︎Create", "☝ ⏵︎Create form", "☑ ⏵︎xxx"] start:☝ ⏵︎Create form
+        ["suspend-gw-to-catch-before-Activity_0wwfenp", "suspend-gw-to-catch-before-Activity_0wc2mcq", "~suspend~"], {start_id: "catch-before-Activity_0wc2mcq"},
+        # after: ["⛾ ⏵︎Create", "☝ ⏵︎Create", "☑ ⏵︎xxx"]
+        ["suspend-gw-to-catch-before-Activity_0wwfenp", "suspend-Gateway_14h0q7a", "~suspend~"],
+      ],
 
-    assert_position_after states[0][:suspend_configuration],
-      ["suspend-gw-to-catch-before-Activity_0wwfenp", "suspend-Gateway_14h0q7a", "~suspend~"],
-      lanes: lanes_cfg
+      [
+        # before: ["⛾ ⏵︎Create", "☝ ⏵︎Create", "☑ ⏵︎xxx"] start:☝ ⏵︎Create
+        ["suspend-gw-to-catch-before-Activity_0wwfenp", "suspend-Gateway_14h0q7a", "~suspend~"], {start_id: "catch-before-Activity_1psp91r"},
+        # after: ["⛾ ⏵︎Update ⏵︎Notify approver", "☝ ⏵︎Update form ⏵︎Notify approver", "☑ ⏵︎xxx"]
+        ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0kknfje", "~suspend~"],
+      ],
 
-    assert_position_before states[1][:positions_before],
-      ["suspend-gw-to-catch-before-Activity_0wwfenp", "suspend-Gateway_14h0q7a", "~suspend~"],
-      start_id: "catch-before-Activity_1psp91r",
-      lanes: lanes_cfg
+      [
+        # before: ["⛾ ⏵︎Create", "☝ ⏵︎Create", "☑ ⏵︎xxx"] start:☝ ⏵︎Create
+        ["suspend-gw-to-catch-before-Activity_0wwfenp", "suspend-Gateway_14h0q7a", "~suspend~"], {start_id: "catch-before-Activity_1psp91r"},
+        # after: ["⛾ ⏵︎Create", "☝ ⏵︎Create", "☑ ⏵︎xxx"]
+        ["suspend-gw-to-catch-before-Activity_0wwfenp", "suspend-Gateway_14h0q7a", "~suspend~"],
+      ],
 
-    assert_position_after states[1][:suspend_configuration],
-      ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0kknfje", "~suspend~"],
-      lanes: lanes_cfg
+      [
+        # before: ["⛾ ⏵︎Update ⏵︎Notify approver", "☝ ⏵︎Update form ⏵︎Notify approver", "☑ ⏵︎xxx"] start:☝ ⏵︎Update form
+        ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0kknfje", "~suspend~"], {start_id: "catch-before-Activity_1165bw9"},
+        # after: ["⛾ ⏵︎Update ⏵︎Notify approver", "☝ ⏵︎Update", "☑ ⏵︎xxx"]
+        ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0nxerxv", "~suspend~"],
+      ],
 
-    assert_position_before states[2][:positions_before],
-      ["suspend-gw-to-catch-before-Activity_0wwfenp", "suspend-Gateway_14h0q7a", "~suspend~"],
-      start_id: "catch-before-Activity_1psp91r",
-      lanes: lanes_cfg
+      [
+        # before: ["⛾ ⏵︎Update ⏵︎Notify approver", "☝ ⏵︎Update form ⏵︎Notify approver", "☑ ⏵︎xxx"] start:☝ ⏵︎Notify approver
+        ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0kknfje", "~suspend~"], {start_id: "catch-before-Activity_1dt5di5"},
+        # after: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish", "☑ ⏵︎xxx"]
+        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "~suspend~"],
+      ],
 
-    assert_position_after states[2][:suspend_configuration],
-      ["suspend-gw-to-catch-before-Activity_0wwfenp", "suspend-Gateway_14h0q7a", "~suspend~"],
-      lanes: lanes_cfg
+      [
+        # before: ["⛾ ⏵︎Update ⏵︎Notify approver", "☝ ⏵︎Update", "☑ ⏵︎xxx"] start:☝ ⏵︎Update
+        ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0nxerxv", "~suspend~"], {start_id: "catch-before-Activity_0j78uzd"},
+        # after: ["⛾ ⏵︎Notify approver ⏵︎Update", "☝ ⏵︎Update form ⏵︎Notify approver", "☑ ⏵︎xxx"]
+        ["suspend-Gateway_1wzosup", "suspend-Gateway_1g3fhu2", "~suspend~"],
+      ],
 
-    assert_position_before states[3][:positions_before],
-      ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0kknfje", "~suspend~"],
-      start_id: "catch-before-Activity_1165bw9",
-      lanes: lanes_cfg
+      [
+        # before: ["⛾ ⏵︎Update ⏵︎Notify approver", "☝ ⏵︎Update form ⏵︎Notify approver", "☑ ⏵︎xxx"] start:☝ ⏵︎Notify approver
+        ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0kknfje", "~suspend~"], {start_id: "catch-before-Activity_1dt5di5"},
+        # after: ["⛾ ⏵︎Revise", "☝ ⏵︎Revise form", "☑ ⏵︎xxx"]
+        ["suspend-Gateway_01p7uj7", "suspend-gw-to-catch-before-Activity_0zsock2", "~suspend~"],
+      ],
 
-    assert_position_after states[3][:suspend_configuration],
-      ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0nxerxv", "~suspend~"],
-      lanes: lanes_cfg
+      [
+        # before: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish", "☑ ⏵︎xxx"] start:☝ ⏵︎Update form
+        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "~suspend~"], {start_id: "catch-before-Activity_1165bw9"},
+        # after: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Update", "☑ ⏵︎xxx"]
+        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_0nxerxv", "~suspend~"],
+      ],
 
-    assert_position_before states[4][:positions_before],
-      ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0kknfje", "~suspend~"],
-      start_id: "catch-before-Activity_1dt5di5",
-      lanes: lanes_cfg
+      [
+        # before: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish", "☑ ⏵︎xxx"] start:☝ ⏵︎Delete? form
+        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "~suspend~"], {start_id: "catch-before-Activity_0ha7224"},
+        # after: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Delete ⏵︎Cancel", "☑ ⏵︎xxx"]
+        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_100g9dn", "~suspend~"],
+      ],
 
-    assert_position_after states[4][:suspend_configuration],
-      ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "End.failure"],
-      lanes: lanes_cfg
+      [
+        # before: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish", "☑ ⏵︎xxx"] start:☝ ⏵︎Publish
+        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "~suspend~"], {start_id: "catch-before-Activity_0bsjggk"},
+        # after: ["⛾ ⏵︎Archive", "☝ ⏵︎Archive", "☑ ⏵︎xxx"]
+        ["suspend-gw-to-catch-before-Activity_1hgscu3", "suspend-gw-to-catch-before-Activity_0fy41qq", "~suspend~"],
+      ],
 
-    assert_position_before states[5][:positions_before],
-      ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0nxerxv", "~suspend~"],
-      start_id: "catch-before-Activity_0j78uzd",
-      lanes: lanes_cfg
+      [
+        # before: ["⛾ ⏵︎Update ⏵︎Notify approver", "☝ ⏵︎Update", "☑ ⏵︎xxx"] start:☝ ⏵︎Update
+        ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0nxerxv", "~suspend~"], {start_id: "catch-before-Activity_0j78uzd"},
+        # after: ["⛾ ⏵︎Update ⏵︎Notify approver", "☝ ⏵︎Update", "☑ ⏵︎xxx"]
+        ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0nxerxv", "~suspend~"],
+      ],
 
-    assert_position_after states[5][:suspend_configuration],
-      ["suspend-Gateway_1wzosup", "suspend-Gateway_1g3fhu2", "~suspend~"],
-      lanes: lanes_cfg
+      [
+        # before: ["⛾ ⏵︎Notify approver ⏵︎Update", "☝ ⏵︎Update form ⏵︎Notify approver", "☑ ⏵︎xxx"] start:☝ ⏵︎Update form
+        ["suspend-Gateway_1wzosup", "suspend-Gateway_1g3fhu2", "~suspend~"], {start_id: "catch-before-Activity_1165bw9"},
+        # after: ["⛾ ⏵︎Notify approver ⏵︎Update", "☝ ⏵︎Update", "☑ ⏵︎xxx"]
+        ["suspend-Gateway_1wzosup", "suspend-Gateway_0nxerxv", "~suspend~"],
+      ],
 
-    assert_position_before states[6][:positions_before],
-      ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0kknfje", "~suspend~"],
-      start_id: "catch-before-Activity_1dt5di5",
-      lanes: lanes_cfg
+      [
+        # before: ["⛾ ⏵︎Notify approver ⏵︎Update", "☝ ⏵︎Update form ⏵︎Notify approver", "☑ ⏵︎xxx"] start:☝ ⏵︎Notify approver
+        ["suspend-Gateway_1wzosup", "suspend-Gateway_1g3fhu2", "~suspend~"], {start_id: "catch-before-Activity_1dt5di5"},
+        # after: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish", "☑ ⏵︎xxx"]
+        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "~suspend~"],
+      ],
 
-    assert_position_after states[6][:suspend_configuration],
-      ["suspend-Gateway_01p7uj7", "suspend-gw-to-catch-before-Activity_0zsock2", "End.success"],
-      lanes: lanes_cfg
+      [
+        # before: ["⛾ ⏵︎Revise", "☝ ⏵︎Revise form", "☑ ⏵︎xxx"] start:☝ ⏵︎Revise form
+        ["suspend-Gateway_01p7uj7", "suspend-gw-to-catch-before-Activity_0zsock2", "~suspend~"], {start_id: "catch-before-Activity_0zsock2"},
+        # after: ["⛾ ⏵︎Revise", "☝ ⏵︎Revise", "☑ ⏵︎xxx"]
+        ["suspend-Gateway_01p7uj7", "suspend-Gateway_1xs96ik", "~suspend~"],
+      ],
 
-    assert_position_before states[7][:positions_before],
-      ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "End.failure"],
-      start_id: "catch-before-Activity_0ha7224",
-      lanes: lanes_cfg
+      [
+        # before: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Delete ⏵︎Cancel", "☑ ⏵︎xxx"] start:☝ ⏵︎Delete
+        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_100g9dn", "~suspend~"], {start_id: "catch-before-Activity_15nnysv"},
+        # after: ["⛾ ◉End.success", "☝ ◉End.success", "☑ ⏵︎xxx"]
+        ["Event_1p8873y", "Event_0h6yhq6", "~suspend~"],
+      ],
 
-    assert_position_after states[7][:suspend_configuration],
-      ["suspend-Gateway_1hp2ssj", "suspend-Gateway_100g9dn", "End.failure"],
-      lanes: lanes_cfg
+      [
+        # before: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Delete ⏵︎Cancel", "☑ ⏵︎xxx"] start:☝ ⏵︎Cancel
+        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_100g9dn", "~suspend~"], {start_id: "catch-before-Activity_1uhozy1"},
+        # after: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish", "☑ ⏵︎xxx"]
+        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "~suspend~"],
+      ],
 
-    assert_position_before states[8][:positions_before],
-      ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "End.failure"],
-      start_id: "catch-before-Activity_0bsjggk",
-      lanes: lanes_cfg
+      [
+        # before: ["⛾ ⏵︎Archive", "☝ ⏵︎Archive", "☑ ⏵︎xxx"] start:☝ ⏵︎Archive
+        ["suspend-gw-to-catch-before-Activity_1hgscu3", "suspend-gw-to-catch-before-Activity_0fy41qq", "~suspend~"], {start_id: "catch-before-Activity_0fy41qq"},
+        # after: ["⛾ ◉End.success", "☝ ◉End.success", "☑ ⏵︎xxx"]
+        ["Event_1p8873y", "Event_0h6yhq6", "~suspend~"],
+      ],
 
-    assert_position_after states[8][:suspend_configuration],
-      ["suspend-gw-to-catch-before-Activity_1hgscu3", "suspend-gw-to-catch-before-Activity_0fy41qq", "End.failure"],
-      lanes: lanes_cfg
+      [
+        # before: ["⛾ ⏵︎Revise", "☝ ⏵︎Revise", "☑ ⏵︎xxx"] start:☝ ⏵︎Revise
+        ["suspend-Gateway_01p7uj7", "suspend-Gateway_1xs96ik", "~suspend~"], {start_id: "catch-before-Activity_1wiumzv"},
+        # after: ["⛾ ⏵︎Revise ⏵︎Notify approver", "☝ ⏵︎Revise form ⏵︎Notify approver", "☑ ⏵︎xxx"]
+        ["suspend-Gateway_1kl7pnm", "suspend-Gateway_00n4dsm", "~suspend~"],
+      ],
 
-    assert_position_before states[9][:positions_before],
-      ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0nxerxv", "~suspend~"],
-      start_id: "catch-before-Activity_0j78uzd",
-      lanes: lanes_cfg
+      [
+        # before: ["⛾ ⏵︎Revise", "☝ ⏵︎Revise", "☑ ⏵︎xxx"] start:☝ ⏵︎Revise
+        ["suspend-Gateway_01p7uj7", "suspend-Gateway_1xs96ik", "~suspend~"], {start_id: "catch-before-Activity_1wiumzv"},
+        # after: ["⛾ ⏵︎Revise", "☝ ⏵︎Revise", "☑ ⏵︎xxx"]
+        ["suspend-Gateway_01p7uj7", "suspend-Gateway_1xs96ik", "~suspend~"],
+      ],
 
-    assert_position_after states[9][:suspend_configuration],
-      ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0nxerxv", "~suspend~"],
-      lanes: lanes_cfg
+      [
+        # before: ["⛾ ⏵︎Revise ⏵︎Notify approver", "☝ ⏵︎Revise form ⏵︎Notify approver", "☑ ⏵︎xxx"] start:☝ ⏵︎Revise form
+        ["suspend-Gateway_1kl7pnm", "suspend-Gateway_00n4dsm", "~suspend~"], {start_id: "catch-before-Activity_0zsock2"},
+        # after: ["⛾ ⏵︎Revise ⏵︎Notify approver", "☝ ⏵︎Revise", "☑ ⏵︎xxx"]
+        ["suspend-Gateway_1kl7pnm", "suspend-Gateway_1xs96ik", "~suspend~"],
+      ],
 
-    assert_position_before states[10][:positions_before],
-      ["suspend-Gateway_01p7uj7", "suspend-gw-to-catch-before-Activity_0zsock2", "End.success"],
-      start_id: "catch-before-Activity_0zsock2",
-      lanes: lanes_cfg
+      [
+        # before: ["⛾ ⏵︎Revise ⏵︎Notify approver", "☝ ⏵︎Revise form ⏵︎Notify approver", "☑ ⏵︎xxx"] start:☝ ⏵︎Notify approver
+        ["suspend-Gateway_1kl7pnm", "suspend-Gateway_00n4dsm", "~suspend~"], {start_id: "catch-before-Activity_1dt5di5"},
+        # after: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish", "☑ ⏵︎xxx"]
+        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "~suspend~"],
+      ],
+    ]
 
-    assert_position_after states[10][:suspend_configuration],
-      ["suspend-Gateway_01p7uj7", "suspend-Gateway_1xs96ik", "End.success"],
-      lanes: lanes_cfg
+    assert_data_for_iteration_set.each.with_index do |(start_position_ids, start_cfg, suspend_ids), index|
+      # raise index.inspect
+      assert_position_before states[index][:positions_before],
+        start_position_ids,
+        start_id: start_cfg[:start_id],
+        lanes: lanes_cfg
 
-    assert_position_before states[11][:positions_before],
-      ["suspend-Gateway_1hp2ssj", "suspend-Gateway_100g9dn", "End.failure"],
-      start_id: "catch-before-Activity_15nnysv",
-      lanes: lanes_cfg
+      assert_position_after states[index][:suspend_configuration],
+        suspend_ids,
+        lanes: lanes_cfg
+    end
 
-    assert_position_after states[11][:suspend_configuration],
-      ["Event_1p8873y", "Event_0h6yhq6", "End.failure"],
-      lanes: lanes_cfg
-
-    assert_position_before states[12][:positions_before],
-      ["suspend-Gateway_1hp2ssj", "suspend-Gateway_100g9dn", "End.failure"],
-      start_id: "catch-before-Activity_1uhozy1",
-      lanes: lanes_cfg
-
-    assert_position_after states[12][:suspend_configuration],
-      ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "End.failure"],
-      lanes: lanes_cfg
-
-    assert_position_before states[13][:positions_before],
-      ["suspend-gw-to-catch-before-Activity_1hgscu3", "suspend-gw-to-catch-before-Activity_0fy41qq", "End.failure"],
-      start_id: "catch-before-Activity_0fy41qq",
-      lanes: lanes_cfg
-
-    assert_position_after states[13][:suspend_configuration],
-      ["Event_1p8873y", "Event_0h6yhq6", "End.failure"],
-      lanes: lanes_cfg
-
-    assert_position_before states[14][:positions_before],
-      ["suspend-Gateway_01p7uj7", "suspend-Gateway_1xs96ik", "End.success"],
-      start_id: "catch-before-Activity_1wiumzv",
-      lanes: lanes_cfg
-
-    assert_position_after states[14][:suspend_configuration],
-      ["suspend-Gateway_1kl7pnm", "suspend-Gateway_00n4dsm", "End.success"],
-      lanes: lanes_cfg
-
-    assert_nil states[15]
   end
 
   it "Iteration::Set" do
@@ -181,7 +232,6 @@ class DiscoveryTest < Minitest::Spec
   end
 
   def assert_positions_for(actual_lane_positions, expected_ids, lanes:)
-    # puts actual_lane_positions.collect { |(a, t)| Trailblazer::Activity::Introspect.Nodes(a, task: t).id }.inspect
     lanes = lanes.to_h.keys
 
     actual_lane_positions.collect.with_index do |actual_position, index|

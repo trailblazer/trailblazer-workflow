@@ -6,7 +6,8 @@ module Trailblazer
 
       # Find all possible configurations for a {collaboration} by replacing
       # its tasks with mocks, and run through all possible paths.
-      def call(collaboration, start_task_position:, run_multiple_times: {}, initial_lane_positions: Collaboration::Synchronous.initial_lane_positions(collaboration), message_flow:)
+      # FIXME: initial_lane_positions defaulting is not tested.
+      def call(collaboration, start_task_position:, run_multiple_times: {}, initial_lane_positions: Collaboration::Synchronous.initial_lane_positions(collaboration.to_h[:lanes]), message_flow:)
         # State discovery:
     # The idea is that we collect suspend events and follow up on all their resumes (catch) events.
     # We can't see into {Collaboration.call}, meaning we can really only collect public entry points,
@@ -37,12 +38,13 @@ module Trailblazer
         discovered_states = []
 
         already_visited_catch_events = {}
-        already_visited_catch_events_again = {} # FIXME: well, yeah.
+        already_visited_catch_events_again = {} # FIXME: well, yeah. TODO: implement this
 
         while resumes_to_invoke.any?
 
           (start_task_position, lane_positions, ctx_merge, config_payload) = resumes_to_invoke.shift
           puts "~~~~~~~~~"
+          # puts "@@@@@ #{start_task_position.inspect} (#{lane_positions.to_a[0]})"
 
           ctx = {seq: []}.merge(ctx_merge)
           start_task = start_task_position.to_h[:task]
@@ -104,19 +106,23 @@ module Trailblazer
           # elsif suspend_terminus.is_a?(Trailblazer::Activity::Railway::End) # a real end event!
 
           # Go through all possible resume/catch events and "remember" them
-          suspend_terminus.to_h["resumes"].each do |resume_event_id|
-            resume_event = Trailblazer::Activity::Introspect.Nodes(last_lane, id: resume_event_id).task
+          suspend_terminus.to_h["resumes"].each do |catch_event_id|
+            catch_event = Trailblazer::Activity::Introspect.Nodes(last_lane, id: catch_event_id).task
 
-            unless already_visited_catch_events[resume_event]
+            # Key by catch event *and* the suspend gateway. Why? Because just because you're seeing the same
+            # catch event from a suspend doesn't mean it's the same suspend! Remember: after reject?&Revise
+            suspend_catch_tuple = [suspend_terminus, catch_event]
+
+            unless already_visited_catch_events[suspend_catch_tuple]
               resumes_to_invoke << [
-                Trailblazer::Workflow::Collaboration::Position.new(last_lane, resume_event),
+                Trailblazer::Workflow::Collaboration::Position.new(last_lane, catch_event),
                 configuration.lane_positions,
                 {},
                 {outcome: :success}
               ]
             end
 
-            already_visited_catch_events[resume_event] = true
+            already_visited_catch_events[suspend_catch_tuple] = true
           end
         end
 
