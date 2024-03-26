@@ -9,14 +9,14 @@ module Trailblazer
       #
       # DISCUSS: maybe the naming/namespace will change.
       #          maybe Introspect::Iteration?
-      class Iteration < Struct.new(:id, :event_label, :start_task_position, :start_positions, :suspend_positions, :outcome)
+      class Iteration < Struct.new(:id, :event_label, :start_task_position, :start_positions, :suspend_positions, :suspend_task_position, :outcome)
         class Set
           def self.from_discovered_states(discovered_states, **options)
             iterations = discovered_states.collect do |row|
               triggered_catch_event_position = row[:positions_before][1]
 
               id          = Introspect::Present.id_for_position(triggered_catch_event_position)
-              event_label = Test::Plan::CommentHeader.start_position_label(row[:positions_before][1], row, **options)
+              event_label = Test::Plan::Introspect.start_position_label(row[:positions_before][1], row, **options)
 
               Iteration.new(
                 id,
@@ -24,11 +24,17 @@ module Trailblazer
                 row[:positions_before][1],
                 row[:positions_before][0],
                 row[:suspend_configuration].lane_positions,
+                row[:suspend_configuration].signal,
                 row[:outcome],
               )
             end
 
             Set.new(iterations, **options)
+          end
+
+          def self.from_file(filename, **options) # TODO: test me, and call me from some Setup code.
+            serialized_iteration_set = File.read(filename)
+            Deserialize.(JSON.parse(serialized_iteration_set), **options)
           end
 
           def initialize(iterations, lanes_cfg:)
@@ -58,6 +64,7 @@ module Trailblazer
                   start_task_position: Serialize.serialize_position(*iteration.start_task_position.to_a, **options),
                   start_positions: Serialize.serialize_suspend_positions(iteration.start_positions, **options),
                   suspend_positions: Serialize.serialize_suspend_positions(iteration.suspend_positions, **options),
+                  suspend_task_position: Serialize.serialize_position(*iteration.start_task_position.to_a, **options),
                   outcome: iteration.outcome,
                 }
               end
@@ -119,6 +126,7 @@ module Trailblazer
                   position_from_tuple(*attributes["start_task_position"]["tuple"], label_2_activity: label_2_activity),
                   positions_from(attributes["start_positions"], label_2_activity: label_2_activity),
                   positions_from(attributes["suspend_positions"], label_2_activity: label_2_activity),
+                  position_from_tuple(*attributes["suspend_task_position"]["tuple"], label_2_activity: label_2_activity),
                   attributes["outcome"].to_sym,
                 )
               end

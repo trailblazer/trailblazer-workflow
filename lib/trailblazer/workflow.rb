@@ -14,6 +14,7 @@ require "trailblazer/workflow/collaboration/state_guards" # DISCUSS: it's an Adv
 require "trailblazer/workflow/event"
 
 require "trailblazer/workflow/test/plan"
+require "trailblazer/workflow/test/plan/introspect"
 require "trailblazer/workflow/test/assertions"
 
 require "trailblazer/workflow/discovery"

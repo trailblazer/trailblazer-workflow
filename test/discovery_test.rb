@@ -218,7 +218,7 @@ class DiscoveryTest < Minitest::Spec
     # pp iteration_set_from_json.to_a.collect { |iteration| iteration.to_h }[0]
 
     # TODO: test {Set#to_a}
-    assert_equal iteration_set_from_json.to_a.size, 15
+    assert_equal iteration_set_from_json.to_a.size, 21
   end
 
   # Asserts
@@ -256,6 +256,7 @@ class DiscoveryTest < Minitest::Spec
 
     iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
 
+    # DISCUSS: this table shows redundant events, is that from success/failure discovery?
     cli_state_table_with_ids = Trailblazer::Workflow::Introspect::EventTable.(iteration_set, render_ids: true, hide_lanes: ["approver"], lanes_cfg: lanes_cfg)
 puts cli_state_table_with_ids
 assert_equal cli_state_table_with_ids,
@@ -276,12 +277,18 @@ assert_equal cli_state_table_with_ids,
 | catch-before-Activity_0j78uzd | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0nxerxv                     |
 | ☝ ⏵︎Notify approver            | ⛾ ⏵︎Update ⏵︎Notify approver                  | ☝ ⏵︎Update form ⏵︎Notify approver             |
 | catch-before-Activity_1dt5di5 | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0kknfje                     |
+| ☝ ⏵︎Update form                | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update                  | ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish       |
+| catch-before-Activity_1165bw9 | suspend-Gateway_1hp2ssj                     | suspend-Gateway_1sq41iq                     |
 | ☝ ⏵︎Delete? form               | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update                  | ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish       |
 | catch-before-Activity_0ha7224 | suspend-Gateway_1hp2ssj                     | suspend-Gateway_1sq41iq                     |
 | ☝ ⏵︎Publish                    | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update                  | ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish       |
 | catch-before-Activity_0bsjggk | suspend-Gateway_1hp2ssj                     | suspend-Gateway_1sq41iq                     |
 | ☝ ⏵︎Update                     | ⛾ ⏵︎Update ⏵︎Notify approver                  | ☝ ⏵︎Update                                   |
 | catch-before-Activity_0j78uzd | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0nxerxv                     |
+| ☝ ⏵︎Update form                | ⛾ ⏵︎Notify approver ⏵︎Update                  | ☝ ⏵︎Update form ⏵︎Notify approver             |
+| catch-before-Activity_1165bw9 | suspend-Gateway_1wzosup                     | suspend-Gateway_1g3fhu2                     |
+| ☝ ⏵︎Notify approver            | ⛾ ⏵︎Notify approver ⏵︎Update                  | ☝ ⏵︎Update form ⏵︎Notify approver             |
+| catch-before-Activity_1dt5di5 | suspend-Gateway_1wzosup                     | suspend-Gateway_1g3fhu2                     |
 | ☝ ⏵︎Revise form                | ⛾ ⏵︎Revise                                   | ☝ ⏵︎Revise form                              |
 | catch-before-Activity_0zsock2 | suspend-Gateway_01p7uj7                     | suspend-gw-to-catch-before-Activity_0zsock2 |
 | ☝ ⏵︎Delete                     | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update                  | ☝ ⏵︎Delete ⏵︎Cancel                           |
@@ -292,6 +299,12 @@ assert_equal cli_state_table_with_ids,
 | catch-before-Activity_0fy41qq | suspend-gw-to-catch-before-Activity_1hgscu3 | suspend-gw-to-catch-before-Activity_0fy41qq |
 | ☝ ⏵︎Revise                     | ⛾ ⏵︎Revise                                   | ☝ ⏵︎Revise                                   |
 | catch-before-Activity_1wiumzv | suspend-Gateway_01p7uj7                     | suspend-Gateway_1xs96ik                     |
+| ☝ ⏵︎Revise                     | ⛾ ⏵︎Revise                                   | ☝ ⏵︎Revise                                   |
+| catch-before-Activity_1wiumzv | suspend-Gateway_01p7uj7                     | suspend-Gateway_1xs96ik                     |
+| ☝ ⏵︎Revise form                | ⛾ ⏵︎Revise ⏵︎Notify approver                  | ☝ ⏵︎Revise form ⏵︎Notify approver             |
+| catch-before-Activity_0zsock2 | suspend-Gateway_1kl7pnm                     | suspend-Gateway_00n4dsm                     |
+| ☝ ⏵︎Notify approver            | ⛾ ⏵︎Revise ⏵︎Notify approver                  | ☝ ⏵︎Revise form ⏵︎Notify approver             |
+| catch-before-Activity_1dt5di5 | suspend-Gateway_1kl7pnm                     | suspend-Gateway_00n4dsm                     |
 +-------------------------------+---------------------------------------------+---------------------------------------------+)
   end
 end
@@ -303,28 +316,34 @@ class DiscoveryTestPlanTest < Minitest::Spec
     iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
 
     # this usually happens straight after discovery:
-    test_plan_comment_header = Trailblazer::Workflow::Test::Plan.render_comment_header(iteration_set, lanes_cfg: lanes_cfg)
+    test_plan_comment_header = Trailblazer::Workflow::Test::Plan::Introspect.(iteration_set, lanes_cfg: lanes_cfg)
     puts test_plan_comment_header
     assert_equal test_plan_comment_header,
-%(+----------------------+---------------------------------------------------------------------------------+---------------------------------------------------------------------------------+
-| triggered catch      | start configuration                                                             | expected reached configuration                                                  |
-+----------------------+---------------------------------------------------------------------------------+---------------------------------------------------------------------------------+
-| ☝ ⏵︎Create form       | ⛾ ⏵︎Create                  ☝ ⏵︎Create form                        ☑ ⏵︎xxx         | ⛾ ⏵︎Create                  ☝ ⏵︎Create                             ☑ ⏵︎xxx         |
-| ☝ ⏵︎Create            | ⛾ ⏵︎Create                  ☝ ⏵︎Create                             ☑ ⏵︎xxx         | ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update form ⏵︎Notify approver       ☑ ⏵︎xxx         |
-| ☝ ⏵︎Create ⛞          | ⛾ ⏵︎Create                  ☝ ⏵︎Create                             ☑ ⏵︎xxx         | ⛾ ⏵︎Create                  ☝ ⏵︎Create                             ☑ ⏵︎xxx         |
-| ☝ ⏵︎Update form       | ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update form ⏵︎Notify approver       ☑ ⏵︎xxx         | ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update                             ☑ ⏵︎xxx         |
-| ☝ ⏵︎Notify approver   | ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update form ⏵︎Notify approver       ☑ ⏵︎xxx         | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish ☑ ◉End.failure |
-| ☝ ⏵︎Update            | ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update                             ☑ ⏵︎xxx         | ⛾ ⏵︎Notify approver ⏵︎Update ☝ ⏵︎Update form ⏵︎Notify approver       ☑ ⏵︎xxx         |
-| ☝ ⏵︎Notify approver ⛞ | ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update form ⏵︎Notify approver       ☑ ⏵︎xxx         | ⛾ ⏵︎Revise                  ☝ ⏵︎Revise form                        ☑ ◉End.success |
-| ☝ ⏵︎Delete? form      | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish ☑ ◉End.failure | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update ☝ ⏵︎Delete ⏵︎Cancel                     ☑ ◉End.failure |
-| ☝ ⏵︎Publish           | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish ☑ ◉End.failure | ⛾ ⏵︎Archive                 ☝ ⏵︎Archive                            ☑ ◉End.failure |
-| ☝ ⏵︎Update ⛞          | ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update                             ☑ ⏵︎xxx         | ⛾ ⏵︎Update ⏵︎Notify approver ☝ ⏵︎Update                             ☑ ⏵︎xxx         |
-| ☝ ⏵︎Revise form       | ⛾ ⏵︎Revise                  ☝ ⏵︎Revise form                        ☑ ◉End.success | ⛾ ⏵︎Revise                  ☝ ⏵︎Revise                             ☑ ◉End.success |
-| ☝ ⏵︎Delete            | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update ☝ ⏵︎Delete ⏵︎Cancel                     ☑ ◉End.failure | ⛾ ◉End.success             ☝ ◉End.success                        ☑ ◉End.failure |
-| ☝ ⏵︎Cancel            | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update ☝ ⏵︎Delete ⏵︎Cancel                     ☑ ◉End.failure | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish ☑ ◉End.failure |
-| ☝ ⏵︎Archive           | ⛾ ⏵︎Archive                 ☝ ⏵︎Archive                            ☑ ◉End.failure | ⛾ ◉End.success             ☝ ◉End.success                        ☑ ◉End.failure |
-| ☝ ⏵︎Revise            | ⛾ ⏵︎Revise                  ☝ ⏵︎Revise                             ☑ ◉End.success | ⛾ ⏵︎Revise ⏵︎Notify approver ☝ ⏵︎Revise form ⏵︎Notify approver       ☑ ◉End.success |
-+----------------------+---------------------------------------------------------------------------------+---------------------------------------------------------------------------------+)
+%(+----------------------+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| triggered catch      | start configuration                                                                          | expected reached configuration                                                               |
++----------------------+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ☝ ⏵︎Create form       | ⛾ ⏵︎Create <0wwf>                  ☝ ⏵︎Create form <0wc2>                        ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Create <0wwf>                  ☝ ⏵︎Create <14h0>                             ☑ ⏵︎xxx <uspe> |
+| ☝ ⏵︎Create            | ⛾ ⏵︎Create <0wwf>                  ☝ ⏵︎Create <14h0>                             ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Update ⏵︎Notify approver <0fnb> ☝ ⏵︎Update form ⏵︎Notify approver <0kkn>       ☑ ⏵︎xxx <uspe> |
+| ☝ ⏵︎Create ⛞          | ⛾ ⏵︎Create <0wwf>                  ☝ ⏵︎Create <14h0>                             ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Create <0wwf>                  ☝ ⏵︎Create <14h0>                             ☑ ⏵︎xxx <uspe> |
+| ☝ ⏵︎Update form       | ⛾ ⏵︎Update ⏵︎Notify approver <0fnb> ☝ ⏵︎Update form ⏵︎Notify approver <0kkn>       ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Update ⏵︎Notify approver <0fnb> ☝ ⏵︎Update <0nxe>                             ☑ ⏵︎xxx <uspe> |
+| ☝ ⏵︎Notify approver   | ⛾ ⏵︎Update ⏵︎Notify approver <0fnb> ☝ ⏵︎Update form ⏵︎Notify approver <0kkn>       ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update <1hp2> ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish <1sq4> ☑ ⏵︎xxx <uspe> |
+| ☝ ⏵︎Update            | ⛾ ⏵︎Update ⏵︎Notify approver <0fnb> ☝ ⏵︎Update <0nxe>                             ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Notify approver ⏵︎Update <1wzo> ☝ ⏵︎Update form ⏵︎Notify approver <1g3f>       ☑ ⏵︎xxx <uspe> |
+| ☝ ⏵︎Notify approver ⛞ | ⛾ ⏵︎Update ⏵︎Notify approver <0fnb> ☝ ⏵︎Update form ⏵︎Notify approver <0kkn>       ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Revise <01p7>                  ☝ ⏵︎Revise form <0zso>                        ☑ ⏵︎xxx <uspe> |
+| ☝ ⏵︎Update form       | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update <1hp2> ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish <1sq4> ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update <1hp2> ☝ ⏵︎Update <0nxe>                             ☑ ⏵︎xxx <uspe> |
+| ☝ ⏵︎Delete? form      | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update <1hp2> ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish <1sq4> ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update <1hp2> ☝ ⏵︎Delete ⏵︎Cancel <100g>                     ☑ ⏵︎xxx <uspe> |
+| ☝ ⏵︎Publish           | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update <1hp2> ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish <1sq4> ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Archive <1hgs>                 ☝ ⏵︎Archive <0fy4>                            ☑ ⏵︎xxx <uspe> |
+| ☝ ⏵︎Update ⛞          | ⛾ ⏵︎Update ⏵︎Notify approver <0fnb> ☝ ⏵︎Update <0nxe>                             ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Update ⏵︎Notify approver <0fnb> ☝ ⏵︎Update <0nxe>                             ☑ ⏵︎xxx <uspe> |
+| ☝ ⏵︎Update form       | ⛾ ⏵︎Notify approver ⏵︎Update <1wzo> ☝ ⏵︎Update form ⏵︎Notify approver <1g3f>       ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Notify approver ⏵︎Update <1wzo> ☝ ⏵︎Update <0nxe>                             ☑ ⏵︎xxx <uspe> |
+| ☝ ⏵︎Notify approver   | ⛾ ⏵︎Notify approver ⏵︎Update <1wzo> ☝ ⏵︎Update form ⏵︎Notify approver <1g3f>       ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update <1hp2> ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish <1sq4> ☑ ⏵︎xxx <uspe> |
+| ☝ ⏵︎Revise form       | ⛾ ⏵︎Revise <01p7>                  ☝ ⏵︎Revise form <0zso>                        ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Revise <01p7>                  ☝ ⏵︎Revise <1xs9>                             ☑ ⏵︎xxx <uspe> |
+| ☝ ⏵︎Delete            | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update <1hp2> ☝ ⏵︎Delete ⏵︎Cancel <100g>                     ☑ ⏵︎xxx <uspe> | ⛾ ◉End.success <1p88>             ☝ ◉End.success <0h6y>                        ☑ ⏵︎xxx <uspe> |
+| ☝ ⏵︎Cancel            | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update <1hp2> ☝ ⏵︎Delete ⏵︎Cancel <100g>                     ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update <1hp2> ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish <1sq4> ☑ ⏵︎xxx <uspe> |
+| ☝ ⏵︎Archive           | ⛾ ⏵︎Archive <1hgs>                 ☝ ⏵︎Archive <0fy4>                            ☑ ⏵︎xxx <uspe> | ⛾ ◉End.success <1p88>             ☝ ◉End.success <0h6y>                        ☑ ⏵︎xxx <uspe> |
+| ☝ ⏵︎Revise            | ⛾ ⏵︎Revise <01p7>                  ☝ ⏵︎Revise <1xs9>                             ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Revise ⏵︎Notify approver <1kl7> ☝ ⏵︎Revise form ⏵︎Notify approver <00n4>       ☑ ⏵︎xxx <uspe> |
+| ☝ ⏵︎Revise ⛞          | ⛾ ⏵︎Revise <01p7>                  ☝ ⏵︎Revise <1xs9>                             ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Revise <01p7>                  ☝ ⏵︎Revise <1xs9>                             ☑ ⏵︎xxx <uspe> |
+| ☝ ⏵︎Revise form       | ⛾ ⏵︎Revise ⏵︎Notify approver <1kl7> ☝ ⏵︎Revise form ⏵︎Notify approver <00n4>       ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Revise ⏵︎Notify approver <1kl7> ☝ ⏵︎Revise <1xs9>                             ☑ ⏵︎xxx <uspe> |
+| ☝ ⏵︎Notify approver   | ⛾ ⏵︎Revise ⏵︎Notify approver <1kl7> ☝ ⏵︎Revise form ⏵︎Notify approver <00n4>       ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update <1hp2> ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish <1sq4> ☑ ⏵︎xxx <uspe> |
++----------------------+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+)
   end
 end
 

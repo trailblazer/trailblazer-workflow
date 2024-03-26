@@ -20,8 +20,7 @@ module Trailblazer
             start_positions = iteration.start_positions
             start_task_position = iteration.start_task_position
 
-            events = states[start_positions]
-            events = [] if events.nil?
+            events = states[start_positions] || []
 
             events += [start_task_position]
 
@@ -35,9 +34,14 @@ module Trailblazer
           suggested_state_names = {}
 
           cli_rows = states.flat_map do |positions, catch_events|
-            suspend_tuples = positions.to_a.collect do |position|
-              Iteration::Set::Serialize.id_tuple_for(*position.to_a, lanes_cfg: lanes_cfg)
+            # suspend_tuples = positions.to_a.collect do |position|
+            #   Iteration::Set::Serialize.id_tuple_for(*position.to_a, lanes_cfg: lanes_cfg)
+            # end
+            suspend_id_hints = positions.to_a.collect do |position| # DISCUSS: are these positions ordered lifecycle,UI,reviewer, always?
+              [Introspect::Present.lane_label_for(*position.to_a, lanes_cfg: lanes_cfg), Test::Plan::Introspect.id_hint_for_suspend_position(*position.to_a)].join(" ")
             end
+
+            readable_suspend_id_hints = suspend_id_hints.join(" ")
 
             suggested_state_name = suggested_state_name_for(catch_events)
 
@@ -46,9 +50,8 @@ module Trailblazer
             # add an "ID hint" to the state name (part of the actual suspend gw's ID).
             if suggested_state_names[suggested_state_name]
               last_lane = catch_events[0].activity # DISCUSS: could be more explicit.
-              suspend_id_hint = positions[last_lane].to_h[:semantic][1][-8..]
 
-              suggested_state_name = "#{suggested_state_name} (#{suspend_id_hint})"
+              suggested_state_name = "#{suggested_state_name}"
             else
               suggested_state_names[suggested_state_name] = true
             end
@@ -57,9 +60,6 @@ module Trailblazer
               .collect { |event_position| Present.readable_name_for_catch_event(*event_position.to_a, lanes_cfg: lanes_cfg).inspect }
               .join(", ")
 
-            # key: row[:catch_events].collect { |position| Introspect::Present.id_for_position(position) }.uniq.sort
-
-
 
             Hash[
               "state name",
@@ -67,6 +67,9 @@ module Trailblazer
 
               "triggerable events",
               triggerable_events,
+
+              "Suspend IDs",
+              readable_suspend_id_hints,
 
               :positions,
               positions,
@@ -88,14 +91,14 @@ module Trailblazer
             .join("♦")
         end
 
-        # Render the actual table, for CLI.
+        # Render the actual table, for CLI and debugging.
         class Render < Trailblazer::Activity::Railway
           step Subprocess(StateTable)
           step :render
           def render(ctx, rows:, **)
             cli_rows = rows.collect { |row| row.merge("state name" => row["state name"].inspect) }
 
-            columns = ["state name", "triggerable events"]
+            columns = ["state name", "triggerable events", "Suspend IDs"]
             ctx[:table] = Present::Table.render(columns, cli_rows)
           end
         end
