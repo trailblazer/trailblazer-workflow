@@ -12,6 +12,10 @@ class IntrospectStateTableTest < Minitest::Spec
     assert_equal ctx[:rows].collect { |row| row["Suspend IDs"] }, [
       "⛾ 1hgs ☝ 0fy4 ☑ uspe", "⛾ 0wwf ☝ 14h0 ☑ uspe", "⛾ 0wwf ☝ 0wc2 ☑ uspe", "⛾ 1hp2 ☝ 100g ☑ uspe", "⛾ 01p7 ☝ 1xs9 ☑ uspe", "⛾ 01p7 ☝ 0zso ☑ uspe", "⛾ 1kl7 ☝ 00n4 ☑ uspe", "⛾ 0fnb ☝ 0nxe ☑ uspe", "⛾ 1hp2 ☝ 1sq4 ☑ uspe", "⛾ 0fnb ☝ 0kkn ☑ uspe", "⛾ 1wzo ☝ 1g3f ☑ uspe"
     ]
+
+    assert_equal ctx[:rows].collect { |row| row[:suspend_tuples] }, [
+[["lifecycle", "suspend-gw-to-catch-before-Activity_1hgscu3"], ["UI", "suspend-gw-to-catch-before-Activity_0fy41qq"], ["approver", "~suspend~"]], [["lifecycle", "suspend-gw-to-catch-before-Activity_0wwfenp"], ["UI", "suspend-Gateway_14h0q7a"], ["approver", "~suspend~"]], [["lifecycle", "suspend-gw-to-catch-before-Activity_0wwfenp"], ["UI", "suspend-gw-to-catch-before-Activity_0wc2mcq"], ["approver", "~suspend~"]], [["lifecycle", "suspend-Gateway_1hp2ssj"], ["UI", "suspend-Gateway_100g9dn"], ["approver", "~suspend~"]], [["lifecycle", "suspend-Gateway_01p7uj7"], ["UI", "suspend-Gateway_1xs96ik"], ["approver", "~suspend~"]], [["lifecycle", "suspend-Gateway_01p7uj7"], ["UI", "suspend-gw-to-catch-before-Activity_0zsock2"], ["approver", "~suspend~"]], [["lifecycle", "suspend-Gateway_1kl7pnm"], ["UI", "suspend-Gateway_00n4dsm"], ["approver", "~suspend~"]], [["lifecycle", "suspend-Gateway_0fnbg3r"], ["UI", "suspend-Gateway_0nxerxv"], ["approver", "~suspend~"]], [["lifecycle", "suspend-Gateway_1hp2ssj"], ["UI", "suspend-Gateway_1sq41iq"], ["approver", "~suspend~"]], [["lifecycle", "suspend-Gateway_0fnbg3r"], ["UI", "suspend-Gateway_0kknfje"], ["approver", "~suspend~"]], [["lifecycle", "suspend-Gateway_1wzosup"], ["UI", "suspend-Gateway_1g3fhu2"], ["approver", "~suspend~"]]
+    ]
   end
 
   it "StateTable.render" do

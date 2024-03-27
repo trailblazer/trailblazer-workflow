@@ -30,14 +30,16 @@ module Trailblazer
           ctx[:states] = states
         end
 
+        # DISCUSS: at some point, we need to separate data computing and rendering here.
         def render_data(ctx, states:, lanes_cfg:, **)
           suggested_state_names = {}
 
-          cli_rows = states.flat_map do |positions, catch_events|
-            # suspend_tuples = positions.to_a.collect do |position|
-            #   Iteration::Set::Serialize.id_tuple_for(*position.to_a, lanes_cfg: lanes_cfg)
-            # end
-            suspend_id_hints = positions.to_a.collect do |position| # DISCUSS: are these positions ordered lifecycle,UI,reviewer, always?
+          cli_rows = states.flat_map do |start_positions, catch_events|
+            suspend_tuples = start_positions.to_a.collect do |position|
+              Iteration::Set::Serialize.id_tuple_for(*position.to_a, lanes_cfg: lanes_cfg)
+            end
+
+            suspend_id_hints = start_positions.to_a.collect do |position| # DISCUSS: are these start_positions ordered lifecycle,UI,reviewer, always?
               [Introspect::Present.lane_label_for(*position.to_a, lanes_cfg: lanes_cfg), Test::Plan::Introspect.id_hint_for_suspend_position(*position.to_a)].join(" ")
             end
 
@@ -71,8 +73,11 @@ module Trailblazer
               "Suspend IDs",
               readable_suspend_id_hints,
 
-              :positions,
-              positions,
+              :suspend_tuples,
+              suspend_tuples,
+
+              :start_positions,
+              start_positions,
 
               :catch_events, # this is triggerable_events as objects, not human-readable.
               catch_events
