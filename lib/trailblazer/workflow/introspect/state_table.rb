@@ -45,6 +45,11 @@ module Trailblazer
 
             readable_suspend_id_hints = suspend_id_hints.join(" ")
 
+            catch_event_tuples = catch_events.collect do |position|
+              Iteration::Set::Serialize.id_tuple_for(*position.to_a, lanes_cfg: lanes_cfg)
+            end
+
+
             suggested_state_name = suggested_state_name_for(catch_events)
 
             suggested_state_name = "⏸︎ #{suggested_state_name}"
@@ -68,7 +73,10 @@ module Trailblazer
               suggested_state_name,
 
               "triggerable events",
-              triggerable_events,
+              triggerable_events, # DISCUSS: do we need that?
+
+              "Catch IDs",
+              catch_event_tuples,
 
               "Suspend IDs",
               readable_suspend_id_hints,
