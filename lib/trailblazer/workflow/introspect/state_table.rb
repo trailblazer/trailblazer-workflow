@@ -5,6 +5,10 @@ module Trailblazer
         # Each row represents a configuration of suspends aka "state".
         # The state knows its possible resume events.
         # DISCUSS: does the state know which state fields belong to it?
+
+      # A state table maintains all reachable combinations of suspend events in the collaboration ("configuration").
+      # Each state has a suggested state name that includes the reachable catch events per suspend.
+      # This structure usually only changes when modifying the diagram.
       class StateTable < Trailblazer::Activity::Railway
         step :aggregate_by_state
         step :render_data
@@ -51,17 +55,18 @@ module Trailblazer
 
 
             suggested_state_name = suggested_state_name_for(catch_events)
+            state_id_hint = suspend_id_hints.collect { |id_hint| id_hint[2] }.join("")
 
-            suggested_state_name = "⏸︎ #{suggested_state_name}"
+            suggested_state_name = "⏸︎ #{suggested_state_name} [#{state_id_hint}]"
 
             # add an "ID hint" to the state name (part of the actual suspend gw's ID).
-            if suggested_state_names[suggested_state_name]
-              last_lane = catch_events[0].activity # DISCUSS: could be more explicit.
+            # if suggested_state_names[suggested_state_name]
+            #   last_lane = catch_events[0].activity # DISCUSS: could be more explicit.
 
-              suggested_state_name = "#{suggested_state_name}"
-            else
-              suggested_state_names[suggested_state_name] = true
-            end
+            #   suggested_state_name = "#{suggested_state_name}"
+            # else
+            #   suggested_state_names[suggested_state_name] = true
+            # end
 
             triggerable_events = catch_events
               .collect { |event_position| Present.readable_name_for_catch_event(*event_position.to_a, lanes_cfg: lanes_cfg).inspect }
