@@ -15,28 +15,32 @@ class AdvanceTest < Minitest::Spec
     iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set::Deserialize.(JSON.parse(serialized_iteration_set), lanes_cfg: lanes_cfg)
 
     state_guards_from_user = {state_guards: {
-  "⏸︎ Create form                " => {guard: ->(ctx, model: nil, **) { model.nil? }, id: ["catch-before-Activity_0wc2mcq"]},
-  "⏸︎ Create                     " => {guard: ->(ctx, model: nil, **) { model.nil? }, id: ["catch-before-Activity_1psp91r"]},
-  "⏸︎ Update form♦Notify approver" => {guard: ->(ctx, model:, **) { model }, id: ["catch-before-Activity_1165bw9", "catch-before-Activity_1dt5di5"]},
-  "⏸︎ Update                     " => {guard: ->(ctx, model:, **) { model }, id: ["catch-before-Activity_0j78uzd"]},
-  "⏸︎ Delete? form♦Publish       " => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_0bsjggk", "catch-before-Activity_0ha7224"]},
-  "⏸︎ Revise form                " => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_0zsock2"]},
-  "⏸︎ Delete♦Cancel              " => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_15nnysv", "catch-before-Activity_1uhozy1"]},
-  "⏸︎ Archive                    " => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_0fy41qq"]},
-  "⏸︎ Revise                     " => {guard: ->(ctx, process_model:, **) { raise "implement me!" }, id: ["catch-before-Activity_1wiumzv"]},
+        "⏸︎ Archive [10u]"                          => {guard: ->(ctx, model:, **) { model.state == "⏸︎ Archive [10u]" }},
+        "⏸︎ Create [01u]"                           => {guard: ->(ctx, model: nil, **) { model.nil? }},
+        "⏸︎ Create form [00u]"                      => {guard: ->(ctx, model:, **) { model.state == "⏸︎ Create form [00u]" }},
+        "⏸︎ Delete♦Cancel [11u]"                    => {guard: ->(ctx, model:, **) { model.state == "⏸︎ Delete♦Cancel [11u]" }},
+        "⏸︎ Revise [01u]"                           => {guard: ->(ctx, model:, **) { model.state == "⏸︎ Revise [01u]" }},
+        "⏸︎ Revise form [00u]"                      => {guard: ->(ctx, model:, **) { model.state == "⏸︎ Revise form [00u]" }},
+        "⏸︎ Revise form♦Notify approver [10u]"      => {guard: ->(ctx, model:, **) { model.state == "⏸︎ Revise form♦Notify approver [10u]" }},
+        "⏸︎ Update [00u]"                           => {guard: ->(ctx, model:, **) { model.id == 1 }},
+        "⏸︎ Update form♦Delete? form♦Publish [11u]" => {guard: ->(ctx, model:, **) { model.state == "⏸︎ Update form♦Delete? form♦Publish [11u]" }},
+        "⏸︎ Update form♦Notify approver [00u]"      => {guard: ->(ctx, model:, **) { model.state == "⏸︎ Update form♦Notify approver [00u]" }},
+        "⏸︎ Update form♦Notify approver [11u]"      => {guard: ->(ctx, model:, **) { model.state == "⏸︎ Update form♦Notify approver [11u]" }},
 }}[:state_guards]
 
     # auto-generated. this structure could also hold alternative state names, etc.
     state_table = {
-  "⏸︎ Create form                " => {id: ["catch-before-Activity_0wc2mcq"]},
-  "⏸︎ Create                     " => {id: ["catch-before-Activity_1psp91r"]},
-  "⏸︎ Update form♦Notify approver" => {id: ["catch-before-Activity_1165bw9", "catch-before-Activity_1dt5di5"]},
-  "⏸︎ Update                     " => {id: ["catch-before-Activity_0j78uzd"]},
-  "⏸︎ Delete? form♦Publish       " => {id: ["catch-before-Activity_0bsjggk", "catch-before-Activity_0ha7224"]},
-  "⏸︎ Revise form                " => {id: ["catch-before-Activity_0zsock2"]},
-  "⏸︎ Delete♦Cancel              " => {id: ["catch-before-Activity_15nnysv", "catch-before-Activity_1uhozy1"]},
-  "⏸︎ Archive                    " => {id: ["catch-before-Activity_0fy41qq"]},
-  "⏸︎ Revise                     " => {id: ["catch-before-Activity_1wiumzv"]},
+    "⏸︎ Archive [10u]"                          => {suspend_tuples: [["lifecycle", "suspend-gw-to-catch-before-Activity_1hgscu3"], ["UI", "suspend-gw-to-catch-before-Activity_0fy41qq"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_0fy41qq"]]},
+    "⏸︎ Create [01u]"                           => {suspend_tuples: [["lifecycle", "suspend-gw-to-catch-before-Activity_0wwfenp"], ["UI", "suspend-Gateway_14h0q7a"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_1psp91r"]]},
+    "⏸︎ Create form [00u]"                      => {suspend_tuples: [["lifecycle", "suspend-gw-to-catch-before-Activity_0wwfenp"], ["UI", "suspend-gw-to-catch-before-Activity_0wc2mcq"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_0wc2mcq"]]},
+    "⏸︎ Delete♦Cancel [11u]"                    => {suspend_tuples: [["lifecycle", "suspend-Gateway_1hp2ssj"], ["UI", "suspend-Gateway_100g9dn"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_15nnysv"], ["UI", "catch-before-Activity_1uhozy1"]]},
+    "⏸︎ Revise [01u]"                           => {suspend_tuples: [["lifecycle", "suspend-Gateway_01p7uj7"], ["UI", "suspend-Gateway_1xs96ik"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_1wiumzv"]]},
+    "⏸︎ Revise form [00u]"                      => {suspend_tuples: [["lifecycle", "suspend-Gateway_01p7uj7"], ["UI", "suspend-gw-to-catch-before-Activity_0zsock2"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_0zsock2"]]},
+    "⏸︎ Revise form♦Notify approver [10u]"      => {suspend_tuples: [["lifecycle", "suspend-Gateway_1kl7pnm"], ["UI", "suspend-Gateway_00n4dsm"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_0zsock2"], ["UI", "catch-before-Activity_1dt5di5"]]},
+    "⏸︎ Update [00u]"                           => {suspend_tuples: [["lifecycle", "suspend-Gateway_0fnbg3r"], ["UI", "suspend-Gateway_0nxerxv"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_0j78uzd"]]},
+    "⏸︎ Update form♦Delete? form♦Publish [11u]" => {suspend_tuples: [["lifecycle", "suspend-Gateway_1hp2ssj"], ["UI", "suspend-Gateway_1sq41iq"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_1165bw9"], ["UI", "catch-before-Activity_0ha7224"], ["UI", "catch-before-Activity_0bsjggk"]]},
+    "⏸︎ Update form♦Notify approver [00u]"      => {suspend_tuples: [["lifecycle", "suspend-Gateway_0fnbg3r"], ["UI", "suspend-Gateway_0kknfje"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_1165bw9"], ["UI", "catch-before-Activity_1dt5di5"]]},
+    "⏸︎ Update form♦Notify approver [11u]"      => {suspend_tuples: [["lifecycle", "suspend-Gateway_1wzosup"], ["UI", "suspend-Gateway_1g3fhu2"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_1165bw9"], ["UI", "catch-before-Activity_1dt5di5"]]},
     }
 
     state_guards = Trailblazer::Workflow::Collaboration::StateGuards.from_user_hash( # TODO: unify naming, DSL.state_guards_from_user or something like that.

@@ -7,26 +7,59 @@ module Trailblazer
     # TODO:
     # * wire the event_valid? step to {invalid_state} terminus and handle that differently in the endpoint.
     class Advance <  Trailblazer::Activity::Railway
+      step task: :compute_catch_event_tuple
       step task: :find_position_options
       step task: :event_valid?, Output(:failure) => End(:not_authorized)
       step task: :advance
 
-      def find_position_options((ctx, flow_options), **)
+      def compute_catch_event_tuple((ctx, flow_options), **)
         iteration_set, event_label = flow_options[:iteration_set], flow_options[:event_label]
 
+        # DISCUSS: maybe it's not a future-compatible idea to use the {iteration_set} for the state label lookup?
+        #          it's probably cleaner to have a dedicated state_table.
+        #          it should compute activity/start_task (catch event ID) from the event label.
         planned_iteration = iteration_set.to_a.find { |iteration| iteration.event_label == event_label }
 
         # TODO: those positions could also be passed in manually, without using an Iteration::Set.
-        flow_options[:position_options] = position_options_from_iteration(planned_iteration) # :start_task_position and :start_positions
+        position_options_FIXME = position_options_from_iteration(planned_iteration) # :start_task_position and :start_positions
+        catch_event_tuple = Introspect::Iteration::Set::Serialize.id_tuple_for(*position_options_FIXME[:start_task_position].to_a, lanes_cfg: flow_options[:lanes]) # TODO: this should be done via state_table.
+
+         flow_options[:catch_event_tuple] = catch_event_tuple
+
+        return Activity::Right, [ctx, flow_options]
+      end
+
+      # TODO: Position object with "tuple", resolved activity/task, comment, lane label, etc. Instead of recomputing it continuously.
+
+
+      # TODO: this should be done in the StateGuard realm.
+      def find_position_options((ctx, flow_options), **)
+        state_resolver = flow_options[:state_guards]
+
+        _, state_options = state_resolver.(*flow_options[:catch_event_tuple], [ctx], **ctx.to_hash)
+
+
+        lanes_cfg = flow_options[:lanes]
+        fixme_tuples = state_options[:suspend_tuples].collect { |tuple| {"tuple" => tuple} }
+        fixme_label_2_activity = lanes_cfg.to_h.values.collect { |cfg| [cfg[:label], cfg[:activity]] }.to_h
+
+        flow_options[:position_options] = {
+          start_task_position: Introspect::Iteration::Set::Deserialize.position_from_tuple(*flow_options[:catch_event_tuple].to_a, label_2_activity: fixme_label_2_activity), # FIXME: we're doing the literal opposite one step before this.
+          lane_positions: Introspect::Iteration::Set::Deserialize.positions_from(fixme_tuples, label_2_activity: fixme_label_2_activity)
+        }
+
+        # raise flow_options[:position_options].inspect
 
         return Activity::Right, [ctx, flow_options]
       end
 
       def event_valid?((ctx, flow_options), **)
-        position_options = flow_options[:position_options]
-        state_guards = flow_options[:state_guards]
+        # position_options = flow_options[:position_options]
+        # state_guards = flow_options[:state_guards]
 
-        result = state_guards.(ctx, start_task_position: position_options[:start_task_position])
+        # result = state_guards.(ctx, start_task_position: position_options[:start_task_position])
+
+        result = flow_options[:position_options][:lane_positions].is_a? Trailblazer::Workflow::Collaboration::Positions # FIXME
 
         return result ? Activity::Right : Activity::Left, [ctx, flow_options]
       end

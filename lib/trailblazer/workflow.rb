@@ -10,6 +10,7 @@ require "trailblazer/workflow/generate"
 require "trailblazer/workflow/collaboration"
 require "trailblazer/workflow/collaboration/lane"
 require "trailblazer/workflow/collaboration/messages"
+require "trailblazer/workflow/collaboration/state"
 require "trailblazer/workflow/collaboration/state_guards" # DISCUSS: it's an Advance concept, not necessary for normal operations.
 require "trailblazer/workflow/event"
 
