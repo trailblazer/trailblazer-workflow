@@ -19,7 +19,7 @@ module Trailblazer
           # Execute those, the first returning true indicates the configuration.
           target_state = possible_states.find { |state_name, cfg| @guards.(state_name, args, **kws) }
 
-          raise "No state configuration found for #{state_name.inspect}" if target_state.nil?
+          raise "No state configuration found for #{possible_states.inspect}" if target_state.nil?
 
           target_state
         end

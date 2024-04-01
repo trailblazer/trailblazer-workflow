@@ -14,43 +14,7 @@ class AdvanceTest < Minitest::Spec
     serialized_iteration_set = JSON.dump(Trailblazer::Workflow::Introspect::Iteration::Set::Serialize.(iteration_set, lanes_cfg: lanes_cfg))
     iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set::Deserialize.(JSON.parse(serialized_iteration_set), lanes_cfg: lanes_cfg)
 
-    state_guards_from_user = {state_guards: {
-        "⏸︎ Archive [10u]"                          => {guard: ->(ctx, model:, **) { model.state == "⏸︎ Archive [10u]" }},
-        "⏸︎ Create [01u]"                           => {guard: ->(ctx, model: nil, **) { model.nil? }},
-        "⏸︎ Create form [00u]"                      => {guard: ->(ctx, model:, **) { model.state == "⏸︎ Create form [00u]" }},
-        "⏸︎ Delete♦Cancel [11u]"                    => {guard: ->(ctx, model:, **) { model.state == "⏸︎ Delete♦Cancel [11u]" }},
-        "⏸︎ Revise [01u]"                           => {guard: ->(ctx, model:, **) { model.state == "⏸︎ Revise [01u]" }},
-        "⏸︎ Revise form [00u]"                      => {guard: ->(ctx, model:, **) { model.state == "⏸︎ Revise form [00u]" }},
-        "⏸︎ Revise form♦Notify approver [10u]"      => {guard: ->(ctx, model:, **) { model.state == "⏸︎ Revise form♦Notify approver [10u]" }},
-        "⏸︎ Update [00u]"                           => {guard: ->(ctx, model:, **) { model.id == 1 }},
-        "⏸︎ Update form♦Delete? form♦Publish [11u]" => {guard: ->(ctx, model:, **) { model.state == "⏸︎ Update form♦Delete? form♦Publish [11u]" }},
-        "⏸︎ Update form♦Notify approver [00u]"      => {guard: ->(ctx, model:, **) { model.state == "⏸︎ Update form♦Notify approver [00u]" }},
-        "⏸︎ Update form♦Notify approver [11u]"      => {guard: ->(ctx, model:, **) { model.state == "⏸︎ Update form♦Notify approver [11u]" }},
-}}[:state_guards]
-
-    # auto-generated. this structure could also hold alternative state names, etc.
-    state_table = {
-    "⏸︎ Archive [10u]"                          => {suspend_tuples: [["lifecycle", "suspend-gw-to-catch-before-Activity_1hgscu3"], ["UI", "suspend-gw-to-catch-before-Activity_0fy41qq"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_0fy41qq"]]},
-    "⏸︎ Create [01u]"                           => {suspend_tuples: [["lifecycle", "suspend-gw-to-catch-before-Activity_0wwfenp"], ["UI", "suspend-Gateway_14h0q7a"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_1psp91r"]]},
-    "⏸︎ Create form [00u]"                      => {suspend_tuples: [["lifecycle", "suspend-gw-to-catch-before-Activity_0wwfenp"], ["UI", "suspend-gw-to-catch-before-Activity_0wc2mcq"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_0wc2mcq"]]},
-    "⏸︎ Delete♦Cancel [11u]"                    => {suspend_tuples: [["lifecycle", "suspend-Gateway_1hp2ssj"], ["UI", "suspend-Gateway_100g9dn"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_15nnysv"], ["UI", "catch-before-Activity_1uhozy1"]]},
-    "⏸︎ Revise [01u]"                           => {suspend_tuples: [["lifecycle", "suspend-Gateway_01p7uj7"], ["UI", "suspend-Gateway_1xs96ik"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_1wiumzv"]]},
-    "⏸︎ Revise form [00u]"                      => {suspend_tuples: [["lifecycle", "suspend-Gateway_01p7uj7"], ["UI", "suspend-gw-to-catch-before-Activity_0zsock2"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_0zsock2"]]},
-    "⏸︎ Revise form♦Notify approver [10u]"      => {suspend_tuples: [["lifecycle", "suspend-Gateway_1kl7pnm"], ["UI", "suspend-Gateway_00n4dsm"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_0zsock2"], ["UI", "catch-before-Activity_1dt5di5"]]},
-    "⏸︎ Update [00u]"                           => {suspend_tuples: [["lifecycle", "suspend-Gateway_0fnbg3r"], ["UI", "suspend-Gateway_0nxerxv"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_0j78uzd"]]},
-    "⏸︎ Update form♦Delete? form♦Publish [11u]" => {suspend_tuples: [["lifecycle", "suspend-Gateway_1hp2ssj"], ["UI", "suspend-Gateway_1sq41iq"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_1165bw9"], ["UI", "catch-before-Activity_0ha7224"], ["UI", "catch-before-Activity_0bsjggk"]]},
-    "⏸︎ Update form♦Notify approver [00u]"      => {suspend_tuples: [["lifecycle", "suspend-Gateway_0fnbg3r"], ["UI", "suspend-Gateway_0kknfje"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_1165bw9"], ["UI", "catch-before-Activity_1dt5di5"]]},
-    "⏸︎ Update form♦Notify approver [11u]"      => {suspend_tuples: [["lifecycle", "suspend-Gateway_1wzosup"], ["UI", "suspend-Gateway_1g3fhu2"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_1165bw9"], ["UI", "catch-before-Activity_1dt5di5"]]},
-    }
-
-    state_guards = Trailblazer::Workflow::Collaboration::StateGuards.from_user_hash( # TODO: unify naming, DSL.state_guards_from_user or something like that.
-      state_guards_from_user,
-      # iteration_set: iteration_set,
-      state_table: state_table,
-    )
-
-
-
+    state_guards = state_guards()
 
 
 =begin
@@ -81,12 +45,6 @@ class AdvanceTest < Minitest::Spec
 
     assert_equal signal.inspect, %(Trailblazer::Activity::Left)
 =end
-    Posting = Struct.new(:id) do
-      def self.find_by(id:)
-        new(id)
-      end
-    end
-
     require "trailblazer/endpoint"
     require "trailblazer/macro/model/find"
 
@@ -162,7 +120,7 @@ class AdvanceTest < Minitest::Spec
 # Update is invalid
     flow_options = original_flow_options.merge(event_label: "☝ ⏵︎Update",)
     Trailblazer::Endpoint::Runtime.({params: {id: 1}, seq: [], update: false}, adapter: action_adapter_with_model, default_matcher: default_matcher, matcher_context: self, flow_options: flow_options, &matcher_block)
-    assert_equal @render, %(failed: #<struct AdvanceTest::Posting id=1>)
+    assert_equal @render, %(failed: #<struct Minitest::Spec::Posting id=1, state="⏸︎ Update [00u]">)
 
 
 # {flow_options} is passed correctly through the entire run.

@@ -19,8 +19,8 @@ module Trailblazer
         # Compile error message when the expected lane position doesn't match the actual one.
         def self.error_message_for(position, expected_position, **options) # TODO: test me.
           # TODO: make the labels use UTF8 icons etc, as in the CLI rendering code.
-          expected_label = Introspect::Present.readable_name_for_suspend_or_terminus(*position.to_a, **options)
-          actual_label   = Introspect::Present.readable_name_for_suspend_or_terminus(*expected_position.to_a, **options)
+          actual_label = Introspect::Present.readable_name_for_suspend_or_terminus(*position.to_a, **options)
+          expected_label   = Introspect::Present.readable_name_for_suspend_or_terminus(*expected_position.to_a, **options)
 
           lane_label = Introspect::Present.lane_options_for_position(position, **options)[:label]
 
@@ -52,6 +52,7 @@ module Trailblazer
             return ctx # FIXME: test this!
           end
 
+          puts "finding #{event_label}"
           iteration = test_plan.to_a.find { |iteration| iteration.event_label == event_label }
 
           assert_positions configuration[:lane_positions], iteration.suspend_positions, test_plan: test_plan, **schema.to_h

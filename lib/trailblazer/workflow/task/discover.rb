@@ -82,7 +82,7 @@ module Trailblazer
             module_function
 
             def call(iteration_set, lanes_cfg:, test_filename:, namespace:, input: {}, iteration_set_filename:)
-              test_plan_comment_header = Trailblazer::Workflow::Test::Plan.render_comment_header(iteration_set, lanes_cfg: lanes_cfg)
+              test_plan_comment_header = Trailblazer::Workflow::Test::Plan::Introspect.(iteration_set, lanes_cfg: lanes_cfg)
 
               assertions = Trailblazer::Workflow::Test::Plan.for(iteration_set, lanes_cfg: lanes_cfg, input: input)
 
