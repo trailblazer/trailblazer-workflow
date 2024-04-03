@@ -1,7 +1,42 @@
 require "test_helper"
 
-# high-level unit test that shows the user's interface.
+# low-level private test
 class AdvanceTest < Minitest::Spec
+  it "legal, modelless advance" do
+    iteration_set, lanes_cfg, schema = fixtures()
+
+    ctx = {seq: []}
+    event_label = "☝ ⏵︎Create form" # TODO: "☝ ⏵︎Notify approver"
+
+    ctx_for_advance = Trailblazer::Context(ctx, {})
+    flow_options    = {
+      event_label:    event_label,
+      throw:          [],
+      iteration_set:  iteration_set,
+      **schema.to_h,
+
+      lanes: lanes_cfg, # FIXME: why is this not part of schema.to_h?
+      state_guards: state_guards(), # TODO: rename to {state_resolver}?
+    }
+
+    signal, (ctx, flow_options) = Trailblazer::Workflow::Advance.([ctx_for_advance, flow_options])
+
+    configuration = flow_options[:configuration]
+
+    assert_equal signal.inspect, %(#<Trailblazer::Activity::End semantic=:success>)
+
+
+    #@ unknown event label
+    flow_options = flow_options.merge!(event_label: "XXX unknown ~~~")
+
+    signal, (ctx, flow_options) = Trailblazer::Workflow::Advance.([ctx_for_advance, flow_options])
+
+    assert_equal signal.inspect, %(#<Trailblazer::Activity::End semantic=:invalid_event>)
+  end
+end
+
+# high-level unit test that shows the user's interface.
+class AdvanceEndpointTest < Minitest::Spec
   include BuildSchema
   include DiscoveredStates
 
@@ -67,11 +102,11 @@ class AdvanceTest < Minitest::Spec
 
 
     advance_protocol = Trailblazer::Endpoint.build_protocol(protocol_template, domain_activity: Trailblazer::Workflow::Advance,
-      protocol_block: ->(*) { {Trailblazer::Activity::Railway.Output(:not_authorized) => Trailblazer::Activity::Railway.Track(:not_authorized)} }
+      protocol_block: ->(*) { {Trailblazer::Activity::Railway.Output(:invalid_event) => Trailblazer::Activity::Railway.Track(:not_authorized)} }
     )
 
     advance_protocol_with_model = Trailblazer::Endpoint.build_protocol(protocol_template_with_model, domain_activity: Trailblazer::Workflow::Advance,
-      protocol_block: ->(*) { {Trailblazer::Activity::Railway.Output(:not_authorized) => Trailblazer::Activity::Railway.Track(:not_authorized)} }
+      protocol_block: ->(*) { {Trailblazer::Activity::Railway.Output(:invalid_event) => Trailblazer::Activity::Railway.Track(:not_authorized)} }
     )
 
     # action_protocol = Trailblazer::Endpoint.build_protocol(Protocol, domain_activity: Create, protocol_block: ->(*) { {Output(:not_found) => Track(:not_found)} })

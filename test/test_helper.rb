@@ -245,6 +245,6 @@ Minitest::Spec.class_eval do
     states, lanes_sorted, lanes_cfg, schema, message_flow = states()
     iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
 
-    @fixtures = [iteration_set, lanes_cfg]
+    @fixtures = [iteration_set, lanes_cfg, schema]
   end
 end
