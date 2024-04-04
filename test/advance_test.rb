@@ -27,7 +27,7 @@ class AdvanceTest < Minitest::Spec
 
 
   #@ unknown event label
-    flow_options = flow_options.merge!(event_label: "XXX unknown ~~~")
+    flow_options = flow_options.merge(event_label: "XXX unknown ~~~")
 
     signal, (ctx, flow_options) = Trailblazer::Workflow::Advance.([ctx_for_advance, flow_options])
 
@@ -35,7 +35,7 @@ class AdvanceTest < Minitest::Spec
 
   #@ no state guard matches
   # DISCUSS: should we stop on a different terminus here to indicate that we found matching guards, but they were all unmet?
-    flow_options = flow_options.merge!(event_label: "☝ ⏵︎Update")
+    flow_options = flow_options.merge(event_label: "☝ ⏵︎Update")
     ctx_for_advance = {model: Posting.new(state: "~~~undefined~~~")}
 
     signal, (ctx, flow_options) = Trailblazer::Workflow::Advance.([ctx_for_advance, flow_options])
@@ -136,6 +136,7 @@ class AdvanceEndpointTest < Minitest::Spec
 
     default_matcher = Trailblazer::Endpoint::Matcher.new(
       success:    ->(*) { raise },
+      not_authorized: ->(ctx, params:, **) { render "not authorized! #{params.inspect}" }
     )
     matcher_block = -> do
       success { |ctx, seq:, **| render seq.inspect }
@@ -162,11 +163,21 @@ class AdvanceEndpointTest < Minitest::Spec
     Trailblazer::Endpoint::Runtime.({params: {}, seq: []}, adapter: action_adapter_with_model, default_matcher: default_matcher, matcher_context: self, flow_options: flow_options, &matcher_block)
     assert_equal @render, %(404 not found: )
 
-# Update is invalid
+# Update input is invalid
     flow_options = original_flow_options.merge(event_label: "☝ ⏵︎Update",)
     Trailblazer::Endpoint::Runtime.({params: {id: 1}, seq: [], update: false}, adapter: action_adapter_with_model, default_matcher: default_matcher, matcher_context: self, flow_options: flow_options, &matcher_block)
     assert_equal @render, %(failed: #<struct Minitest::Spec::Posting id=1, state="⏸︎ Update [00u]">)
 
+#@ unknown event label (not_authorized)
+    flow_options = flow_options.merge(event_label: "XXX unknown ~~~")
+    Trailblazer::Endpoint::Runtime.({params: {id: 1}, seq: []}, adapter: action_adapter_with_model, default_matcher: default_matcher, matcher_context: self, flow_options: flow_options, &matcher_block)
+    assert_equal @render, %(not authorized! {:id=>1})
+
+  #@ no state guard matches
+  # DISCUSS: should we stop on a different terminus here to indicate that we found matching guards, but they were all unmet?
+    flow_options = flow_options.merge(event_label: "☝ ⏵︎Archive")
+    Trailblazer::Endpoint::Runtime.({params: {id: 1}, seq: []}, adapter: action_adapter_with_model, default_matcher: default_matcher, matcher_context: self, flow_options: flow_options, &matcher_block)
+    assert_equal @render, %(not authorized! {:id=>1})
 
 # {flow_options} is passed correctly through the entire run.
     flow_options = original_flow_options.merge(event_label: "☝ ⏵︎Update",)
