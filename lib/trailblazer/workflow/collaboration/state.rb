@@ -15,13 +15,10 @@ module Trailblazer
           # First, find all state guards that "point to" this catch event.
           possible_states = @table.find_all { |state_name, cfg| cfg[:catch_tuples].include?([lane_label, catch_id]) }
 
-
           # Execute those, the first returning true indicates the configuration.
           target_state = possible_states.find { |state_name, cfg| @guards.(state_name, args, **kws) }
 
-          raise "No state configuration found for #{possible_states.inspect}" if target_state.nil?
-
-          target_state
+          return target_state, possible_states
         end
       end
     end

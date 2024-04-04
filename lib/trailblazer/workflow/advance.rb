@@ -10,9 +10,12 @@ module Trailblazer
       terminus :invalid_event
 
       step task: :compute_catch_event_tuple, Output(:failure) => Track(:invalid_event)
-      step task: :find_position_options
+      step task: :find_position_options, Output(:failure) => Track(:invalid_event)
       step task: :advance
 
+      # DISCUSS: what we actually want here is a "catch_event tuple", the event we want to trigger.
+      #          currently, we receive an {event_label}, find that in the iteration_set and thus
+      #          get the catch event.
       def compute_catch_event_tuple((ctx, flow_options), **)
         iteration_set, event_label = flow_options[:iteration_set], flow_options[:event_label]
 
@@ -46,9 +49,11 @@ module Trailblazer
       def find_position_options((ctx, flow_options), **)
         state_resolver = flow_options[:state_guards]
 
-        _, state_options = state_resolver.(*flow_options[:catch_event_tuple], [ctx], **ctx.to_hash)
-
-        # raise unless state_options # FIXME.
+        (_, state_options), possible_states = state_resolver.(*flow_options[:catch_event_tuple], [ctx], **ctx.to_hash)
+        unless state_options
+          flow_options[:errors] = "No state configuration found for #{possible_states.inspect}"
+          return Activity::Left, [ctx, flow_options]  # FIXME: make this nicer.
+        end
 
         lanes_cfg = flow_options[:lanes]
         fixme_tuples = state_options[:suspend_tuples].collect { |tuple| {"tuple" => tuple} }

@@ -26,12 +26,22 @@ class AdvanceTest < Minitest::Spec
     assert_equal signal.inspect, %(#<Trailblazer::Activity::End semantic=:success>)
 
 
-    #@ unknown event label
+  #@ unknown event label
     flow_options = flow_options.merge!(event_label: "XXX unknown ~~~")
 
     signal, (ctx, flow_options) = Trailblazer::Workflow::Advance.([ctx_for_advance, flow_options])
 
     assert_equal signal.inspect, %(#<Trailblazer::Activity::End semantic=:invalid_event>)
+
+  #@ no state guard matches
+  # DISCUSS: should we stop on a different terminus here to indicate that we found matching guards, but they were all unmet?
+    flow_options = flow_options.merge!(event_label: "☝ ⏵︎Update")
+    ctx_for_advance = {model: Posting.new(state: "~~~undefined~~~")}
+
+    signal, (ctx, flow_options) = Trailblazer::Workflow::Advance.([ctx_for_advance, flow_options])
+
+    assert_equal signal.inspect, %(#<Trailblazer::Activity::End semantic=:invalid_event>)
+    assert_equal flow_options[:errors], %(No state configuration found for [[\"⏸︎ Update [00u]\", {:suspend_tuples=>[[\"lifecycle\", \"suspend-Gateway_0fnbg3r\"], [\"UI\", \"suspend-Gateway_0nxerxv\"], [\"approver\", \"~suspend~\"]], :catch_tuples=>[[\"UI\", \"catch-before-Activity_0j78uzd\"]]}]])
   end
 end
 
