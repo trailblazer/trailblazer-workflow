@@ -99,6 +99,9 @@ class GenerateTest < Minitest::Spec
 
     signal, (ctx, _) = Trailblazer::Workflow::Generate.invoke([{json_document: moderation_json}, {}])
 
+  #@ test {:structure}, which is the directly parsed graph
+    assert_equal ctx[:structure].messages.size, 18
+
     lanes = ctx[:intermediates]
 
     # pp lanes
