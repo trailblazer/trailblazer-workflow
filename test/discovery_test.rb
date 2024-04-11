@@ -28,6 +28,11 @@ class DiscoveryTest < Minitest::Spec
     end.join("\n")
   end
 
+  def stub_task(lane_label, task_label)
+    stub_task_name = "#{lane_label}:#{task_label}".to_sym # name of the method.
+    stub_task = Trailblazer::Activity::Testing.def_tasks(stub_task_name).method(stub_task_name)
+  end
+
   it "Discovery.call" do
     states, schema, lanes_cfg = self.class.states
 
@@ -36,7 +41,7 @@ class DiscoveryTest < Minitest::Spec
     assert_equal states.size, 21
 
     # Uncomment next line to render the test below! Hahaha
-    # puts render_assert_data_for_iteration_set(states, **schema.to_h)
+    puts render_assert_data_for_iteration_set(states, **schema.to_h)
     assert_data_for_iteration_set = [
       [
         # before: ["⛾ ⏵︎Create", "☝ ⏵︎Create form", "☑ ⏵︎xxx"] start:☝ ⏵︎Create form
@@ -58,21 +63,6 @@ class DiscoveryTest < Minitest::Spec
         # after: ["⛾ ⏵︎Create", "☝ ⏵︎Create", "☑ ⏵︎xxx"]
         ["suspend-gw-to-catch-before-Activity_0wwfenp", "suspend-Gateway_14h0q7a", "~suspend~"],
       ],
-
-      [
-        # before: ["⛾ ⏵︎Update ⏵︎Notify approver", "☝ ⏵︎Update form ⏵︎Notify approver", "☑ ⏵︎xxx"] start:☝ ⏵︎Update form
-        ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0kknfje", "~suspend~"], {start_id: "catch-before-Activity_1165bw9"},
-        # after: ["⛾ ⏵︎Update ⏵︎Notify approver", "☝ ⏵︎Update", "☑ ⏵︎xxx"]
-        ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0nxerxv", "~suspend~"],
-      ],
-
-      [
-        # before: ["⛾ ⏵︎Update ⏵︎Notify approver", "☝ ⏵︎Update form ⏵︎Notify approver", "☑ ⏵︎xxx"] start:☝ ⏵︎Notify approver
-        ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0kknfje", "~suspend~"], {start_id: "catch-before-Activity_1dt5di5"},
-        # after: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish", "☑ ⏵︎xxx"]
-        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "~suspend~"],
-      ],
-
       [
         # before: ["⛾ ⏵︎Update ⏵︎Notify approver", "☝ ⏵︎Update", "☑ ⏵︎xxx"] start:☝ ⏵︎Update
         ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0nxerxv", "~suspend~"], {start_id: "catch-before-Activity_0j78uzd"},
@@ -86,6 +76,21 @@ class DiscoveryTest < Minitest::Spec
         # after: ["⛾ ⏵︎Revise", "☝ ⏵︎Revise form", "☑ ⏵︎xxx"]
         ["suspend-Gateway_01p7uj7", "suspend-gw-to-catch-before-Activity_0zsock2", "~suspend~"],
       ],
+
+      [
+        # before: ["⛾ ⏵︎Update ⏵︎Notify approver", "☝ ⏵︎Update form ⏵︎Notify approver", "☑ ⏵︎xxx"] start:☝ ⏵︎Notify approver
+        ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0kknfje", "~suspend~"], {start_id: "catch-before-Activity_1dt5di5"},
+        # after: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish", "☑ ⏵︎xxx"]
+        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "~suspend~"],
+      ],
+
+      [
+        # before: ["⛾ ⏵︎Update ⏵︎Notify approver", "☝ ⏵︎Update form ⏵︎Notify approver", "☑ ⏵︎xxx"] start:☝ ⏵︎Update form
+        ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0kknfje", "~suspend~"], {start_id: "catch-before-Activity_1165bw9"},
+        # after: ["⛾ ⏵︎Update ⏵︎Notify approver", "☝ ⏵︎Update", "☑ ⏵︎xxx"]
+        ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0nxerxv", "~suspend~"],
+      ],
+
 
       [
         # before: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish", "☑ ⏵︎xxx"] start:☝ ⏵︎Update form
@@ -186,7 +191,11 @@ class DiscoveryTest < Minitest::Spec
       ],
     ]
 
+    # order = ->((_, start_cfg_a), (_, start_cfg_b)) { raise start_cfg_a.inspect }
+    # assert_data_for_iteration_set_sorted = assert_data_for_iteration_set.sort(&order)
+
     assert_data_for_iteration_set.each.with_index do |(start_position_ids, start_cfg, suspend_ids), index|
+      puts "@@@@@ #{index.inspect} #{states[index][:positions_before][1]}"
       # raise index.inspect
       assert_position_before states[index][:positions_before],
         start_position_ids,
@@ -210,6 +219,16 @@ class DiscoveryTest < Minitest::Spec
     assert_equal testing_json, File.read("test/iteration_json.json")
 
     iteration_set_from_json = Trailblazer::Workflow::Introspect::Iteration::Set::Deserialize.(JSON.parse(testing_json), lanes_cfg: lanes_cfg)
+
+
+# Deserialized iteration set test.
+    # pp iteration_set_from_json.to_a[0]
+    # raise
+
+
+
+
+
 
     assert_equal JSON.pretty_generate(Trailblazer::Workflow::Introspect::Iteration::Set::Serialize.(iteration_set, lanes_cfg: lanes_cfg)), JSON.pretty_generate(Trailblazer::Workflow::Introspect::Iteration::Set::Serialize.(iteration_set_from_json, lanes_cfg: lanes_cfg))
 
@@ -432,5 +451,7 @@ class TestPlanExecutionTest < Minitest::Spec
 
 
 # TODO: test error message for assert_advance
+# TODO: test invalid: true and {invalid_event} outcome
   end
+
 end

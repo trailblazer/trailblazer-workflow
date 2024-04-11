@@ -169,6 +169,7 @@ module DiscoveredStates
 
     states = Trailblazer::Workflow::Discovery.(
       schema,
+      json_filename: "test/fixtures/v1/moderation.json",
       initial_lane_positions: initial_lane_positions,
       start_task_position: start_task_position,
       message_flow: message_flow,
@@ -177,17 +178,17 @@ module DiscoveredStates
       run_multiple_times: {
          # We're "clicking" the [Notify_approver] button again, this time to get rejected.
           Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_notify_approver}").task => {ctx_merge: {
-              # decision: false, # TODO: this is how it should be.
-              :"approver:xxx" => Trailblazer::Activity::Left, # FIXME: {:decision} must be translated to {:"approver:xxx"}
+              decision: false, # TODO: this is how it should be.
+              # :"approver:xxx" => Trailblazer::Activity::Left, # FIXME: {:decision} must be translated to {:"approver:xxx"}
             }, config_payload: {outcome: :failure}},
 
         **Trailblazer::Workflow::Discovery::DSL.configuration_for_branching_from_user_hash(
           {
             # Click [UI Create] again, with invalid data.
-            ["UI", "Create"] => {ctx_merge: {:"lifecycle:Create" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
+            ["<ui> author workflow", "Create"] => {ctx_merge: {:"article moderation:Create" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
             # Click [UI Update] again, with invalid data.
-            ["UI", "Update"] => {ctx_merge: {:"lifecycle:Update" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
-            ["UI", "Revise"] => {ctx_merge: {:"lifecycle:Revise" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
+            ["<ui> author workflow", "Update"] => {ctx_merge: {:"article moderation:Update" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
+            ["<ui> author workflow", "Revise"] => {ctx_merge: {:"article moderation:Revise" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
           },
           **schema.to_h
         )

@@ -2,8 +2,7 @@ module Trailblazer
   module Workflow
     # User-friendly builder.
     def self.Collaboration(json_file:, lanes:, state_guards: nil)
-      json_from_pro = File.read(json_file)
-      signal, (ctx, _) = Trailblazer::Workflow::Generate.invoke([{json_document: json_from_pro}, {}])
+      ctx = Collaboration.structure_from_filename(json_file)
 
       lanes_options = lanes.collect do |json_id, user_options|
         lane_options = normalize_lane_options(**user_options)
@@ -42,6 +41,12 @@ module Trailblazer
     end
 
     class Collaboration
+      def self.structure_from_filename(json_file)
+        json_from_pro = File.read(json_file)
+        signal, (ctx, _) = Trailblazer::Workflow::Generate.invoke([{json_document: json_from_pro}, {}])
+        ctx
+      end
+
       class Schema
         def initialize(lanes:, message_flow:, state_guards: {}, options:{})
           @lanes        = lanes
@@ -141,7 +146,9 @@ module Trailblazer
             # FIXME: set the suspend that leads to the "start catch event" as the circuit's start_task, then we don't need this here.
             # Find the suspend that resumes the actual start_catch_event
             suspend_task, _ = activity.to_h[:circuit].to_h[:map].find { |task, _| task.is_a?(Trailblazer::Workflow::Event::Suspend) && task.to_h["resumes"].include?(start_catch_event_id) }
-
+ if suspend_task.nil?
+  pp activity.to_h[:circuit]
+end
             [
               activity,
               suspend_task # We deliberately have *one* position per lane, we're Synchronous.
@@ -180,10 +187,10 @@ module Trailblazer
             # break if (@options[:skip_message_from] || []).include?(flow[:throw][-1][0]) # FIXME: untested!
 
             debug_points_to = start_task_position[:activity].to_h[:circuit].to_h[:map][start_task_position[:task]]
-            Trailblazer::Activity::Introspect.Nodes(start_task_position[:activity], task: start_task_position[:task]).data
+            # Trailblazer::Activity::Introspect.Nodes(start_task_position[:activity], task: start_task_position[:task]).data
             puts "
 >>>>>>>>> FROM \033[1msuspend ---> #{debug_points_to}\033[0m"
-
+    puts "message from #{flow[:throw].last}"
             flow, start_task_position = receiver_task(flow, message_flow)
             # every time we "deliver" a message, we should check if it's allowed (meaning the receiving activity is actually in the targeted catch event)
           end
@@ -203,8 +210,8 @@ module Trailblazer
           # the *actual* receiver position, where we're currently.
           actual_receiver_task = lane_positions[activity] # receiver should always be in a suspend task/event gateway.
 
-#           puts "######### #{} | #{task}
-# >>>>>>>>> #{actual_receiver_task}"
+          puts "######### | #{task}
+>>>>>>>>> #{actual_receiver_task}"
 #           puts
 
           reachable_catch_events = actual_receiver_task.to_h["resumes"]
