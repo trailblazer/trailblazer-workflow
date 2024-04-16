@@ -42,7 +42,7 @@ module Trailblazer
       # Find all possible configurations for a {collaboration} by replacing
       # its tasks with mocks, and run through all possible paths.
       # FIXME: initial_lane_positions defaulting is not tested.
-      def call(collaboration, json_filename:, start_task_position:, run_multiple_times: {}, initial_lane_positions: Collaboration::Synchronous.initial_lane_positions(collaboration.to_h[:lanes]), message_flow:)
+      def call(json_filename:, start_lane:, dsl_options_for_run_multiple_times: {})
         # State discovery:
     # The idea is that we collect suspend events and follow up on all their resumes (catch) events.
     # We can't see into {Collaboration.call}, meaning we can really only collect public entry points,
@@ -58,8 +58,24 @@ module Trailblazer
 
         collaboration = Stub.(json_filename: json_filename)
 
+        initial_lane_positions = Collaboration::Synchronous.initial_lane_positions(collaboration.to_h[:lanes])
+        initial_lane_positions = Collaboration::Positions.new(initial_lane_positions.collect { |activity, task| Trailblazer::Workflow::Collaboration::Position.new(activity, task) }) # FIXME: initial_lane_positions should return {Collaboration::Positions}
+
+        start_activity = collaboration.to_h[:lanes].(json_id: start_lane)[:activity]
+        start_task = start_activity.to_h[:circuit].to_h[:start_task]
+        start_task_position = Collaboration::Position.new(start_activity, start_task)
+
+        message_flow = collaboration.to_h[:message_flow]
 
         original_lanes = collaboration.to_h[:lanes] # this dictates the order within created Positions.
+
+
+
+        run_multiple_times = Trailblazer::Workflow::Discovery::DSL.configuration_for_branching_from_user_hash(
+          dsl_options_for_run_multiple_times,
+          **collaboration.to_h
+        )
+
 
 
         resumes_to_invoke = [
@@ -110,7 +126,7 @@ module Trailblazer
           )
 
           discovered_state = discovered_state.merge(ctx_before: [ctx.inspect])
-
+puts "@@@@@ #{ctx.inspect}"
           configuration, (ctx, flow) = Trailblazer::Workflow::Collaboration::Synchronous.advance(
             [ctx, {throw: []}],
             {}, # circuit_options
@@ -167,7 +183,7 @@ module Trailblazer
           end
         end
 
-        return discovered_states
+        return discovered_states, collaboration
       end
 
       module DSL

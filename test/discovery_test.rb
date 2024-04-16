@@ -34,11 +34,31 @@ class DiscoveryTest < Minitest::Spec
   end
 
   it "Discovery.call" do
-    states, schema, lanes_cfg = self.class.states
+    states, schema = Trailblazer::Workflow::Discovery.(
+      json_filename: "test/fixtures/v1/posting-v10.json",
+      start_lane: "<ui> author workflow",
+
+      # TODO: allow translating the original "id" (?) to the stubbed.
+      dsl_options_for_run_multiple_times: {
+         # We're "clicking" the [Notify_approver] button again, this time to get rejected.
+          # Trailblazer::Activity::Introspect.Nodes(lane_activity_ui, id: "catch-before-#{ui_notify_approver}").task => {ctx_merge: {
+          #     decision: false, # TODO: this is how it should be.
+          #     # :"approver:xxx" => Trailblazer::Activity::Left, # FIXME: {:decision} must be translated to {:"approver:xxx"}
+          #   }, config_payload: {outcome: :failure}},
+
+        # Click [UI Create] again, with invalid data.
+        ["<ui> author workflow", "Create"] => {ctx_merge: {:"article moderation:Create" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
+        # Click [UI Update] again, with invalid data.
+        ["<ui> author workflow", "Update"] => {ctx_merge: {:"article moderation:Update" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
+        ["<ui> author workflow", "Revise"] => {ctx_merge: {:"article moderation:Revise" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
+      }
+    )
+
+
 
     # pp states
     # TODO: should we really assert the state table manually?
-    assert_equal states.size, 21
+    assert_equal states.size, 22
 
     # Uncomment next line to render the test below! Hahaha
     puts render_assert_data_for_iteration_set(states, **schema.to_h)
@@ -193,6 +213,8 @@ class DiscoveryTest < Minitest::Spec
 
     # order = ->((_, start_cfg_a), (_, start_cfg_b)) { raise start_cfg_a.inspect }
     # assert_data_for_iteration_set_sorted = assert_data_for_iteration_set.sort(&order)
+
+    lanes_cfg = schema.to_h[:lanes]
 
     assert_data_for_iteration_set.each.with_index do |(start_position_ids, start_cfg, suspend_ids), index|
       puts "@@@@@ #{index.inspect} #{states[index][:positions_before][1]}"
