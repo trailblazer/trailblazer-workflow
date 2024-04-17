@@ -137,7 +137,7 @@ module Trailblazer
             # "Deserialize" a {Position} from a serialized tuple.
             # Opposite of {#id_tuple_for}.
             def position_from_tuple(lane_label, task_id, label_2_activity:)
-              lane_activity = label_2_activity[lane_label]
+              lane_activity = label_2_activity.fetch(lane_label)
               task = Trailblazer::Activity::Introspect.Nodes(lane_activity, id: task_id).task
 
               Collaboration::Position.new(lane_activity, task)

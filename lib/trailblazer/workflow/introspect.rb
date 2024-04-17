@@ -33,9 +33,13 @@ module Trailblazer
         # Find the next connected task, usually outgoing from a catch event.
         def label_for_next_task(activity, catch_event)
           task_after_catch  = activity.to_h[:circuit].to_h[:map][catch_event][Trailblazer::Activity::Right]
-          next_node         = Trailblazer::Activity::Introspect.Nodes(activity, task: task_after_catch)
+          next_node = node_for_task(activity, task_after_catch)
 
           next_node.data[:label] || next_node.id
+        end
+
+        def node_for_task(activity, task)
+          Trailblazer::Activity::Introspect.Nodes(activity, task: task)
         end
 
         def readable_name_for_catch_event(activity, catch_event, show_lane_icon: true, lanes_cfg: {})
@@ -49,7 +53,11 @@ module Trailblazer
             ""
           end
 
-          event_label = label_for_next_task(activity, catch_event)
+          if label = node_for_task(activity, catch_event).data[:label] # for named catch events such as {accepted?}.
+            event_label = label
+          else
+            event_label = label_for_next_task(activity, catch_event)
+          end
 
           "#{lane_label}#{envelope_icon}#{event_label}"
         end

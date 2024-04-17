@@ -14,7 +14,7 @@ module Trailblazer
           stub_task = Trailblazer::Activity::Testing.def_tasks(stub_task_name).method(stub_task_name)
         end
 
-        def call(json_filename:)
+        def call(json_filename:, lane_hints:)
           ctx = Trailblazer::Workflow::Collaboration.structure_from_filename(json_filename)
 
           stubbed_lanes = ctx[:intermediates].collect do |json_id, intermediate|
@@ -23,13 +23,15 @@ module Trailblazer
             stubbed_tasks = lane_task_2_wiring.collect do |task_ref, wiring|
               [
                 task_label = task_ref.data[:label],
-                stub_task(json_id, task_label)
+                {
+                  task: stub_task(json_id, task_label) # FIXME: add outputs here for non-Railway operations.
+                }
               ]
             end.to_h
 
             [
               json_id,
-              {label: rand, icon: rand, implementation: stubbed_tasks}
+              {label: rand, icon: rand, implementation: stubbed_tasks}.merge(lane_hints[json_id])
             ]
           end.to_h
 
@@ -42,7 +44,7 @@ module Trailblazer
       # Find all possible configurations for a {collaboration} by replacing
       # its tasks with mocks, and run through all possible paths.
       # FIXME: initial_lane_positions defaulting is not tested.
-      def call(json_filename:, start_lane:, dsl_options_for_run_multiple_times: {})
+      def call(json_filename:, start_lane:, dsl_options_for_run_multiple_times: {}, lane_hints: {})
         # State discovery:
     # The idea is that we collect suspend events and follow up on all their resumes (catch) events.
     # We can't see into {Collaboration.call}, meaning we can really only collect public entry points,
@@ -56,7 +58,7 @@ module Trailblazer
         #          imply we start from a public resume and discover the path?
         # we could save work on {run_multiple_times} with this.
 
-        collaboration = Stub.(json_filename: json_filename)
+        collaboration = Stub.(json_filename: json_filename, lane_hints: lane_hints)
 
         initial_lane_positions = Collaboration::Synchronous.initial_lane_positions(collaboration.to_h[:lanes])
         initial_lane_positions = Collaboration::Positions.new(initial_lane_positions.collect { |activity, task| Trailblazer::Workflow::Collaboration::Position.new(activity, task) }) # FIXME: initial_lane_positions should return {Collaboration::Positions}

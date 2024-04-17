@@ -51,9 +51,15 @@ class DiscoveryTest < Minitest::Spec
         # Click [UI Update] again, with invalid data.
         ["<ui> author workflow", "Update"] => {ctx_merge: {:"article moderation:Update" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
         ["<ui> author workflow", "Revise"] => {ctx_merge: {:"article moderation:Revise" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
+      },
+
+      # DISCUSS: compute this automatically/from diagram?
+      lane_hints: {
+        "<ui> author workflow"  => {label: "UI", icon: "☝"},
+        "article moderation"    => {label: "lifecycle", icon: "⛾"},
+        "reviewer"              => {label: "editor", icon: "☑"},
       }
     )
-
 
 
     # pp states
@@ -61,155 +67,167 @@ class DiscoveryTest < Minitest::Spec
     assert_equal states.size, 22
 
     # Uncomment next line to render the test below! Hahaha
-    puts render_assert_data_for_iteration_set(states, **schema.to_h)
-    assert_data_for_iteration_set = [
+    # puts render_assert_data_for_iteration_set(states, **schema.to_h)
+
+    assert_data_for_iteration_set =
+    [
       [
-        # before: ["⛾ ⏵︎Create", "☝ ⏵︎Create form", "☑ ⏵︎xxx"] start:☝ ⏵︎Create form
-        ["suspend-gw-to-catch-before-Activity_0wwfenp", "suspend-gw-to-catch-before-Activity_0wc2mcq", "~suspend~"], {start_id: "catch-before-Activity_0wc2mcq"},
-        # after: ["⛾ ⏵︎Create", "☝ ⏵︎Create", "☑ ⏵︎xxx"]
-        ["suspend-gw-to-catch-before-Activity_0wwfenp", "suspend-Gateway_14h0q7a", "~suspend~"],
+        # before: ["⛾ ⏵︎Create", "☝ ⏵︎Create form", "☑ ⏵︎Notify"] start:☝ ⏵︎Create form
+        ["suspend-gw-to-catch-before-Activity_0wwfenp", "suspend-gw-to-catch-before-Activity_0wc2mcq", "suspend-gw-to-catch-before-Activity_05zip3u"], {start_id: "catch-before-Activity_0wc2mcq"},
+        # after: ["⛾ ⏵︎Create", "☝ ⏵︎Create", "☑ ⏵︎Notify"]
+        ["suspend-gw-to-catch-before-Activity_0wwfenp", "suspend-Gateway_14h0q7a", "suspend-gw-to-catch-before-Activity_05zip3u"],
       ],
 
       [
-        # before: ["⛾ ⏵︎Create", "☝ ⏵︎Create", "☑ ⏵︎xxx"] start:☝ ⏵︎Create
-        ["suspend-gw-to-catch-before-Activity_0wwfenp", "suspend-Gateway_14h0q7a", "~suspend~"], {start_id: "catch-before-Activity_1psp91r"},
-        # after: ["⛾ ⏵︎Update ⏵︎Notify approver", "☝ ⏵︎Update form ⏵︎Notify approver", "☑ ⏵︎xxx"]
-        ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0kknfje", "~suspend~"],
+        # before: ["⛾ ⏵︎Create", "☝ ⏵︎Create", "☑ ⏵︎Notify"] start:☝ ⏵︎Create
+        ["suspend-gw-to-catch-before-Activity_0wwfenp", "suspend-Gateway_14h0q7a", "suspend-gw-to-catch-before-Activity_05zip3u"], {start_id: "catch-before-Activity_1psp91r"},
+        # after: ["⛾ ⏵︎Update ⏵︎Notify approver", "☝ ⏵︎Update form ⏵︎Notify approver", "☑ ⏵︎Notify"]
+        ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0kknfje", "suspend-gw-to-catch-before-Activity_05zip3u"],
       ],
 
       [
-        # before: ["⛾ ⏵︎Create", "☝ ⏵︎Create", "☑ ⏵︎xxx"] start:☝ ⏵︎Create
-        ["suspend-gw-to-catch-before-Activity_0wwfenp", "suspend-Gateway_14h0q7a", "~suspend~"], {start_id: "catch-before-Activity_1psp91r"},
-        # after: ["⛾ ⏵︎Create", "☝ ⏵︎Create", "☑ ⏵︎xxx"]
-        ["suspend-gw-to-catch-before-Activity_0wwfenp", "suspend-Gateway_14h0q7a", "~suspend~"],
-      ],
-      [
-        # before: ["⛾ ⏵︎Update ⏵︎Notify approver", "☝ ⏵︎Update", "☑ ⏵︎xxx"] start:☝ ⏵︎Update
-        ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0nxerxv", "~suspend~"], {start_id: "catch-before-Activity_0j78uzd"},
-        # after: ["⛾ ⏵︎Notify approver ⏵︎Update", "☝ ⏵︎Update form ⏵︎Notify approver", "☑ ⏵︎xxx"]
-        ["suspend-Gateway_1wzosup", "suspend-Gateway_1g3fhu2", "~suspend~"],
+        # before: ["⛾ ⏵︎Create", "☝ ⏵︎Create", "☑ ⏵︎Notify"] start:☝ ⏵︎Create
+        ["suspend-gw-to-catch-before-Activity_0wwfenp", "suspend-Gateway_14h0q7a", "suspend-gw-to-catch-before-Activity_05zip3u"], {start_id: "catch-before-Activity_1psp91r"},
+        # after: ["⛾ ⏵︎Create", "☝ ⏵︎Create", "☑ ⏵︎Notify"]
+        ["suspend-gw-to-catch-before-Activity_0wwfenp", "suspend-Gateway_14h0q7a", "suspend-gw-to-catch-before-Activity_05zip3u"],
       ],
 
       [
-        # before: ["⛾ ⏵︎Update ⏵︎Notify approver", "☝ ⏵︎Update form ⏵︎Notify approver", "☑ ⏵︎xxx"] start:☝ ⏵︎Notify approver
-        ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0kknfje", "~suspend~"], {start_id: "catch-before-Activity_1dt5di5"},
-        # after: ["⛾ ⏵︎Revise", "☝ ⏵︎Revise form", "☑ ⏵︎xxx"]
-        ["suspend-Gateway_01p7uj7", "suspend-gw-to-catch-before-Activity_0zsock2", "~suspend~"],
+        # before: ["⛾ ⏵︎Update ⏵︎Notify approver", "☝ ⏵︎Update form ⏵︎Notify approver", "☑ ⏵︎Notify"] start:☝ ⏵︎Update form
+        ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0kknfje", "suspend-gw-to-catch-before-Activity_05zip3u"], {start_id: "catch-before-Activity_1165bw9"},
+        # after: ["⛾ ⏵︎Update ⏵︎Notify approver", "☝ ⏵︎Update", "☑ ⏵︎Notify"]
+        ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0nxerxv", "suspend-gw-to-catch-before-Activity_05zip3u"],
       ],
 
       [
-        # before: ["⛾ ⏵︎Update ⏵︎Notify approver", "☝ ⏵︎Update form ⏵︎Notify approver", "☑ ⏵︎xxx"] start:☝ ⏵︎Notify approver
-        ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0kknfje", "~suspend~"], {start_id: "catch-before-Activity_1dt5di5"},
-        # after: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish", "☑ ⏵︎xxx"]
-        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "~suspend~"],
+        # before: ["⛾ ⏵︎Update ⏵︎Notify approver", "☝ ⏵︎Update form ⏵︎Notify approver", "☑ ⏵︎Notify"] start:☝ ⏵︎Notify approver
+        ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0kknfje", "suspend-gw-to-catch-before-Activity_05zip3u"], {start_id: "catch-before-Activity_1dt5di5"},
+        # after: ["⛾ ⏵︎Reject ⏵︎Approve", "☝ ⏵︎suspend-Gateway_1sq41iq ⏵︎suspend-gw-to-catch-before-Activity_0zsock2", "☑ ⏵︎Approve ⏵︎Reject"]
+        ["suspend-Gateway_0y3f8tz", "suspend-Gateway_063k28q", "suspend-Gateway_02veylj"],
       ],
 
       [
-        # before: ["⛾ ⏵︎Update ⏵︎Notify approver", "☝ ⏵︎Update form ⏵︎Notify approver", "☑ ⏵︎xxx"] start:☝ ⏵︎Update form
-        ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0kknfje", "~suspend~"], {start_id: "catch-before-Activity_1165bw9"},
-        # after: ["⛾ ⏵︎Update ⏵︎Notify approver", "☝ ⏵︎Update", "☑ ⏵︎xxx"]
-        ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0nxerxv", "~suspend~"],
-      ],
-
-
-      [
-        # before: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish", "☑ ⏵︎xxx"] start:☝ ⏵︎Update form
-        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "~suspend~"], {start_id: "catch-before-Activity_1165bw9"},
-        # after: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Update", "☑ ⏵︎xxx"]
-        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_0nxerxv", "~suspend~"],
+        # before: ["⛾ ⏵︎Update ⏵︎Notify approver", "☝ ⏵︎Update", "☑ ⏵︎Notify"] start:☝ ⏵︎Update
+        ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0nxerxv", "suspend-gw-to-catch-before-Activity_05zip3u"], {start_id: "catch-before-Activity_0j78uzd"},
+        # after: ["⛾ ⏵︎Notify approver ⏵︎Update", "☝ ⏵︎Update form ⏵︎Notify approver", "☑ ⏵︎Notify"]
+        ["suspend-Gateway_1wzosup", "suspend-Gateway_1g3fhu2", "suspend-gw-to-catch-before-Activity_05zip3u"],
       ],
 
       [
-        # before: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish", "☑ ⏵︎xxx"] start:☝ ⏵︎Delete? form
-        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "~suspend~"], {start_id: "catch-before-Activity_0ha7224"},
-        # after: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Delete ⏵︎Cancel", "☑ ⏵︎xxx"]
-        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_100g9dn", "~suspend~"],
+        # before: ["⛾ ⏵︎Reject ⏵︎Approve", "☝ ⏵︎suspend-Gateway_1sq41iq ⏵︎suspend-gw-to-catch-before-Activity_0zsock2", "☑ ⏵︎Approve ⏵︎Reject"] start:☑ ⏵︎Approve
+        ["suspend-Gateway_0y3f8tz", "suspend-Gateway_063k28q", "suspend-Gateway_02veylj"], {start_id: "catch-before-Activity_13fw5nm"},
+        # after: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish", "☑ ⏵︎Notify"]
+        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "suspend-gw-to-catch-before-Activity_05zip3u"],
       ],
 
       [
-        # before: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish", "☑ ⏵︎xxx"] start:☝ ⏵︎Publish
-        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "~suspend~"], {start_id: "catch-before-Activity_0bsjggk"},
-        # after: ["⛾ ⏵︎Archive", "☝ ⏵︎Archive", "☑ ⏵︎xxx"]
-        ["suspend-gw-to-catch-before-Activity_1hgscu3", "suspend-gw-to-catch-before-Activity_0fy41qq", "~suspend~"],
+        # before: ["⛾ ⏵︎Reject ⏵︎Approve", "☝ ⏵︎suspend-Gateway_1sq41iq ⏵︎suspend-gw-to-catch-before-Activity_0zsock2", "☑ ⏵︎Approve ⏵︎Reject"] start:☑ ⏵︎Reject
+        ["suspend-Gateway_0y3f8tz", "suspend-Gateway_063k28q", "suspend-Gateway_02veylj"], {start_id: "catch-before-Activity_1j7d8sd"},
+        # after: ["⛾ ⏵︎Revise", "☝ ⏵︎Revise form", "☑ ⏵︎Notify"]
+        ["suspend-Gateway_01p7uj7", "suspend-gw-to-catch-before-Activity_0zsock2", "suspend-gw-to-catch-before-Activity_05zip3u"],
       ],
 
       [
-        # before: ["⛾ ⏵︎Update ⏵︎Notify approver", "☝ ⏵︎Update", "☑ ⏵︎xxx"] start:☝ ⏵︎Update
-        ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0nxerxv", "~suspend~"], {start_id: "catch-before-Activity_0j78uzd"},
-        # after: ["⛾ ⏵︎Update ⏵︎Notify approver", "☝ ⏵︎Update", "☑ ⏵︎xxx"]
-        ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0nxerxv", "~suspend~"],
+        # before: ["⛾ ⏵︎Update ⏵︎Notify approver", "☝ ⏵︎Update", "☑ ⏵︎Notify"] start:☝ ⏵︎Update
+        ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0nxerxv", "suspend-gw-to-catch-before-Activity_05zip3u"], {start_id: "catch-before-Activity_0j78uzd"},
+        # after: ["⛾ ⏵︎Update ⏵︎Notify approver", "☝ ⏵︎Update", "☑ ⏵︎Notify"]
+        ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0nxerxv", "suspend-gw-to-catch-before-Activity_05zip3u"],
       ],
 
       [
-        # before: ["⛾ ⏵︎Notify approver ⏵︎Update", "☝ ⏵︎Update form ⏵︎Notify approver", "☑ ⏵︎xxx"] start:☝ ⏵︎Update form
-        ["suspend-Gateway_1wzosup", "suspend-Gateway_1g3fhu2", "~suspend~"], {start_id: "catch-before-Activity_1165bw9"},
-        # after: ["⛾ ⏵︎Notify approver ⏵︎Update", "☝ ⏵︎Update", "☑ ⏵︎xxx"]
-        ["suspend-Gateway_1wzosup", "suspend-Gateway_0nxerxv", "~suspend~"],
+        # before: ["⛾ ⏵︎Notify approver ⏵︎Update", "☝ ⏵︎Update form ⏵︎Notify approver", "☑ ⏵︎Notify"] start:☝ ⏵︎Update form
+        ["suspend-Gateway_1wzosup", "suspend-Gateway_1g3fhu2", "suspend-gw-to-catch-before-Activity_05zip3u"], {start_id: "catch-before-Activity_1165bw9"},
+        # after: ["⛾ ⏵︎Notify approver ⏵︎Update", "☝ ⏵︎Update", "☑ ⏵︎Notify"]
+        ["suspend-Gateway_1wzosup", "suspend-Gateway_0nxerxv", "suspend-gw-to-catch-before-Activity_05zip3u"],
       ],
 
       [
-        # before: ["⛾ ⏵︎Notify approver ⏵︎Update", "☝ ⏵︎Update form ⏵︎Notify approver", "☑ ⏵︎xxx"] start:☝ ⏵︎Notify approver
-        ["suspend-Gateway_1wzosup", "suspend-Gateway_1g3fhu2", "~suspend~"], {start_id: "catch-before-Activity_1dt5di5"},
-        # after: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish", "☑ ⏵︎xxx"]
-        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "~suspend~"],
+        # before: ["⛾ ⏵︎Notify approver ⏵︎Update", "☝ ⏵︎Update form ⏵︎Notify approver", "☑ ⏵︎Notify"] start:☝ ⏵︎Notify approver
+        ["suspend-Gateway_1wzosup", "suspend-Gateway_1g3fhu2", "suspend-gw-to-catch-before-Activity_05zip3u"], {start_id: "catch-before-Activity_1dt5di5"},
+        # after: ["⛾ ⏵︎Reject ⏵︎Approve", "☝ ⏵︎suspend-Gateway_1sq41iq ⏵︎suspend-gw-to-catch-before-Activity_0zsock2", "☑ ⏵︎Approve ⏵︎Reject"]
+        ["suspend-Gateway_0y3f8tz", "suspend-Gateway_063k28q", "suspend-Gateway_02veylj"],
       ],
 
       [
-        # before: ["⛾ ⏵︎Revise", "☝ ⏵︎Revise form", "☑ ⏵︎xxx"] start:☝ ⏵︎Revise form
-        ["suspend-Gateway_01p7uj7", "suspend-gw-to-catch-before-Activity_0zsock2", "~suspend~"], {start_id: "catch-before-Activity_0zsock2"},
-        # after: ["⛾ ⏵︎Revise", "☝ ⏵︎Revise", "☑ ⏵︎xxx"]
-        ["suspend-Gateway_01p7uj7", "suspend-Gateway_1xs96ik", "~suspend~"],
+        # before: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish", "☑ ⏵︎Notify"] start:☝ ⏵︎Update form
+        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "suspend-gw-to-catch-before-Activity_05zip3u"], {start_id: "catch-before-Activity_1165bw9"},
+        # after: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Update", "☑ ⏵︎Notify"]
+        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_0nxerxv", "suspend-gw-to-catch-before-Activity_05zip3u"],
       ],
 
       [
-        # before: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Delete ⏵︎Cancel", "☑ ⏵︎xxx"] start:☝ ⏵︎Delete
-        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_100g9dn", "~suspend~"], {start_id: "catch-before-Activity_15nnysv"},
-        # after: ["⛾ ◉End.success", "☝ ◉End.success", "☑ ⏵︎xxx"]
-        ["Event_1p8873y", "Event_0h6yhq6", "~suspend~"],
+        # before: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish", "☑ ⏵︎Notify"] start:☝ ⏵︎Delete? form
+        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "suspend-gw-to-catch-before-Activity_05zip3u"], {start_id: "catch-before-Activity_0ha7224"},
+        # after: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Delete ⏵︎Cancel", "☑ ⏵︎Notify"]
+        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_100g9dn", "suspend-gw-to-catch-before-Activity_05zip3u"],
       ],
 
       [
-        # before: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Delete ⏵︎Cancel", "☑ ⏵︎xxx"] start:☝ ⏵︎Cancel
-        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_100g9dn", "~suspend~"], {start_id: "catch-before-Activity_1uhozy1"},
-        # after: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish", "☑ ⏵︎xxx"]
-        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "~suspend~"],
+        # before: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish", "☑ ⏵︎Notify"] start:☝ ⏵︎Publish
+        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "suspend-gw-to-catch-before-Activity_05zip3u"], {start_id: "catch-before-Activity_0bsjggk"},
+        # after: ["⛾ ⏵︎Archive", "☝ ⏵︎Archive", "☑ ⏵︎Notify"]
+        ["suspend-gw-to-catch-before-Activity_1hgscu3", "suspend-gw-to-catch-before-Activity_0fy41qq", "suspend-gw-to-catch-before-Activity_05zip3u"],
       ],
 
       [
-        # before: ["⛾ ⏵︎Archive", "☝ ⏵︎Archive", "☑ ⏵︎xxx"] start:☝ ⏵︎Archive
-        ["suspend-gw-to-catch-before-Activity_1hgscu3", "suspend-gw-to-catch-before-Activity_0fy41qq", "~suspend~"], {start_id: "catch-before-Activity_0fy41qq"},
-        # after: ["⛾ ◉End.success", "☝ ◉End.success", "☑ ⏵︎xxx"]
-        ["Event_1p8873y", "Event_0h6yhq6", "~suspend~"],
+        # before: ["⛾ ⏵︎Revise", "☝ ⏵︎Revise form", "☑ ⏵︎Notify"] start:☝ ⏵︎Revise form
+        ["suspend-Gateway_01p7uj7", "suspend-gw-to-catch-before-Activity_0zsock2", "suspend-gw-to-catch-before-Activity_05zip3u"], {start_id: "catch-before-Activity_0zsock2"},
+        # after: ["⛾ ⏵︎Revise", "☝ ⏵︎Revise", "☑ ⏵︎Notify"]
+        ["suspend-Gateway_01p7uj7", "suspend-Gateway_1xs96ik", "suspend-gw-to-catch-before-Activity_05zip3u"],
       ],
 
       [
-        # before: ["⛾ ⏵︎Revise", "☝ ⏵︎Revise", "☑ ⏵︎xxx"] start:☝ ⏵︎Revise
-        ["suspend-Gateway_01p7uj7", "suspend-Gateway_1xs96ik", "~suspend~"], {start_id: "catch-before-Activity_1wiumzv"},
-        # after: ["⛾ ⏵︎Revise ⏵︎Notify approver", "☝ ⏵︎Revise form ⏵︎Notify approver", "☑ ⏵︎xxx"]
-        ["suspend-Gateway_1kl7pnm", "suspend-Gateway_00n4dsm", "~suspend~"],
+        # before: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Delete ⏵︎Cancel", "☑ ⏵︎Notify"] start:☝ ⏵︎Delete
+        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_100g9dn", "suspend-gw-to-catch-before-Activity_05zip3u"], {start_id: "catch-before-Activity_15nnysv"},
+        # after: ["⛾ ◉End.success", "☝ ◉End.success", "☑ ⏵︎Notify"]
+        ["Event_1p8873y", "Event_0h6yhq6", "suspend-gw-to-catch-before-Activity_05zip3u"],
       ],
 
       [
-        # before: ["⛾ ⏵︎Revise", "☝ ⏵︎Revise", "☑ ⏵︎xxx"] start:☝ ⏵︎Revise
-        ["suspend-Gateway_01p7uj7", "suspend-Gateway_1xs96ik", "~suspend~"], {start_id: "catch-before-Activity_1wiumzv"},
-        # after: ["⛾ ⏵︎Revise", "☝ ⏵︎Revise", "☑ ⏵︎xxx"]
-        ["suspend-Gateway_01p7uj7", "suspend-Gateway_1xs96ik", "~suspend~"],
+        # before: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Delete ⏵︎Cancel", "☑ ⏵︎Notify"] start:☝ ⏵︎Cancel
+        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_100g9dn", "suspend-gw-to-catch-before-Activity_05zip3u"], {start_id: "catch-before-Activity_1uhozy1"},
+        # after: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish", "☑ ⏵︎Notify"]
+        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "suspend-gw-to-catch-before-Activity_05zip3u"],
       ],
 
       [
-        # before: ["⛾ ⏵︎Revise ⏵︎Notify approver", "☝ ⏵︎Revise form ⏵︎Notify approver", "☑ ⏵︎xxx"] start:☝ ⏵︎Revise form
-        ["suspend-Gateway_1kl7pnm", "suspend-Gateway_00n4dsm", "~suspend~"], {start_id: "catch-before-Activity_0zsock2"},
-        # after: ["⛾ ⏵︎Revise ⏵︎Notify approver", "☝ ⏵︎Revise", "☑ ⏵︎xxx"]
-        ["suspend-Gateway_1kl7pnm", "suspend-Gateway_1xs96ik", "~suspend~"],
+        # before: ["⛾ ⏵︎Archive", "☝ ⏵︎Archive", "☑ ⏵︎Notify"] start:☝ ⏵︎Archive
+        ["suspend-gw-to-catch-before-Activity_1hgscu3", "suspend-gw-to-catch-before-Activity_0fy41qq", "suspend-gw-to-catch-before-Activity_05zip3u"], {start_id: "catch-before-Activity_0fy41qq"},
+        # after: ["⛾ ◉End.success", "☝ ◉End.success", "☑ ⏵︎Notify"]
+        ["Event_1p8873y", "Event_0h6yhq6", "suspend-gw-to-catch-before-Activity_05zip3u"],
       ],
 
       [
-        # before: ["⛾ ⏵︎Revise ⏵︎Notify approver", "☝ ⏵︎Revise form ⏵︎Notify approver", "☑ ⏵︎xxx"] start:☝ ⏵︎Notify approver
-        ["suspend-Gateway_1kl7pnm", "suspend-Gateway_00n4dsm", "~suspend~"], {start_id: "catch-before-Activity_1dt5di5"},
-        # after: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish", "☑ ⏵︎xxx"]
-        ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "~suspend~"],
+        # before: ["⛾ ⏵︎Revise", "☝ ⏵︎Revise", "☑ ⏵︎Notify"] start:☝ ⏵︎Revise
+        ["suspend-Gateway_01p7uj7", "suspend-Gateway_1xs96ik", "suspend-gw-to-catch-before-Activity_05zip3u"], {start_id: "catch-before-Activity_1wiumzv"},
+        # after: ["⛾ ⏵︎Revise ⏵︎Notify approver", "☝ ⏵︎Revise form ⏵︎Notify approver", "☑ ⏵︎Notify"]
+        ["suspend-Gateway_1kl7pnm", "suspend-Gateway_1xnsssa", "suspend-gw-to-catch-before-Activity_05zip3u"],
       ],
+
+      [
+        # before: ["⛾ ⏵︎Revise", "☝ ⏵︎Revise", "☑ ⏵︎Notify"] start:☝ ⏵︎Revise
+        ["suspend-Gateway_01p7uj7", "suspend-Gateway_1xs96ik", "suspend-gw-to-catch-before-Activity_05zip3u"], {start_id: "catch-before-Activity_1wiumzv"},
+        # after: ["⛾ ⏵︎Revise", "☝ ⏵︎Revise", "☑ ⏵︎Notify"]
+        ["suspend-Gateway_01p7uj7", "suspend-Gateway_1xs96ik", "suspend-gw-to-catch-before-Activity_05zip3u"],
+      ],
+
+      [
+        # before: ["⛾ ⏵︎Revise ⏵︎Notify approver", "☝ ⏵︎Revise form ⏵︎Notify approver", "☑ ⏵︎Notify"] start:☝ ⏵︎Revise form
+        ["suspend-Gateway_1kl7pnm", "suspend-Gateway_1xnsssa", "suspend-gw-to-catch-before-Activity_05zip3u"], {start_id: "catch-before-Activity_0zsock2"},
+        # after: ["⛾ ⏵︎Revise ⏵︎Notify approver", "☝ ⏵︎Revise", "☑ ⏵︎Notify"]
+        ["suspend-Gateway_1kl7pnm", "suspend-Gateway_1xs96ik", "suspend-gw-to-catch-before-Activity_05zip3u"],
+      ],
+
+      [
+        # before: ["⛾ ⏵︎Revise ⏵︎Notify approver", "☝ ⏵︎Revise form ⏵︎Notify approver", "☑ ⏵︎Notify"] start:☝ ⏵︎Notify approver
+        ["suspend-Gateway_1kl7pnm", "suspend-Gateway_1xnsssa", "suspend-gw-to-catch-before-Activity_05zip3u"], {start_id: "catch-before-Activity_1dt5di5"},
+        # after: ["⛾ ⏵︎Reject ⏵︎Approve", "☝ ⏵︎suspend-Gateway_1sq41iq ⏵︎suspend-gw-to-catch-before-Activity_0zsock2", "☑ ⏵︎Approve ⏵︎Reject"]
+        ["suspend-Gateway_0y3f8tz", "suspend-Gateway_063k28q", "suspend-Gateway_02veylj"],
+      ]
+
     ]
+
+
 
     # order = ->((_, start_cfg_a), (_, start_cfg_b)) { raise start_cfg_a.inspect }
     # assert_data_for_iteration_set_sorted = assert_data_for_iteration_set.sort(&order)
@@ -217,7 +235,7 @@ class DiscoveryTest < Minitest::Spec
     lanes_cfg = schema.to_h[:lanes]
 
     assert_data_for_iteration_set.each.with_index do |(start_position_ids, start_cfg, suspend_ids), index|
-      puts "@@@@@ #{index.inspect} #{states[index][:positions_before][1]}"
+      # puts "@@@@@ #{index.inspect} #{states[index][:positions_before][1]}"
       # raise index.inspect
       assert_position_before states[index][:positions_before],
         start_position_ids,
@@ -259,7 +277,7 @@ class DiscoveryTest < Minitest::Spec
     # pp iteration_set_from_json.to_a.collect { |iteration| iteration.to_h }[0]
 
     # TODO: test {Set#to_a}
-    assert_equal iteration_set_from_json.to_a.size, 21
+    assert_equal iteration_set_from_json.to_a.size, 22
   end
 
   # Asserts
@@ -298,7 +316,7 @@ class DiscoveryTest < Minitest::Spec
     iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
 
     # DISCUSS: this table shows redundant events, is that from success/failure discovery?
-    cli_state_table_with_ids = Trailblazer::Workflow::Introspect::EventTable.(iteration_set, render_ids: true, hide_lanes: ["approver"], lanes_cfg: lanes_cfg)
+    cli_state_table_with_ids = Trailblazer::Workflow::Introspect::EventTable.(iteration_set, render_ids: true, hide_lanes: ["editor"], lanes_cfg: lanes_cfg)
 puts cli_state_table_with_ids
 assert_equal cli_state_table_with_ids,
 %(+-------------------------------+---------------------------------------------+---------------------------------------------+
@@ -316,20 +334,22 @@ assert_equal cli_state_table_with_ids,
 | catch-before-Activity_1dt5di5 | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0kknfje                     |
 | ☝ ⏵︎Update                     | ⛾ ⏵︎Update ⏵︎Notify approver                  | ☝ ⏵︎Update                                   |
 | catch-before-Activity_0j78uzd | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0nxerxv                     |
-| ☝ ⏵︎Notify approver            | ⛾ ⏵︎Update ⏵︎Notify approver                  | ☝ ⏵︎Update form ⏵︎Notify approver             |
-| catch-before-Activity_1dt5di5 | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0kknfje                     |
-| ☝ ⏵︎Update form                | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update                  | ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish       |
-| catch-before-Activity_1165bw9 | suspend-Gateway_1hp2ssj                     | suspend-Gateway_1sq41iq                     |
-| ☝ ⏵︎Delete? form               | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update                  | ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish       |
-| catch-before-Activity_0ha7224 | suspend-Gateway_1hp2ssj                     | suspend-Gateway_1sq41iq                     |
-| ☝ ⏵︎Publish                    | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update                  | ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish       |
-| catch-before-Activity_0bsjggk | suspend-Gateway_1hp2ssj                     | suspend-Gateway_1sq41iq                     |
+| ☑ ⏵︎Approve                    | ⛾ ⏵︎Reject ⏵︎Approve                          | ☝ ⏵︎accepted? ⏵︎rejected?                     |
+| catch-before-Activity_13fw5nm | suspend-Gateway_0y3f8tz                     | suspend-Gateway_063k28q                     |
+| ☑ ⏵︎Reject                     | ⛾ ⏵︎Reject ⏵︎Approve                          | ☝ ⏵︎accepted? ⏵︎rejected?                     |
+| catch-before-Activity_1j7d8sd | suspend-Gateway_0y3f8tz                     | suspend-Gateway_063k28q                     |
 | ☝ ⏵︎Update                     | ⛾ ⏵︎Update ⏵︎Notify approver                  | ☝ ⏵︎Update                                   |
 | catch-before-Activity_0j78uzd | suspend-Gateway_0fnbg3r                     | suspend-Gateway_0nxerxv                     |
 | ☝ ⏵︎Update form                | ⛾ ⏵︎Notify approver ⏵︎Update                  | ☝ ⏵︎Update form ⏵︎Notify approver             |
 | catch-before-Activity_1165bw9 | suspend-Gateway_1wzosup                     | suspend-Gateway_1g3fhu2                     |
 | ☝ ⏵︎Notify approver            | ⛾ ⏵︎Notify approver ⏵︎Update                  | ☝ ⏵︎Update form ⏵︎Notify approver             |
 | catch-before-Activity_1dt5di5 | suspend-Gateway_1wzosup                     | suspend-Gateway_1g3fhu2                     |
+| ☝ ⏵︎Update form                | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update                  | ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish       |
+| catch-before-Activity_1165bw9 | suspend-Gateway_1hp2ssj                     | suspend-Gateway_1sq41iq                     |
+| ☝ ⏵︎Delete? form               | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update                  | ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish       |
+| catch-before-Activity_0ha7224 | suspend-Gateway_1hp2ssj                     | suspend-Gateway_1sq41iq                     |
+| ☝ ⏵︎Publish                    | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update                  | ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish       |
+| catch-before-Activity_0bsjggk | suspend-Gateway_1hp2ssj                     | suspend-Gateway_1sq41iq                     |
 | ☝ ⏵︎Revise form                | ⛾ ⏵︎Revise                                   | ☝ ⏵︎Revise form                              |
 | catch-before-Activity_0zsock2 | suspend-Gateway_01p7uj7                     | suspend-gw-to-catch-before-Activity_0zsock2 |
 | ☝ ⏵︎Delete                     | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update                  | ☝ ⏵︎Delete ⏵︎Cancel                           |
@@ -343,9 +363,9 @@ assert_equal cli_state_table_with_ids,
 | ☝ ⏵︎Revise                     | ⛾ ⏵︎Revise                                   | ☝ ⏵︎Revise                                   |
 | catch-before-Activity_1wiumzv | suspend-Gateway_01p7uj7                     | suspend-Gateway_1xs96ik                     |
 | ☝ ⏵︎Revise form                | ⛾ ⏵︎Revise ⏵︎Notify approver                  | ☝ ⏵︎Revise form ⏵︎Notify approver             |
-| catch-before-Activity_0zsock2 | suspend-Gateway_1kl7pnm                     | suspend-Gateway_00n4dsm                     |
+| catch-before-Activity_0zsock2 | suspend-Gateway_1kl7pnm                     | suspend-Gateway_1xnsssa                     |
 | ☝ ⏵︎Notify approver            | ⛾ ⏵︎Revise ⏵︎Notify approver                  | ☝ ⏵︎Revise form ⏵︎Notify approver             |
-| catch-before-Activity_1dt5di5 | suspend-Gateway_1kl7pnm                     | suspend-Gateway_00n4dsm                     |
+| catch-before-Activity_1dt5di5 | suspend-Gateway_1kl7pnm                     | suspend-Gateway_1xnsssa                     |
 +-------------------------------+---------------------------------------------+---------------------------------------------+)
   end
 end
@@ -360,31 +380,32 @@ class DiscoveryTestPlanTest < Minitest::Spec
     test_plan_comment_header = Trailblazer::Workflow::Test::Plan::Introspect.(iteration_set, lanes_cfg: lanes_cfg)
     puts test_plan_comment_header
     assert_equal test_plan_comment_header,
-%(+----------------------+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
-| triggered catch      | start configuration                                                                          | expected reached configuration                                                               |
-+----------------------+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
-| ☝ ⏵︎Create form       | ⛾ ⏵︎Create <0wwf>                  ☝ ⏵︎Create form <0wc2>                        ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Create <0wwf>                  ☝ ⏵︎Create <14h0>                             ☑ ⏵︎xxx <uspe> |
-| ☝ ⏵︎Create            | ⛾ ⏵︎Create <0wwf>                  ☝ ⏵︎Create <14h0>                             ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Update ⏵︎Notify approver <0fnb> ☝ ⏵︎Update form ⏵︎Notify approver <0kkn>       ☑ ⏵︎xxx <uspe> |
-| ☝ ⏵︎Create ⛞          | ⛾ ⏵︎Create <0wwf>                  ☝ ⏵︎Create <14h0>                             ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Create <0wwf>                  ☝ ⏵︎Create <14h0>                             ☑ ⏵︎xxx <uspe> |
-| ☝ ⏵︎Update form       | ⛾ ⏵︎Update ⏵︎Notify approver <0fnb> ☝ ⏵︎Update form ⏵︎Notify approver <0kkn>       ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Update ⏵︎Notify approver <0fnb> ☝ ⏵︎Update <0nxe>                             ☑ ⏵︎xxx <uspe> |
-| ☝ ⏵︎Notify approver   | ⛾ ⏵︎Update ⏵︎Notify approver <0fnb> ☝ ⏵︎Update form ⏵︎Notify approver <0kkn>       ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update <1hp2> ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish <1sq4> ☑ ⏵︎xxx <uspe> |
-| ☝ ⏵︎Update            | ⛾ ⏵︎Update ⏵︎Notify approver <0fnb> ☝ ⏵︎Update <0nxe>                             ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Notify approver ⏵︎Update <1wzo> ☝ ⏵︎Update form ⏵︎Notify approver <1g3f>       ☑ ⏵︎xxx <uspe> |
-| ☝ ⏵︎Notify approver ⛞ | ⛾ ⏵︎Update ⏵︎Notify approver <0fnb> ☝ ⏵︎Update form ⏵︎Notify approver <0kkn>       ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Revise <01p7>                  ☝ ⏵︎Revise form <0zso>                        ☑ ⏵︎xxx <uspe> |
-| ☝ ⏵︎Update form       | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update <1hp2> ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish <1sq4> ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update <1hp2> ☝ ⏵︎Update <0nxe>                             ☑ ⏵︎xxx <uspe> |
-| ☝ ⏵︎Delete? form      | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update <1hp2> ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish <1sq4> ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update <1hp2> ☝ ⏵︎Delete ⏵︎Cancel <100g>                     ☑ ⏵︎xxx <uspe> |
-| ☝ ⏵︎Publish           | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update <1hp2> ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish <1sq4> ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Archive <1hgs>                 ☝ ⏵︎Archive <0fy4>                            ☑ ⏵︎xxx <uspe> |
-| ☝ ⏵︎Update ⛞          | ⛾ ⏵︎Update ⏵︎Notify approver <0fnb> ☝ ⏵︎Update <0nxe>                             ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Update ⏵︎Notify approver <0fnb> ☝ ⏵︎Update <0nxe>                             ☑ ⏵︎xxx <uspe> |
-| ☝ ⏵︎Update form       | ⛾ ⏵︎Notify approver ⏵︎Update <1wzo> ☝ ⏵︎Update form ⏵︎Notify approver <1g3f>       ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Notify approver ⏵︎Update <1wzo> ☝ ⏵︎Update <0nxe>                             ☑ ⏵︎xxx <uspe> |
-| ☝ ⏵︎Notify approver   | ⛾ ⏵︎Notify approver ⏵︎Update <1wzo> ☝ ⏵︎Update form ⏵︎Notify approver <1g3f>       ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update <1hp2> ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish <1sq4> ☑ ⏵︎xxx <uspe> |
-| ☝ ⏵︎Revise form       | ⛾ ⏵︎Revise <01p7>                  ☝ ⏵︎Revise form <0zso>                        ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Revise <01p7>                  ☝ ⏵︎Revise <1xs9>                             ☑ ⏵︎xxx <uspe> |
-| ☝ ⏵︎Delete            | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update <1hp2> ☝ ⏵︎Delete ⏵︎Cancel <100g>                     ☑ ⏵︎xxx <uspe> | ⛾ ◉End.success <1p88>             ☝ ◉End.success <0h6y>                        ☑ ⏵︎xxx <uspe> |
-| ☝ ⏵︎Cancel            | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update <1hp2> ☝ ⏵︎Delete ⏵︎Cancel <100g>                     ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update <1hp2> ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish <1sq4> ☑ ⏵︎xxx <uspe> |
-| ☝ ⏵︎Archive           | ⛾ ⏵︎Archive <1hgs>                 ☝ ⏵︎Archive <0fy4>                            ☑ ⏵︎xxx <uspe> | ⛾ ◉End.success <1p88>             ☝ ◉End.success <0h6y>                        ☑ ⏵︎xxx <uspe> |
-| ☝ ⏵︎Revise            | ⛾ ⏵︎Revise <01p7>                  ☝ ⏵︎Revise <1xs9>                             ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Revise ⏵︎Notify approver <1kl7> ☝ ⏵︎Revise form ⏵︎Notify approver <00n4>       ☑ ⏵︎xxx <uspe> |
-| ☝ ⏵︎Revise ⛞          | ⛾ ⏵︎Revise <01p7>                  ☝ ⏵︎Revise <1xs9>                             ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Revise <01p7>                  ☝ ⏵︎Revise <1xs9>                             ☑ ⏵︎xxx <uspe> |
-| ☝ ⏵︎Revise form       | ⛾ ⏵︎Revise ⏵︎Notify approver <1kl7> ☝ ⏵︎Revise form ⏵︎Notify approver <00n4>       ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Revise ⏵︎Notify approver <1kl7> ☝ ⏵︎Revise <1xs9>                             ☑ ⏵︎xxx <uspe> |
-| ☝ ⏵︎Notify approver   | ⛾ ⏵︎Revise ⏵︎Notify approver <1kl7> ☝ ⏵︎Revise form ⏵︎Notify approver <00n4>       ☑ ⏵︎xxx <uspe> | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update <1hp2> ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish <1sq4> ☑ ⏵︎xxx <uspe> |
-+----------------------+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+)
+%(+--------------------+----------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------+
+| triggered catch    | start configuration                                                                                      | expected reached configuration                                                                           |
++--------------------+----------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------+
+| ☝ ⏵︎Create form     | ⛾ ⏵︎Create <0wwf>                  ☝ ⏵︎Create form <0wc2>                        ☑ ⏵︎Notify <05zi>          | ⛾ ⏵︎Create <0wwf>                  ☝ ⏵︎Create <14h0>                             ☑ ⏵︎Notify <05zi>          |
+| ☝ ⏵︎Create          | ⛾ ⏵︎Create <0wwf>                  ☝ ⏵︎Create <14h0>                             ☑ ⏵︎Notify <05zi>          | ⛾ ⏵︎Update ⏵︎Notify approver <0fnb> ☝ ⏵︎Update form ⏵︎Notify approver <0kkn>       ☑ ⏵︎Notify <05zi>          |
+| ☝ ⏵︎Create ⛞        | ⛾ ⏵︎Create <0wwf>                  ☝ ⏵︎Create <14h0>                             ☑ ⏵︎Notify <05zi>          | ⛾ ⏵︎Create <0wwf>                  ☝ ⏵︎Create <14h0>                             ☑ ⏵︎Notify <05zi>          |
+| ☝ ⏵︎Update form     | ⛾ ⏵︎Update ⏵︎Notify approver <0fnb> ☝ ⏵︎Update form ⏵︎Notify approver <0kkn>       ☑ ⏵︎Notify <05zi>          | ⛾ ⏵︎Update ⏵︎Notify approver <0fnb> ☝ ⏵︎Update <0nxe>                             ☑ ⏵︎Notify <05zi>          |
+| ☝ ⏵︎Notify approver | ⛾ ⏵︎Update ⏵︎Notify approver <0fnb> ☝ ⏵︎Update form ⏵︎Notify approver <0kkn>       ☑ ⏵︎Notify <05zi>          | ⛾ ⏵︎Reject ⏵︎Approve <0y3f>         ☝ ⏵︎accepted? ⏵︎rejected? <063k>               ☑ ⏵︎Approve ⏵︎Reject <02ve> |
+| ☝ ⏵︎Update          | ⛾ ⏵︎Update ⏵︎Notify approver <0fnb> ☝ ⏵︎Update <0nxe>                             ☑ ⏵︎Notify <05zi>          | ⛾ ⏵︎Notify approver ⏵︎Update <1wzo> ☝ ⏵︎Update form ⏵︎Notify approver <1g3f>       ☑ ⏵︎Notify <05zi>          |
+| ☑ ⏵︎Approve         | ⛾ ⏵︎Reject ⏵︎Approve <0y3f>         ☝ ⏵︎accepted? ⏵︎rejected? <063k>               ☑ ⏵︎Approve ⏵︎Reject <02ve> | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update <1hp2> ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish <1sq4> ☑ ⏵︎Notify <05zi>          |
+| ☑ ⏵︎Reject          | ⛾ ⏵︎Reject ⏵︎Approve <0y3f>         ☝ ⏵︎accepted? ⏵︎rejected? <063k>               ☑ ⏵︎Approve ⏵︎Reject <02ve> | ⛾ ⏵︎Revise <01p7>                  ☝ ⏵︎Revise form <0zso>                        ☑ ⏵︎Notify <05zi>          |
+| ☝ ⏵︎Update ⛞        | ⛾ ⏵︎Update ⏵︎Notify approver <0fnb> ☝ ⏵︎Update <0nxe>                             ☑ ⏵︎Notify <05zi>          | ⛾ ⏵︎Update ⏵︎Notify approver <0fnb> ☝ ⏵︎Update <0nxe>                             ☑ ⏵︎Notify <05zi>          |
+| ☝ ⏵︎Update form     | ⛾ ⏵︎Notify approver ⏵︎Update <1wzo> ☝ ⏵︎Update form ⏵︎Notify approver <1g3f>       ☑ ⏵︎Notify <05zi>          | ⛾ ⏵︎Notify approver ⏵︎Update <1wzo> ☝ ⏵︎Update <0nxe>                             ☑ ⏵︎Notify <05zi>          |
+| ☝ ⏵︎Notify approver | ⛾ ⏵︎Notify approver ⏵︎Update <1wzo> ☝ ⏵︎Update form ⏵︎Notify approver <1g3f>       ☑ ⏵︎Notify <05zi>          | ⛾ ⏵︎Reject ⏵︎Approve <0y3f>         ☝ ⏵︎accepted? ⏵︎rejected? <063k>               ☑ ⏵︎Approve ⏵︎Reject <02ve> |
+| ☝ ⏵︎Update form     | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update <1hp2> ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish <1sq4> ☑ ⏵︎Notify <05zi>          | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update <1hp2> ☝ ⏵︎Update <0nxe>                             ☑ ⏵︎Notify <05zi>          |
+| ☝ ⏵︎Delete? form    | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update <1hp2> ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish <1sq4> ☑ ⏵︎Notify <05zi>          | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update <1hp2> ☝ ⏵︎Delete ⏵︎Cancel <100g>                     ☑ ⏵︎Notify <05zi>          |
+| ☝ ⏵︎Publish         | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update <1hp2> ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish <1sq4> ☑ ⏵︎Notify <05zi>          | ⛾ ⏵︎Archive <1hgs>                 ☝ ⏵︎Archive <0fy4>                            ☑ ⏵︎Notify <05zi>          |
+| ☝ ⏵︎Revise form     | ⛾ ⏵︎Revise <01p7>                  ☝ ⏵︎Revise form <0zso>                        ☑ ⏵︎Notify <05zi>          | ⛾ ⏵︎Revise <01p7>                  ☝ ⏵︎Revise <1xs9>                             ☑ ⏵︎Notify <05zi>          |
+| ☝ ⏵︎Delete          | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update <1hp2> ☝ ⏵︎Delete ⏵︎Cancel <100g>                     ☑ ⏵︎Notify <05zi>          | ⛾ ◉End.success <1p88>             ☝ ◉End.success <0h6y>                        ☑ ⏵︎Notify <05zi>          |
+| ☝ ⏵︎Cancel          | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update <1hp2> ☝ ⏵︎Delete ⏵︎Cancel <100g>                     ☑ ⏵︎Notify <05zi>          | ⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update <1hp2> ☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish <1sq4> ☑ ⏵︎Notify <05zi>          |
+| ☝ ⏵︎Archive         | ⛾ ⏵︎Archive <1hgs>                 ☝ ⏵︎Archive <0fy4>                            ☑ ⏵︎Notify <05zi>          | ⛾ ◉End.success <1p88>             ☝ ◉End.success <0h6y>                        ☑ ⏵︎Notify <05zi>          |
+| ☝ ⏵︎Revise          | ⛾ ⏵︎Revise <01p7>                  ☝ ⏵︎Revise <1xs9>                             ☑ ⏵︎Notify <05zi>          | ⛾ ⏵︎Revise ⏵︎Notify approver <1kl7> ☝ ⏵︎Revise form ⏵︎Notify approver <1xns>       ☑ ⏵︎Notify <05zi>          |
+| ☝ ⏵︎Revise ⛞        | ⛾ ⏵︎Revise <01p7>                  ☝ ⏵︎Revise <1xs9>                             ☑ ⏵︎Notify <05zi>          | ⛾ ⏵︎Revise <01p7>                  ☝ ⏵︎Revise <1xs9>                             ☑ ⏵︎Notify <05zi>          |
+| ☝ ⏵︎Revise form     | ⛾ ⏵︎Revise ⏵︎Notify approver <1kl7> ☝ ⏵︎Revise form ⏵︎Notify approver <1xns>       ☑ ⏵︎Notify <05zi>          | ⛾ ⏵︎Revise ⏵︎Notify approver <1kl7> ☝ ⏵︎Revise <1xs9>                             ☑ ⏵︎Notify <05zi>          |
+| ☝ ⏵︎Notify approver | ⛾ ⏵︎Revise ⏵︎Notify approver <1kl7> ☝ ⏵︎Revise form ⏵︎Notify approver <1xns>       ☑ ⏵︎Notify <05zi>          | ⛾ ⏵︎Reject ⏵︎Approve <0y3f>         ☝ ⏵︎accepted? ⏵︎rejected? <063k>               ☑ ⏵︎Approve ⏵︎Reject <02ve> |
++--------------------+----------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------+)
   end
 end
 
