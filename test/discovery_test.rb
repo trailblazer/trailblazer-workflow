@@ -415,81 +415,94 @@ class TestPlanExecutionTest < Minitest::Spec
   include Trailblazer::Test::Assertions # DISCUSS: this is for assert_advance and friends.
 
   it "run test plan" do
-    states, schema, lanes_cfg, message_flow = DiscoveryTest.states()
+    states, stub_schema = DiscoveryTest.states()
+    stub_lanes_cfg = stub_schema.to_h[:lanes]
+    iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: stub_lanes_cfg)
+    serialized_iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set::Serialize.(iteration_set, lanes_cfg: stub_lanes_cfg)
 
-    schema = schema.to_h.merge(message_flow: message_flow)
-    schema = schema.to_h.merge(state_guards: state_guards()) # FIXME
 
-    iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
+    # FIXME: simulate real world conditions better.
+    schema, lanes_cfg = build_schema()
+    iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set::Deserialize.(JSON.parse(JSON.dump(serialized_iteration_set)), lanes_cfg: lanes_cfg)
+
+
+
+
+
+
 
     #@ Test plan
     # FIXME: properly test this output!
     puts Trailblazer::Workflow::Test::Plan.for(iteration_set, lanes_cfg: lanes_cfg, input: {})
 
-    # TODO: encapsulate
-    # plan_structure = Trailblazer::Workflow::Test::Plan::Structure.serialize(states, lanes_cfg: lanes_cfg)
-    # testing_json = JSON.pretty_generate(plan_structure)
-    # test_plan_structure = Trailblazer::Workflow::Test::Plan::Structure.deserialize(plan_structure, lanes_cfg: lanes_cfg)
-    test_plan_structure = iteration_set
+    test_plan = iteration_set
 
     # test: ☝ ⏵︎Create form
-    ctx = assert_advance "☝ ⏵︎Create form", expected_ctx: {}, test_plan: test_plan_structure, schema: schema
+    ctx = assert_advance "☝ ⏵︎Create form", expected_ctx: {}, test_plan: test_plan, schema: schema
     assert_exposes ctx, seq: [:create_form], reader: :[]
 
     # test: ☝ ⏵︎Create
-    ctx = assert_advance "☝ ⏵︎Create", expected_ctx: {}, test_plan: test_plan_structure, schema: schema
+    ctx = assert_advance "☝ ⏵︎Create", expected_ctx: {}, test_plan: test_plan, schema: schema
     assert_exposes ctx, seq: [:ui_create, :create], reader: :[]
 
     # test: ☝ ⏵︎Create ⛞
-    ctx = assert_advance "☝ ⏵︎Create ⛞", ctx: {create: false, seq: []}, expected_ctx: {}, test_plan: test_plan_structure, schema: schema
+    ctx = assert_advance "☝ ⏵︎Create ⛞", ctx: {create: false, seq: []}, expected_ctx: {}, test_plan: test_plan, schema: schema
     assert_exposes ctx, seq: [:ui_create, :create, :create_form_with_errors], reader: :[]
 
     # test: ☝ ⏵︎Update form
-    ctx = assert_advance "☝ ⏵︎Update form", expected_ctx: {}, test_plan: test_plan_structure, schema: schema, ctx: {seq: [], model: Posting.new(state: "⏸︎ Update form♦Notify approver [00u]")}
+    ctx = assert_advance "☝ ⏵︎Update form", expected_ctx: {}, test_plan: test_plan, schema: schema, ctx: {seq: [], model: Posting.new(state: "⏸︎ Update form♦Notify approver [000]")}
     assert_exposes ctx, seq: [:update_form], reader: :[]
 
     # test: ☝ ⏵︎Notify approver
-    ctx = assert_advance "☝ ⏵︎Notify approver", expected_ctx: {}, test_plan: test_plan_structure, schema: schema, ctx: {seq: [], model: Posting.new(state: "⏸︎ Update form♦Notify approver [00u]")}
-    assert_exposes ctx, seq: [:notify_approver, :notify_approver, :approve], reader: :[]
+    ctx = assert_advance "☝ ⏵︎Notify approver", expected_ctx: {}, test_plan: test_plan, schema: schema, ctx: {seq: [], model: Posting.new(state: "⏸︎ Update form♦Notify approver [000]")}
+    assert_exposes ctx, seq: [:notify_approver, :notify_approver, :Notify], reader: :[]
 
     # test: ☝ ⏵︎Update
-    ctx = assert_advance "☝ ⏵︎Update", expected_ctx: {}, test_plan: test_plan_structure, schema: schema, ctx: {seq: [], model: Posting.new(state: "⏸︎ Update [00u]")}
+    ctx = assert_advance "☝ ⏵︎Update", expected_ctx: {}, test_plan: test_plan, schema: schema, ctx: {seq: [], model: Posting.new(state: "⏸︎ Update [000]")}
     assert_exposes ctx, seq: [:ui_update, :update], reader: :[]
 
-    # test: ☝ ⏵︎Notify approver ⛞
-    ctx = assert_advance "☝ ⏵︎Notify approver ⛞", expected_ctx: {}, test_plan: test_plan_structure, schema: schema, ctx: {decision: false, seq: [], model: Posting.new(state: "⏸︎ Update form♦Notify approver [00u]")}
-    assert_exposes ctx, seq: [:notify_approver, :notify_approver, :reject], reader: :[]
+    # test: ☑ ⏵︎Approve
+    ctx = assert_advance "☑ ⏵︎Approve", test_plan: test_plan, schema: schema, ctx: {seq: [], model: Posting.new(state: "⏸︎ Approve♦Reject [000]")}
+    assert_exposes ctx, seq: [:Approve, :approve], reader: :[]
+
+    # test: ☑ ⏵︎Reject
+    ctx = assert_advance "☑ ⏵︎Reject", test_plan: test_plan, schema: schema, ctx: {seq: [], model: Posting.new(state: "⏸︎ Approve♦Reject [000]")}
+    assert_exposes ctx, seq: [:Reject, :reject], reader: :[]
+
+    # # test: ☝ ⏵︎Notify approver ⛞
+    # ctx = assert_advance "☝ ⏵︎Notify approver ⛞", expected_ctx: {}, test_plan: test_plan, schema: schema, ctx: {decision: false, seq: [], model: Posting.new(state: "⏸︎ Update form♦Notify approver [000]")}
+    # assert_exposes ctx, seq: [:notify_approver, :notify_approver, :reject], reader: :[]
 
     # test: ☝ ⏵︎Delete? form
-    ctx = assert_advance "☝ ⏵︎Delete? form", expected_ctx: {}, test_plan: test_plan_structure, schema: schema, ctx: {seq: [], model: Posting.new(state: "⏸︎ Update form♦Delete? form♦Publish [11u]")}
+    ctx = assert_advance "☝ ⏵︎Delete? form", expected_ctx: {}, test_plan: test_plan, schema: schema, ctx: {seq: [], model: Posting.new(state: "⏸︎ Update form♦Delete? form♦Publish [110]")}
     assert_exposes ctx, seq: [:delete_form], reader: :[]
 
     # test: ☝ ⏵︎Publish
-    ctx = assert_advance "☝ ⏵︎Publish", expected_ctx: {}, test_plan: test_plan_structure, schema: schema, ctx: {seq: [], model: Posting.new(state: "⏸︎ Update form♦Delete? form♦Publish [11u]")}
+    ctx = assert_advance "☝ ⏵︎Publish", expected_ctx: {}, test_plan: test_plan, schema: schema, ctx: {seq: [], model: Posting.new(state: "⏸︎ Update form♦Delete? form♦Publish [110]")}
     assert_exposes ctx, seq: [:publish, :publish], reader: :[]
 
     # test: ☝ ⏵︎Update ⛞
-    ctx = assert_advance "☝ ⏵︎Update ⛞", expected_ctx: {}, test_plan: test_plan_structure, schema: schema, ctx: {update: false, seq: [], model: Posting.new(state: "⏸︎ Update [00u]")}
+    ctx = assert_advance "☝ ⏵︎Update ⛞", expected_ctx: {}, test_plan: test_plan, schema: schema, ctx: {update: false, seq: [], model: Posting.new(state: "⏸︎ Update [000]")}
     assert_exposes ctx, seq: [:ui_update, :update, :update_form_with_errors], reader: :[]
 
     # test: ☝ ⏵︎Revise form
-    ctx = assert_advance "☝ ⏵︎Revise form", expected_ctx: {}, test_plan: test_plan_structure, schema: schema, ctx: {update: false, seq: [], model: Posting.new(state: "⏸︎ Revise form [00u]")}
+    ctx = assert_advance "☝ ⏵︎Revise form", expected_ctx: {}, test_plan: test_plan, schema: schema, ctx: {update: false, seq: [], model: Posting.new(state: "⏸︎ Revise form [000]")}
     assert_exposes ctx, seq: [:revise_form], reader: :[]
 
     # test: ☝ ⏵︎Delete
-    ctx = assert_advance "☝ ⏵︎Delete", expected_ctx: {}, test_plan: test_plan_structure, schema: schema, ctx: {update: false, seq: [], model: Posting.new(state: "⏸︎ Delete♦Cancel [11u]")}
+    ctx = assert_advance "☝ ⏵︎Delete", expected_ctx: {}, test_plan: test_plan, schema: schema, ctx: {update: false, seq: [], model: Posting.new(state: "⏸︎ Delete♦Cancel [110]")}
     assert_exposes ctx, seq: [:delete, :delete], reader: :[]
 
     # test: ☝ ⏵︎Cancel
-    ctx = assert_advance "☝ ⏵︎Cancel", expected_ctx: {}, test_plan: test_plan_structure, schema: schema, ctx: {update: false, seq: [], model: Posting.new(state: "⏸︎ Delete♦Cancel [11u]")}
+    ctx = assert_advance "☝ ⏵︎Cancel", expected_ctx: {}, test_plan: test_plan, schema: schema, ctx: {update: false, seq: [], model: Posting.new(state: "⏸︎ Delete♦Cancel [110]")}
     assert_exposes ctx, seq: [:cancel], reader: :[]
 
     # test: ☝ ⏵︎Archive
-    ctx = assert_advance "☝ ⏵︎Archive", expected_ctx: {}, test_plan: test_plan_structure, schema: schema, ctx: {update: false, seq: [], model: Posting.new(state: "⏸︎ Archive [10u]")}
+    ctx = assert_advance "☝ ⏵︎Archive", expected_ctx: {}, test_plan: test_plan, schema: schema, ctx: {update: false, seq: [], model: Posting.new(state: "⏸︎ Archive [100]")}
     assert_exposes ctx, seq: [:archive, :archive], reader: :[]
 
     # test: ☝ ⏵︎Revise
-    ctx = assert_advance "☝ ⏵︎Revise", expected_ctx: {}, test_plan: test_plan_structure, schema: schema, ctx: {update: false, seq: [], model: Posting.new(state: "⏸︎ Revise [01u]")}
+    ctx = assert_advance "☝ ⏵︎Revise", expected_ctx: {}, test_plan: test_plan, schema: schema, ctx: {update: false, seq: [], model: Posting.new(state: "⏸︎ Revise [010]")}
     assert_exposes ctx, seq: [:revise, :revise], reader: :[]
 
 

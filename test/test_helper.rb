@@ -2,7 +2,6 @@ $LOAD_PATH.unshift File.expand_path("../lib", __dir__)
 require "trailblazer/workflow"
 
 require "minitest/autorun"
-require "pp"
 require "trailblazer/activity/testing"
 
 class Minitest::Spec
@@ -33,10 +32,10 @@ module BuildSchema
     implementing_ui = Trailblazer::Activity::Testing.def_steps(:create_form, :ui_create, :update_form, :ui_update, :notify_approver, :reject, :approve, :revise, :publish, :archive, :delete, :delete_form, :cancel, :revise_form,
       :create_form_with_errors, :update_form_with_errors, :revise_form_with_errors)
 
-    implementing_editor = Trailblazer::Activity::Testing.def_steps(:notify)
+    implementing_editor = Trailblazer::Activity::Testing.def_steps(:Notify, :Reject, :Approve)
 
     schema = Trailblazer::Workflow.Collaboration(
-      json_file: "test/fixtures/v1/moderation.json",
+      json_file: "test/fixtures/v1/posting-v10.json",
       lanes: {
         "article moderation"    => {
           label: "lifecycle",
@@ -79,68 +78,24 @@ module BuildSchema
           label: "editor",
           icon: "☑",
           implementation: {
-            "Notify" => implementing_editor.method(:notify),
+            "Notify" => implementing_editor.method(:Notify),
+            "Reject" => implementing_editor.method(:Reject),
+            "Approve" => implementing_editor.method(:Approve),
           }
         }
-      }
+      }, # :lanes
+      state_guards: state_guards(),
     )
 
     lanes_cfg    = schema.to_h[:lanes]
 
     return schema, lanes_cfg
   end
-
-  # # DISCUSS: this is mostly to play around with the "API" of building a Collaboration.
-  # def build_custom_editor_lane(lanes, message_flow)
-  #   approve_id = "Activity_1qrkaz0"
-  #   reject_id = "Activity_0d9yewp"
-
-  #   lifecycle_activity = lanes.(label: "lifecycle")[:activity]
-
-  #   missing_throw_from_notify_approver = Trailblazer::Activity::Introspect.Nodes(lifecycle_activity, id: "throw-after-Activity_0wr78cv").task
-
-  #   decision_is_approve_throw = nil
-  #   decision_is_reject_throw  = nil
-
-  #   approver_start_suspend = nil
-  #   approver_activity = Class.new(Trailblazer::Activity::Railway) do
-  #     terminus task: approver_start_suspend = Trailblazer::Workflow::Event::Suspend.new(semantic: "invented_semantic", "resumes" => ["catch-before-decider-xxx"]), id: "~suspend~"
-
-  #     fail task: Trailblazer::Workflow::Event::Catch.new(semantic: "xxx --> decider"), id: "catch-before-decider-xxx", Output(:success) => Track(:failure)
-  #     fail :decider, id: "xxx",
-  #       Output(:failure) => Trailblazer::Activity::Railway.Id("xxx_reject")
-  #     fail task: decision_is_approve_throw = Trailblazer::Workflow::Event::Throw.new(semantic: "xxx_approve"), Output(:success) => Id("~suspend~")
-
-  #     step task: decision_is_reject_throw = Trailblazer::Workflow::Event::Throw.new(semantic: "xxx_reject"),
-  #       magnetic_to: :reject, id: "xxx_reject", Output(:success) => Id("~suspend~")
-
-  #     def decider(ctx, decision: true, **)
-  #       # raise if !decision
-
-  #       decision
-  #     end
-  #   end
-
-  #   extended_message_flow = message_flow.merge(
-  #     # "throw-after-Activity_0wr78cv"
-  #     missing_throw_from_notify_approver => [approver_activity, Trailblazer::Activity::Introspect.Nodes(approver_activity, id: "catch-before-decider-xxx").task],
-  #     decision_is_approve_throw => [lifecycle_activity, Trailblazer::Activity::Introspect.Nodes(lifecycle_activity, id: "catch-before-#{approve_id}").task],
-  #     decision_is_reject_throw => [lifecycle_activity, Trailblazer::Activity::Introspect.Nodes(lifecycle_activity, id: "catch-before-#{reject_id}").task],
-  #   )
-
-  #   initial_lane_positions = Trailblazer::Workflow::Collaboration::Synchronous.initial_lane_positions(lanes) # we need to do this manually here, as initial_lane_positions isn't part of the {Schema.build} process.
-  #   extended_initial_lane_positions = initial_lane_positions.merge(
-  #     approver_activity => approver_start_suspend
-  #   )
-  #   extended_initial_lane_positions = Trailblazer::Workflow::Collaboration::Positions.new(extended_initial_lane_positions.collect { |activity, task| Trailblazer::Workflow::Collaboration::Position.new(activity, task) })
-
-  #   return approver_activity, extended_message_flow, extended_initial_lane_positions
-  # end
 end
 
 module DiscoveredStates
   def states
-    states, schema = Trailblazer::Workflow::Discovery.(
+    states, stub_schema = Trailblazer::Workflow::Discovery.(
       json_filename: "test/fixtures/v1/posting-v10.json",
       start_lane: "<ui> author workflow",
 
@@ -167,30 +122,40 @@ module DiscoveredStates
       }
     )
 
-    return states, schema, schema.to_h[:lanes]
+    return states, stub_schema, stub_schema.to_h[:lanes]
   end
 
   def state_guards
     state_guards_from_user = {state_guards: {
-        # "⏸︎ Archive [10u]"                          => {guard: ->(ctx, model:, **) { model.state == "⏸︎ Archive [10u]" }},
-        # "⏸︎ Create [01u]"                           => {guard: ->(ctx, model: nil, **) { model.nil? }},
-        # "⏸︎ Create form [00u]"                      => {guard: ->(ctx, model: nil, **) { model.nil? }},
+        "⏸︎ Archive [100]"                          => {guard: ->(ctx, model:, **) { model.state == "⏸︎ Archive [100]" }},
+        "⏸︎ Create [010]"                           => {guard: ->(ctx, model: nil, **) { model.nil? }},
+        "⏸︎ Create form [000]"                      => {guard: ->(ctx, model: nil, **) { model.nil? }},
+        "⏸︎ Approve♦Reject [000]"                   => {guard: ->(ctx, model:, **) { model.state == "⏸︎ Approve♦Reject [000]" }},
+        "⏸︎ Delete♦Cancel [110]"                    => {guard: ->(ctx, model:, **) { model.state == "⏸︎ Delete♦Cancel [110]" }},
+        "⏸︎ Revise [010]"                           => {guard: ->(ctx, model:, **) { model.state == "⏸︎ Revise [010]" }},
+        "⏸︎ Revise form [000]"                      => {guard: ->(ctx, model:, **) { model.state == "⏸︎ Revise form [000]" }},
+        "⏸︎ Revise form♦Notify approver [110]"      => {guard: ->(ctx, model:, **) { model.state == "⏸︎ Revise form♦Notify approver [110]" }},
+        "⏸︎ Update [000]"                           => {guard: ->(ctx, model:, **) { model.state == "⏸︎ Update [000]" }},
+        "⏸︎ Update form♦Delete? form♦Publish [110]" => {guard: ->(ctx, model:, **) { model.state == "⏸︎ Update form♦Delete? form♦Publish [110]" }},
+        "⏸︎ Update form♦Notify approver [000]"      => {guard: ->(ctx, model:, **) { model.state == "⏸︎ Update form♦Notify approver [000]" }},
+        "⏸︎ Update form♦Notify approver [110]"      => {guard: ->(ctx, model:, **) { model.state == "⏸︎ Update form♦Notify approver [110]" }},
 
     }}[:state_guards]
 
     # auto-generated. this structure could also hold alternative state names, etc.
     state_table = {
-    "⏸︎ Archive [10u]"                          => {suspend_tuples: [["lifecycle", "suspend-gw-to-catch-before-Activity_1hgscu3"], ["UI", "suspend-gw-to-catch-before-Activity_0fy41qq"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_0fy41qq"]]},
-    "⏸︎ Create [01u]"                           => {suspend_tuples: [["lifecycle", "suspend-gw-to-catch-before-Activity_0wwfenp"], ["UI", "suspend-Gateway_14h0q7a"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_1psp91r"]]},
-    "⏸︎ Create form [00u]"                      => {suspend_tuples: [["lifecycle", "suspend-gw-to-catch-before-Activity_0wwfenp"], ["UI", "suspend-gw-to-catch-before-Activity_0wc2mcq"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_0wc2mcq"]]},
-    "⏸︎ Delete♦Cancel [11u]"                    => {suspend_tuples: [["lifecycle", "suspend-Gateway_1hp2ssj"], ["UI", "suspend-Gateway_100g9dn"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_15nnysv"], ["UI", "catch-before-Activity_1uhozy1"]]},
-    "⏸︎ Revise [01u]"                           => {suspend_tuples: [["lifecycle", "suspend-Gateway_01p7uj7"], ["UI", "suspend-Gateway_1xs96ik"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_1wiumzv"]]},
-    "⏸︎ Revise form [00u]"                      => {suspend_tuples: [["lifecycle", "suspend-Gateway_01p7uj7"], ["UI", "suspend-gw-to-catch-before-Activity_0zsock2"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_0zsock2"]]},
-    "⏸︎ Revise form♦Notify approver [10u]"      => {suspend_tuples: [["lifecycle", "suspend-Gateway_1kl7pnm"], ["UI", "suspend-Gateway_00n4dsm"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_0zsock2"], ["UI", "catch-before-Activity_1dt5di5"]]},
-    "⏸︎ Update [00u]"                           => {suspend_tuples: [["lifecycle", "suspend-Gateway_0fnbg3r"], ["UI", "suspend-Gateway_0nxerxv"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_0j78uzd"]]},
-    "⏸︎ Update form♦Delete? form♦Publish [11u]" => {suspend_tuples: [["lifecycle", "suspend-Gateway_1hp2ssj"], ["UI", "suspend-Gateway_1sq41iq"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_1165bw9"], ["UI", "catch-before-Activity_0ha7224"], ["UI", "catch-before-Activity_0bsjggk"]]},
-    "⏸︎ Update form♦Notify approver [00u]"      => {suspend_tuples: [["lifecycle", "suspend-Gateway_0fnbg3r"], ["UI", "suspend-Gateway_0kknfje"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_1165bw9"], ["UI", "catch-before-Activity_1dt5di5"]]},
-    "⏸︎ Update form♦Notify approver [11u]"      => {suspend_tuples: [["lifecycle", "suspend-Gateway_1wzosup"], ["UI", "suspend-Gateway_1g3fhu2"], ["approver", "~suspend~"]], catch_tuples: [["UI", "catch-before-Activity_1165bw9"], ["UI", "catch-before-Activity_1dt5di5"]]},
+    "⏸︎ Approve♦Reject [000]"                   => {suspend_tuples: [["lifecycle", "suspend-Gateway_0y3f8tz"], ["UI", "suspend-Gateway_063k28q"], ["editor", "suspend-Gateway_02veylj"]], catch_tuples: [["editor", "catch-before-Activity_13fw5nm"], ["editor", "catch-before-Activity_1j7d8sd"]]},
+    "⏸︎ Archive [100]"                          => {suspend_tuples: [["lifecycle", "suspend-gw-to-catch-before-Activity_1hgscu3"], ["UI", "suspend-gw-to-catch-before-Activity_0fy41qq"], ["editor", "suspend-gw-to-catch-before-Activity_05zip3u"]], catch_tuples: [["UI", "catch-before-Activity_0fy41qq"]]},
+    "⏸︎ Create [010]"                           => {suspend_tuples: [["lifecycle", "suspend-gw-to-catch-before-Activity_0wwfenp"], ["UI", "suspend-Gateway_14h0q7a"], ["editor", "suspend-gw-to-catch-before-Activity_05zip3u"]], catch_tuples: [["UI", "catch-before-Activity_1psp91r"]]},
+    "⏸︎ Create form [000]"                      => {suspend_tuples: [["lifecycle", "suspend-gw-to-catch-before-Activity_0wwfenp"], ["UI", "suspend-gw-to-catch-before-Activity_0wc2mcq"], ["editor", "suspend-gw-to-catch-before-Activity_05zip3u"]], catch_tuples: [["UI", "catch-before-Activity_0wc2mcq"]]},
+    "⏸︎ Delete♦Cancel [110]"                    => {suspend_tuples: [["lifecycle", "suspend-Gateway_1hp2ssj"], ["UI", "suspend-Gateway_100g9dn"], ["editor", "suspend-gw-to-catch-before-Activity_05zip3u"]], catch_tuples: [["UI", "catch-before-Activity_15nnysv"], ["UI", "catch-before-Activity_1uhozy1"]]},
+    "⏸︎ Revise [010]"                           => {suspend_tuples: [["lifecycle", "suspend-Gateway_01p7uj7"], ["UI", "suspend-Gateway_1xs96ik"], ["editor", "suspend-gw-to-catch-before-Activity_05zip3u"]], catch_tuples: [["UI", "catch-before-Activity_1wiumzv"]]},
+    "⏸︎ Revise form [000]"                      => {suspend_tuples: [["lifecycle", "suspend-Gateway_01p7uj7"], ["UI", "suspend-gw-to-catch-before-Activity_0zsock2"], ["editor", "suspend-gw-to-catch-before-Activity_05zip3u"]], catch_tuples: [["UI", "catch-before-Activity_0zsock2"]]},
+    "⏸︎ Revise form♦Notify approver [110]"      => {suspend_tuples: [["lifecycle", "suspend-Gateway_1kl7pnm"], ["UI", "suspend-Gateway_1xnsssa"], ["editor", "suspend-gw-to-catch-before-Activity_05zip3u"]], catch_tuples: [["UI", "catch-before-Activity_0zsock2"], ["UI", "catch-before-Activity_1dt5di5"]]},
+    "⏸︎ Update [000]"                           => {suspend_tuples: [["lifecycle", "suspend-Gateway_0fnbg3r"], ["UI", "suspend-Gateway_0nxerxv"], ["editor", "suspend-gw-to-catch-before-Activity_05zip3u"]], catch_tuples: [["UI", "catch-before-Activity_0j78uzd"]]},
+    "⏸︎ Update form♦Delete? form♦Publish [110]" => {suspend_tuples: [["lifecycle", "suspend-Gateway_1hp2ssj"], ["UI", "suspend-Gateway_1sq41iq"], ["editor", "suspend-gw-to-catch-before-Activity_05zip3u"]], catch_tuples: [["UI", "catch-before-Activity_1165bw9"], ["UI", "catch-before-Activity_0ha7224"], ["UI", "catch-before-Activity_0bsjggk"]]},
+    "⏸︎ Update form♦Notify approver [000]"      => {suspend_tuples: [["lifecycle", "suspend-Gateway_0fnbg3r"], ["UI", "suspend-Gateway_0kknfje"], ["editor", "suspend-gw-to-catch-before-Activity_05zip3u"]], catch_tuples: [["UI", "catch-before-Activity_1165bw9"], ["UI", "catch-before-Activity_1dt5di5"]]},
+    "⏸︎ Update form♦Notify approver [110]"      => {suspend_tuples: [["lifecycle", "suspend-Gateway_1wzosup"], ["UI", "suspend-Gateway_1g3fhu2"], ["editor", "suspend-gw-to-catch-before-Activity_05zip3u"]], catch_tuples: [["UI", "catch-before-Activity_1165bw9"], ["UI", "catch-before-Activity_1dt5di5"]]},
     }
 
     state_guards = Trailblazer::Workflow::Collaboration::StateGuards.from_user_hash( # TODO: unify naming, DSL.state_guards_from_user or something like that.
