@@ -6,8 +6,7 @@ module Trailblazer
         module_function
 
         # DISCUSS: what about running this before we have a schema?
-        def call(schema:, namespace:, target_dir:, start_activity_json_id:, run_multiple_times: {}, test_filename:)
-          lanes_cfg = schema.to_h[:lanes]
+        def call(namespace:, target_dir:, run_multiple_times: {}, test_filename:, **discovery_options)
 
           filepath = Filepath.new(target_dir)
 
@@ -15,18 +14,12 @@ module Trailblazer
           state_table_filename    = filepath.("generated/state_table.rb")
           iteration_set_filename  = filepath.("generated/iteration_set.json")
 
-          start_task_position = find_start_task_position(start_activity_json_id, lanes_cfg) # FIXME: handle nil case
-
-          initial_lane_positions = Trailblazer::Workflow::Collaboration::Synchronous.initial_lane_positions(lanes_cfg)
-
-          states = Trailblazer::Workflow::Discovery.(
-            schema,
-            initial_lane_positions: initial_lane_positions,
-            start_task_position: start_task_position,
-            message_flow: schema.to_h[:message_flow],
-
-            run_multiple_times: run_multiple_times,
+          states, schema = Trailblazer::Workflow::Discovery.(
+            **discovery_options
+            # run_multiple_times: run_multiple_times,
           )
+
+          lanes_cfg = schema.to_h[:lanes]
 
           iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
 
