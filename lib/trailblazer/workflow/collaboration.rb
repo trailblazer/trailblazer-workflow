@@ -146,9 +146,7 @@ module Trailblazer
             # FIXME: set the suspend that leads to the "start catch event" as the circuit's start_task, then we don't need this here.
             # Find the suspend that resumes the actual start_catch_event
             suspend_task, _ = activity.to_h[:circuit].to_h[:map].find { |task, _| task.is_a?(Trailblazer::Workflow::Event::Suspend) && task.to_h["resumes"].include?(start_catch_event_id) }
- if suspend_task.nil?
-  pp activity.to_h[:circuit]
-end
+
             [
               activity,
               suspend_task # We deliberately have *one* position per lane, we're Synchronous.
