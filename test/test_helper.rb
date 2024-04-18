@@ -11,7 +11,7 @@ class Minitest::Spec
 
   Posting = Struct.new(:id, :state, keyword_init: true) do
     def self.find_by(id:)
-      new(id: id, state: "⏸︎ Update [00u]")
+      new(id: id, state: "⏸︎ Update [000]")
     end
   end
 end

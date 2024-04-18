@@ -41,7 +41,7 @@ class AdvanceTest < Minitest::Spec
     signal, (ctx, flow_options) = Trailblazer::Workflow::Advance.([ctx_for_advance, flow_options])
 
     assert_equal signal.inspect, %(#<Trailblazer::Activity::End semantic=:invalid_event>)
-    assert_equal flow_options[:errors], %(No state configuration found for [[\"⏸︎ Update [00u]\", {:suspend_tuples=>[[\"lifecycle\", \"suspend-Gateway_0fnbg3r\"], [\"UI\", \"suspend-Gateway_0nxerxv\"], [\"approver\", \"~suspend~\"]], :catch_tuples=>[[\"UI\", \"catch-before-Activity_0j78uzd\"]]}]])
+    assert_equal flow_options[:errors], %(No state configuration found for [[\"⏸︎ Update [000]\", {:suspend_tuples=>[[\"lifecycle\", \"suspend-Gateway_0fnbg3r\"], [\"UI\", \"suspend-Gateway_0nxerxv\"], [\"editor\", \"suspend-gw-to-catch-before-Activity_05zip3u\"]], :catch_tuples=>[[\"UI\", \"catch-before-Activity_0j78uzd\"]]}]])
   end
 end
 
@@ -52,15 +52,15 @@ class AdvanceEndpointTest < Minitest::Spec
 
   it "what" do
     # TODO: this is something that shouldn't be done every time.
-    states, schema, lanes_cfg, message_flow = states()
+    states, schema, lanes_cfg = states()
 
     iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
     # Serialize/deserialize the Set, as this will always be the case in a real environment.
     serialized_iteration_set = JSON.dump(Trailblazer::Workflow::Introspect::Iteration::Set::Serialize.(iteration_set, lanes_cfg: lanes_cfg))
+
+    schema, lanes_cfg = build_schema()
+
     iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set::Deserialize.(JSON.parse(serialized_iteration_set), lanes_cfg: lanes_cfg)
-
-    state_guards = state_guards()
-
 
 =begin
     ctx = {params: [], seq: [], process_model: nil}
@@ -166,7 +166,7 @@ class AdvanceEndpointTest < Minitest::Spec
 # Update input is invalid
     flow_options = original_flow_options.merge(event_label: "☝ ⏵︎Update",)
     Trailblazer::Endpoint::Runtime.({params: {id: 1}, seq: [], update: false}, adapter: action_adapter_with_model, default_matcher: default_matcher, matcher_context: self, flow_options: flow_options, &matcher_block)
-    assert_equal @render, %(failed: #<struct Minitest::Spec::Posting id=1, state="⏸︎ Update [00u]">)
+    assert_equal @render, %(failed: #<struct Minitest::Spec::Posting id=1, state="⏸︎ Update [000]">)
 
 #@ unknown event label (not_authorized)
     flow_options = flow_options.merge(event_label: "XXX unknown ~~~")
