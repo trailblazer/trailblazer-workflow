@@ -3,6 +3,7 @@ require "trailblazer/workflow"
 
 require "minitest/autorun"
 require "trailblazer/activity/testing"
+require "pp" # Object#pretty_inspect
 
 class Minitest::Spec
   def assert_equal(expected, asserted, *args)
