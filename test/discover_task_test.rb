@@ -4,7 +4,7 @@ require "test_helper"
 
 class DiscoverTaskTest < Minitest::Spec
   after { `rm -r test/tmp/app/concepts/posting/collaboration/generated` }
-  after { `rm test/tmp/test/bla_test.rb` }
+  # after { `rm test/tmp/test/bla_test.rb` }
 
   TEST_ROOT = "test/tmp"
 
@@ -12,7 +12,7 @@ class DiscoverTaskTest < Minitest::Spec
     Dir.chdir(TEST_ROOT) do
       Trailblazer::Workflow::Task::Discover.(
         json_filename: "../fixtures/v1/posting-v10.json",
-        start_lane: "<ui> author workflow", # FIXME: old name {start_activity_json_id}
+        start_lane: "<ui> author workflow",
 
         # DISCUSS: compute this automatically/from diagram?
         # TODO: how to get this from CLI?
@@ -22,6 +22,13 @@ class DiscoverTaskTest < Minitest::Spec
           "reviewer"              => {label: "editor", icon: "☑"},
         },
 
+        dsl_options_for_run_multiple_times: {
+          ["<ui> author workflow", "Create"] => {ctx_merge: {:"article moderation:Create" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
+          # Click [UI Update] again, with invalid data.
+          ["<ui> author workflow", "Update"] => {ctx_merge: {:"article moderation:Update" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
+          ["<ui> author workflow", "Revise"] => {ctx_merge: {:"article moderation:Revise" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
+        },
+
         namespace: "Posting::Collaboration",
         target_dir: "app/concepts/posting/collaboration",
         test_filename: "test/bla_test.rb",
@@ -29,7 +36,7 @@ class DiscoverTaskTest < Minitest::Spec
     end
 
     #@ We serialized the discovered iterations, so we don't need to run discovery on every startup.
-    assert_equal (serialized_iteration_set = File.read("#{TEST_ROOT}/app/concepts/posting/collaboration/generated/iteration_set.json")).size, 32415
+    assert_equal (serialized_iteration_set = File.read("#{TEST_ROOT}/app/concepts/posting/collaboration/generated/iteration_set.json")).size, 37417
 
 # raise
 #     iteration_set = Trailblazer::Workflow::Introspect::Iteration::Set.from_discovered_states(states, lanes_cfg: lanes_cfg)
@@ -39,7 +46,7 @@ class DiscoverTaskTest < Minitest::Spec
     iteration_set_from_json = Trailblazer::Workflow::Introspect::Iteration::Set::Deserialize.(JSON.parse(serialized_iteration_set), lanes_cfg: schema.to_h[:lanes])
 
     # TODO: test {Set#to_a}
-    assert_equal iteration_set_from_json.to_a.size, 19
+    assert_equal iteration_set_from_json.to_a.size, 22
 
     #@ Assert test plan
 

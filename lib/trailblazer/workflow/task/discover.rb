@@ -6,7 +6,7 @@ module Trailblazer
         module_function
 
         # DISCUSS: what about running this before we have a schema?
-        def call(namespace:, target_dir:, run_multiple_times: {}, test_filename:, **discovery_options)
+        def call(namespace:, target_dir:, test_filename:, **discovery_options)
 
           filepath = Filepath.new(target_dir)
 

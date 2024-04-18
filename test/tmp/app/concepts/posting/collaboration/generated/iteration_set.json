@@ -178,6 +178,95 @@
     "outcome": "success"
   },
   {
+    "id": "catch-before-Activity_1psp91r",
+    "event_label": "☝ ⏵︎Create ⛞",
+    "start_task_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_1psp91r"
+      ],
+      "comment": [
+        "before",
+        "☝ ⏵︎Create"
+      ]
+    },
+    "start_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-gw-to-catch-before-Activity_0wwfenp"
+        ],
+        "comment": [
+          "before",
+          "⛾ ⏵︎Create"
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_14h0q7a"
+        ],
+        "comment": [
+          "before",
+          "☝ ⏵︎Create"
+        ]
+      },
+      {
+        "tuple": [
+          "editor",
+          "suspend-gw-to-catch-before-Activity_05zip3u"
+        ],
+        "comment": [
+          "before",
+          "☑ ⏵︎Notify"
+        ]
+      }
+    ],
+    "suspend_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-gw-to-catch-before-Activity_0wwfenp"
+        ],
+        "comment": [
+          "before",
+          "⛾ ⏵︎Create"
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_14h0q7a"
+        ],
+        "comment": [
+          "before",
+          "☝ ⏵︎Create"
+        ]
+      },
+      {
+        "tuple": [
+          "editor",
+          "suspend-gw-to-catch-before-Activity_05zip3u"
+        ],
+        "comment": [
+          "before",
+          "☑ ⏵︎Notify"
+        ]
+      }
+    ],
+    "suspend_task_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_1psp91r"
+      ],
+      "comment": [
+        "before",
+        "☝ ⏵︎Create"
+      ]
+    },
+    "outcome": "failure"
+  },
+  {
     "id": "catch-before-Activity_1165bw9",
     "event_label": "☝ ⏵︎Update form",
     "start_task_position": {
@@ -621,6 +710,95 @@
       ]
     },
     "outcome": "success"
+  },
+  {
+    "id": "catch-before-Activity_0j78uzd",
+    "event_label": "☝ ⏵︎Update ⛞",
+    "start_task_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_0j78uzd"
+      ],
+      "comment": [
+        "before",
+        "☝ ⏵︎Update"
+      ]
+    },
+    "start_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_0fnbg3r"
+        ],
+        "comment": [
+          "before",
+          "⛾ ⏵︎Update ⏵︎Notify approver"
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_0nxerxv"
+        ],
+        "comment": [
+          "before",
+          "☝ ⏵︎Update"
+        ]
+      },
+      {
+        "tuple": [
+          "editor",
+          "suspend-gw-to-catch-before-Activity_05zip3u"
+        ],
+        "comment": [
+          "before",
+          "☑ ⏵︎Notify"
+        ]
+      }
+    ],
+    "suspend_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_0fnbg3r"
+        ],
+        "comment": [
+          "before",
+          "⛾ ⏵︎Update ⏵︎Notify approver"
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_0nxerxv"
+        ],
+        "comment": [
+          "before",
+          "☝ ⏵︎Update"
+        ]
+      },
+      {
+        "tuple": [
+          "editor",
+          "suspend-gw-to-catch-before-Activity_05zip3u"
+        ],
+        "comment": [
+          "before",
+          "☑ ⏵︎Notify"
+        ]
+      }
+    ],
+    "suspend_task_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_0j78uzd"
+      ],
+      "comment": [
+        "before",
+        "☝ ⏵︎Update"
+      ]
+    },
+    "outcome": "failure"
   },
   {
     "id": "catch-before-Activity_1165bw9",
@@ -1511,6 +1689,95 @@
       ]
     },
     "outcome": "success"
+  },
+  {
+    "id": "catch-before-Activity_1wiumzv",
+    "event_label": "☝ ⏵︎Revise ⛞",
+    "start_task_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_1wiumzv"
+      ],
+      "comment": [
+        "before",
+        "☝ ⏵︎Revise"
+      ]
+    },
+    "start_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_01p7uj7"
+        ],
+        "comment": [
+          "before",
+          "⛾ ⏵︎Revise"
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_1xs96ik"
+        ],
+        "comment": [
+          "before",
+          "☝ ⏵︎Revise"
+        ]
+      },
+      {
+        "tuple": [
+          "editor",
+          "suspend-gw-to-catch-before-Activity_05zip3u"
+        ],
+        "comment": [
+          "before",
+          "☑ ⏵︎Notify"
+        ]
+      }
+    ],
+    "suspend_positions": [
+      {
+        "tuple": [
+          "lifecycle",
+          "suspend-Gateway_01p7uj7"
+        ],
+        "comment": [
+          "before",
+          "⛾ ⏵︎Revise"
+        ]
+      },
+      {
+        "tuple": [
+          "UI",
+          "suspend-Gateway_1xs96ik"
+        ],
+        "comment": [
+          "before",
+          "☝ ⏵︎Revise"
+        ]
+      },
+      {
+        "tuple": [
+          "editor",
+          "suspend-gw-to-catch-before-Activity_05zip3u"
+        ],
+        "comment": [
+          "before",
+          "☑ ⏵︎Notify"
+        ]
+      }
+    ],
+    "suspend_task_position": {
+      "tuple": [
+        "UI",
+        "catch-before-Activity_1wiumzv"
+      ],
+      "comment": [
+        "before",
+        "☝ ⏵︎Revise"
+      ]
+    },
+    "outcome": "failure"
   },
   {
     "id": "catch-before-Activity_0zsock2",
