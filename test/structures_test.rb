@@ -84,6 +84,12 @@ class StructuresTest < Minitest::Spec
 
     assert_equal lanes_cfg.(label: "UI")[:activity], lane_activity_ui
 
+    exception = assert_raises RuntimeError do
+      lanes_cfg.(label: nil)[:activity]
+    end
+    assert_equal exception.message, %(:label == nil not found)
+
+
     assert_equal lanes_cfg.to_h.inspect,
       %({#{lane_activity.inspect}=>{:label=>"lifecycle", :icon=>"⛾", :activity=>#{lane_activity.inspect}, :json_id=>"article moderation"}, #{lane_activity_ui.inspect}=>{:label=>"UI", :icon=>"☝", :activity=>#{lane_activity_ui.inspect}, :json_id=>\"<ui> author workflow\"}})
     # assert_equal lanes_cfg.json_id("article moderatoin")[:activity], lane_activity

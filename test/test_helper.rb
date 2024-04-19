@@ -91,7 +91,7 @@ end
 module DiscoveredStates
   def states
     states, stub_schema = Trailblazer::Workflow::Discovery.(
-      json_filename: "test/fixtures/v1/posting-v10.json",
+      json_filename: "test/fixtures/v1/posting-v11.json",
       start_lane: "UI",
 
       # TODO: allow translating the original "id" (?) to the stubbed.

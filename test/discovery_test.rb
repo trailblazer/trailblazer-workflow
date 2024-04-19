@@ -35,8 +35,8 @@ class DiscoveryTest < Minitest::Spec
 
   it "Discovery.call" do
     states, schema = Trailblazer::Workflow::Discovery.(
-      json_filename: "test/fixtures/v1/posting-v10.json",
-      start_lane: "<ui> author workflow",
+      json_filename: "test/fixtures/v1/posting-v11.json",
+      start_lane: "UI",
 
       # TODO: allow translating the original "id" (?) to the stubbed.
       dsl_options_for_run_multiple_times: {
@@ -47,23 +47,15 @@ class DiscoveryTest < Minitest::Spec
           #   }, config_payload: {outcome: :failure}},
 
         # Click [UI Create] again, with invalid data.
-        ["<ui> author workflow", "Create"] => {ctx_merge: {:"article moderation:Create" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
+        ["UI", "Create"] => {ctx_merge: {:"article moderation:Create" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
         # Click [UI Update] again, with invalid data.
-        ["<ui> author workflow", "Update"] => {ctx_merge: {:"article moderation:Update" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
-        ["<ui> author workflow", "Revise"] => {ctx_merge: {:"article moderation:Revise" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
+        ["UI", "Update"] => {ctx_merge: {:"article moderation:Update" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
+        ["UI", "Revise"] => {ctx_merge: {:"article moderation:Revise" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
       },
-
-      # DISCUSS: compute this automatically/from diagram?
-      lane_hints: {
-        "<ui> author workflow"  => {label: "UI", icon: "☝"},
-        "article moderation"    => {label: "lifecycle", icon: "⛾"},
-        "reviewer"              => {label: "editor", icon: "☑"},
-      }
     )
 
 
     # pp states
-    # TODO: should we really assert the state table manually?
     assert_equal states.size, 22
 
     # Uncomment next line to render the test below! Hahaha
@@ -235,7 +227,7 @@ class DiscoveryTest < Minitest::Spec
     lanes_cfg = schema.to_h[:lanes]
 
     assert_data_for_iteration_set.each.with_index do |(start_position_ids, start_cfg, suspend_ids), index|
-      # puts "@@@@@ #{index.inspect} #{states[index][:positions_before][1]}"
+      puts "@@@@@ #{index.inspect} #{states[index][:positions_before][1]}"
       # raise index.inspect
       assert_position_before states[index][:positions_before],
         start_position_ids,
