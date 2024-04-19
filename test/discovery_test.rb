@@ -47,10 +47,10 @@ class DiscoveryTest < Minitest::Spec
           #   }, config_payload: {outcome: :failure}},
 
         # Click [UI Create] again, with invalid data.
-        ["UI", "Create"] => {ctx_merge: {:"article moderation:Create" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
+        ["UI", "Create"] => {ctx_merge: {:"⛾.lifecycle.posting:Create" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
         # Click [UI Update] again, with invalid data.
-        ["UI", "Update"] => {ctx_merge: {:"article moderation:Update" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
-        ["UI", "Revise"] => {ctx_merge: {:"article moderation:Revise" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
+        ["UI", "Update"] => {ctx_merge: {:"⛾.lifecycle.posting:Update" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
+        ["UI", "Revise"] => {ctx_merge: {:"⛾.lifecycle.posting:Revise" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
       },
     )
 
@@ -94,7 +94,7 @@ class DiscoveryTest < Minitest::Spec
       [
         # before: ["⛾ ⏵︎Update ⏵︎Notify approver", "☝ ⏵︎Update form ⏵︎Notify approver", "☑ ⏵︎Notify"] start:☝ ⏵︎Notify approver
         ["suspend-Gateway_0fnbg3r", "suspend-Gateway_0kknfje", "suspend-gw-to-catch-before-Activity_05zip3u"], {start_id: "catch-before-Activity_1dt5di5"},
-        # after: ["⛾ ⏵︎Reject ⏵︎Approve", "☝ ⏵︎suspend-Gateway_1sq41iq ⏵︎suspend-gw-to-catch-before-Activity_0zsock2", "☑ ⏵︎Approve ⏵︎Reject"]
+        # after: ["⛾ ⏵︎Reject ⏵︎Approve", "☝ ⏵︎accepted? ⏵︎rejected?", "☑ ⏵︎Approve ⏵︎Reject"]
         ["suspend-Gateway_0y3f8tz", "suspend-Gateway_063k28q", "suspend-Gateway_02veylj"],
       ],
 
@@ -106,14 +106,14 @@ class DiscoveryTest < Minitest::Spec
       ],
 
       [
-        # before: ["⛾ ⏵︎Reject ⏵︎Approve", "☝ ⏵︎suspend-Gateway_1sq41iq ⏵︎suspend-gw-to-catch-before-Activity_0zsock2", "☑ ⏵︎Approve ⏵︎Reject"] start:☑ ⏵︎Approve
+        # before: ["⛾ ⏵︎Reject ⏵︎Approve", "☝ ⏵︎accepted? ⏵︎rejected?", "☑ ⏵︎Approve ⏵︎Reject"] start:☑ ⏵︎Approve
         ["suspend-Gateway_0y3f8tz", "suspend-Gateway_063k28q", "suspend-Gateway_02veylj"], {start_id: "catch-before-Activity_13fw5nm"},
         # after: ["⛾ ⏵︎Publish ⏵︎Delete ⏵︎Update", "☝ ⏵︎Update form ⏵︎Delete? form ⏵︎Publish", "☑ ⏵︎Notify"]
         ["suspend-Gateway_1hp2ssj", "suspend-Gateway_1sq41iq", "suspend-gw-to-catch-before-Activity_05zip3u"],
       ],
 
       [
-        # before: ["⛾ ⏵︎Reject ⏵︎Approve", "☝ ⏵︎suspend-Gateway_1sq41iq ⏵︎suspend-gw-to-catch-before-Activity_0zsock2", "☑ ⏵︎Approve ⏵︎Reject"] start:☑ ⏵︎Reject
+        # before: ["⛾ ⏵︎Reject ⏵︎Approve", "☝ ⏵︎accepted? ⏵︎rejected?", "☑ ⏵︎Approve ⏵︎Reject"] start:☑ ⏵︎Reject
         ["suspend-Gateway_0y3f8tz", "suspend-Gateway_063k28q", "suspend-Gateway_02veylj"], {start_id: "catch-before-Activity_1j7d8sd"},
         # after: ["⛾ ⏵︎Revise", "☝ ⏵︎Revise form", "☑ ⏵︎Notify"]
         ["suspend-Gateway_01p7uj7", "suspend-gw-to-catch-before-Activity_0zsock2", "suspend-gw-to-catch-before-Activity_05zip3u"],
@@ -136,7 +136,7 @@ class DiscoveryTest < Minitest::Spec
       [
         # before: ["⛾ ⏵︎Notify approver ⏵︎Update", "☝ ⏵︎Update form ⏵︎Notify approver", "☑ ⏵︎Notify"] start:☝ ⏵︎Notify approver
         ["suspend-Gateway_1wzosup", "suspend-Gateway_1g3fhu2", "suspend-gw-to-catch-before-Activity_05zip3u"], {start_id: "catch-before-Activity_1dt5di5"},
-        # after: ["⛾ ⏵︎Reject ⏵︎Approve", "☝ ⏵︎suspend-Gateway_1sq41iq ⏵︎suspend-gw-to-catch-before-Activity_0zsock2", "☑ ⏵︎Approve ⏵︎Reject"]
+        # after: ["⛾ ⏵︎Reject ⏵︎Approve", "☝ ⏵︎accepted? ⏵︎rejected?", "☑ ⏵︎Approve ⏵︎Reject"]
         ["suspend-Gateway_0y3f8tz", "suspend-Gateway_063k28q", "suspend-Gateway_02veylj"],
       ],
 
@@ -213,9 +213,9 @@ class DiscoveryTest < Minitest::Spec
       [
         # before: ["⛾ ⏵︎Revise ⏵︎Notify approver", "☝ ⏵︎Revise form ⏵︎Notify approver", "☑ ⏵︎Notify"] start:☝ ⏵︎Notify approver
         ["suspend-Gateway_1kl7pnm", "suspend-Gateway_1xnsssa", "suspend-gw-to-catch-before-Activity_05zip3u"], {start_id: "catch-before-Activity_1dt5di5"},
-        # after: ["⛾ ⏵︎Reject ⏵︎Approve", "☝ ⏵︎suspend-Gateway_1sq41iq ⏵︎suspend-gw-to-catch-before-Activity_0zsock2", "☑ ⏵︎Approve ⏵︎Reject"]
+        # after: ["⛾ ⏵︎Reject ⏵︎Approve", "☝ ⏵︎accepted? ⏵︎rejected?", "☑ ⏵︎Approve ⏵︎Reject"]
         ["suspend-Gateway_0y3f8tz", "suspend-Gateway_063k28q", "suspend-Gateway_02veylj"],
-      ]
+      ],
 
     ]
 

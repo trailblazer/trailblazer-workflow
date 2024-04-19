@@ -103,10 +103,10 @@ module DiscoveredStates
           #   }, config_payload: {outcome: :failure}},
 
         # Click [UI Create] again, with invalid data.
-        ["UI", "Create"] => {ctx_merge: {:"article moderation:Create" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
+        ["UI", "Create"] => {ctx_merge: {:"⛾.lifecycle.posting:Create" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
         # Click [UI Update] again, with invalid data.
-        ["UI", "Update"] => {ctx_merge: {:"article moderation:Update" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
-        ["UI", "Revise"] => {ctx_merge: {:"article moderation:Revise" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
+        ["UI", "Update"] => {ctx_merge: {:"⛾.lifecycle.posting:Update" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
+        ["UI", "Revise"] => {ctx_merge: {:"⛾.lifecycle.posting:Revise" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
       },
     )
 
