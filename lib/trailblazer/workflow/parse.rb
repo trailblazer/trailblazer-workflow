@@ -5,7 +5,7 @@ require "trailblazer/macro"
 module Trailblazer
   module Workflow
     # Computes a {Intermediate} data structures for every lane from a TRB PRO/editor .json file.
-    class Generate < Trailblazer::Activity::Railway
+    class Parse < Trailblazer::Activity::Railway
       Element = Struct.new(:id, :type, :data, :links, :label)
       Link    = Struct.new(:target_id, :semantic)
 
@@ -89,13 +89,13 @@ module Trailblazer
         ctx[:value] = [lane.id, intermediate]
       end
 
-      step Generate.method(:transform_from_json),     id: :transform_from_json
+      step Parse.method(:transform_from_json),     id: :transform_from_json
       step Each(dataset_from: :lanes, item_key: :lane, collect: true) {
-        step Generate.method(:find_start_event),      id: :find_start_event
-        fail Generate.method(:default_start_event),   id: :default_start_event,
+        step Parse.method(:find_start_event),      id: :find_start_event
+        fail Parse.method(:default_start_event),   id: :default_start_event,
           Output(:success) => Track(:success)
-        step Generate.method(:compute_termini_map),   id: :compute_termini_map
-        step Generate.method(:compile_intermediate),  id: :compute_intermediate
+        step Parse.method(:compute_termini_map),   id: :compute_termini_map
+        step Parse.method(:compile_intermediate),  id: :compute_intermediate
       }, Out() => ->(ctx, collected_from_each:, **) { {intermediates: collected_from_each.to_h} } #{:collected_from_each => :intermediates}
     end
   end

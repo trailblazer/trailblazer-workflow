@@ -6,7 +6,7 @@ module Trailblazer
   end
 end
 
-require "trailblazer/workflow/generate"
+require "trailblazer/workflow/parse"
 require "trailblazer/workflow/collaboration"
 require "trailblazer/workflow/collaboration/lane"
 require "trailblazer/workflow/collaboration/messages"
