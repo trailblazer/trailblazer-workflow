@@ -2,10 +2,12 @@ module Trailblazer
   module Workflow
     # User-friendly builder.
     def self.Collaboration(json_file:, lanes:, state_guards: nil)
-      ctx = Collaboration.structure_from_filename(json_file)
+      _, (ctx, _) = Collaboration::Structure.invoke([{json_filename: json_file}, {}])
+
+      lane_options_from_structure = ctx[:lane_hints]
 
       lanes_options = lanes.collect do |json_id, user_options|
-        lane_options = normalize_lane_options(**user_options)
+        lane_options = normalize_lane_options(**lane_options_from_structure[json_id])
 
         activity = build_lane_for(**ctx, **user_options, json_id: json_id)
 
@@ -27,8 +29,8 @@ module Trailblazer
     end
 
     # DISCUSS: use Activity here?
-    def self.normalize_lane_options(label:, icon:, **)
-      {label: label, icon: icon}
+    def self.normalize_lane_options(label:, icon:, name:, **)
+      {label: label, icon: icon, name: name}
     end
 
     def self.build_lane_for(intermediates:, implementation:, json_id:, **)
@@ -41,10 +43,32 @@ module Trailblazer
     end
 
     class Collaboration
-      def self.structure_from_filename(json_file)
-        json_from_pro = File.read(json_file)
-        signal, (ctx, _) = Trailblazer::Workflow::Generate.invoke([{json_document: json_from_pro}, {}])
-        ctx
+      class Structure < Trailblazer::Activity::Railway
+        step :read_file
+        step Subprocess(Trailblazer::Workflow::Parse)
+        step :compute_lane_hints
+
+        def read_file(ctx, json_filename:, **)
+          ctx[:json_document] = File.read(json_filename)
+        end
+
+        def compute_lane_hints(ctx, structure:, **)
+          lane_hints = structure.lanes.collect do |lane|
+            icon, label, name = lane.id.split(".") # TODO: validate/default.
+
+
+            hints = {
+              json_id: lane.id,
+              label: label,
+              icon: icon,
+              name: name
+            }
+
+            [lane.id, hints]
+          end.to_h
+
+          ctx[:lane_hints] = lane_hints
+        end
       end
 
       class Schema

@@ -36,11 +36,9 @@ module BuildSchema
     implementing_editor = Trailblazer::Activity::Testing.def_steps(:Notify, :Reject, :Approve)
 
     schema = Trailblazer::Workflow.Collaboration(
-      json_file: "test/fixtures/v1/posting-v10.json",
+      json_file: "test/fixtures/v1/posting-v11.json",
       lanes: {
-        "article moderation"    => {
-          label: "lifecycle",
-          icon:  "⛾",
+        "⛾.lifecycle.posting" => {
           implementation: {
             "Create" => Trailblazer::Activity::Railway.Subprocess(Create),
             "Update" => implementing.method(:update),
@@ -53,9 +51,7 @@ module BuildSchema
             "Delete" => implementing.method(:delete),
           }
         },
-        "<ui> author workflow"  => {
-          label: "UI",
-          icon:  "☝",
+        "☝.UI.blogger" => {
           implementation: {
             "Create form" => implementing_ui.method(:create_form),
             "Create" => implementing_ui.method(:ui_create),
@@ -75,9 +71,7 @@ module BuildSchema
 
           }
         },
-        "reviewer"=> {
-          label: "editor",
-          icon: "☑",
+        "☑.editor.reviewer" => {
           implementation: {
             "Notify" => implementing_editor.method(:Notify),
             "Reject" => implementing_editor.method(:Reject),
@@ -98,7 +92,7 @@ module DiscoveredStates
   def states
     states, stub_schema = Trailblazer::Workflow::Discovery.(
       json_filename: "test/fixtures/v1/posting-v10.json",
-      start_lane: "<ui> author workflow",
+      start_lane: "UI",
 
       # TODO: allow translating the original "id" (?) to the stubbed.
       dsl_options_for_run_multiple_times: {
@@ -109,18 +103,11 @@ module DiscoveredStates
           #   }, config_payload: {outcome: :failure}},
 
         # Click [UI Create] again, with invalid data.
-        ["<ui> author workflow", "Create"] => {ctx_merge: {:"article moderation:Create" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
+        ["UI", "Create"] => {ctx_merge: {:"article moderation:Create" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
         # Click [UI Update] again, with invalid data.
-        ["<ui> author workflow", "Update"] => {ctx_merge: {:"article moderation:Update" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
-        ["<ui> author workflow", "Revise"] => {ctx_merge: {:"article moderation:Revise" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
+        ["UI", "Update"] => {ctx_merge: {:"article moderation:Update" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
+        ["UI", "Revise"] => {ctx_merge: {:"article moderation:Revise" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
       },
-
-      # DISCUSS: compute this automatically/from diagram?
-      lane_hints: {
-        "<ui> author workflow"  => {label: "UI", icon: "☝"},
-        "article moderation"    => {label: "lifecycle", icon: "⛾"},
-        "reviewer"              => {label: "editor", icon: "☑"},
-      }
     )
 
     return states, stub_schema, stub_schema.to_h[:lanes]
