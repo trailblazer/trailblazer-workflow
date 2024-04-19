@@ -63,7 +63,7 @@ module Trailblazer
         initial_lane_positions = Collaboration::Synchronous.initial_lane_positions(collaboration.to_h[:lanes])
         initial_lane_positions = Collaboration::Positions.new(initial_lane_positions.collect { |activity, task| Trailblazer::Workflow::Collaboration::Position.new(activity, task) }) # FIXME: initial_lane_positions should return {Collaboration::Positions}
 
-        start_activity = collaboration.to_h[:lanes].(json_id: start_lane)[:activity]
+        start_activity = collaboration.to_h[:lanes].(label: start_lane)[:activity]
         start_task = start_activity.to_h[:circuit].to_h[:start_task]
         start_task_position = Collaboration::Position.new(start_activity, start_task)
 
@@ -192,8 +192,8 @@ puts "@@@@@ #{ctx.inspect}"
         module_function
 
         def configuration_for_branching_from_user_hash(branch_cfg, lanes:, **)
-          branch_cfg.collect do |(json_id, cdt_task_label), cfg|
-            activity = lanes.(json_id: json_id)[:activity]
+          branch_cfg.collect do |(label, cdt_task_label), cfg|
+            activity = lanes.(label: label)[:activity]
 
             # Find the catch event for the CDT task.
             # TODO: in workflow, we should have an abstraction for label search.

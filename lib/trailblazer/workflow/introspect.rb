@@ -11,7 +11,7 @@ module Trailblazer
         def call(**options)
           key, value = options.keys[0], options.values[0]
 
-          @ary.find { |options| options[key] == value } or raise
+          @ary.find { |options| options[key] == value } or raise "#{key.inspect} == #{value.inspect} not found"
         end
 
         def to_h
