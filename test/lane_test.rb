@@ -26,9 +26,7 @@ class LaneTest < Minitest::Spec
   it "produces a runnable Activity with (Collaboration.Lane)" do
     implementing = T.def_steps(:create, :notify_approver, :reject, :accept, :revise, :publish, :archive, :delete)
 
-    moderation_json = File.read("test/fixtures/v1/moderation.json")
-
-    signal, (ctx, _) = Trailblazer::Workflow::Generate.invoke([{json_document: moderation_json}, {}])
+    signal, (ctx, _) = Trailblazer::Workflow::Collaboration::Structure.invoke([{json_filename: "test/fixtures/v1/moderation.json"}, {}])
 
     article_moderation_intermediate = ctx[:intermediates]["article moderation"]
     # pp article_moderation_intermediate

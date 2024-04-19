@@ -11,22 +11,14 @@ class DiscoverTaskTest < Minitest::Spec
   it "Discovery task: discover, serialize, create test plan, create state table/state guards" do
     Dir.chdir(TEST_ROOT) do
       Trailblazer::Workflow::Task::Discover.(
-        json_filename: "../fixtures/v1/posting-v10.json",
-        start_lane: "<ui> author workflow",
-
-        # DISCUSS: compute this automatically/from diagram?
-        # TODO: how to get this from CLI?
-        lane_hints: {
-          "<ui> author workflow"  => {label: "UI", icon: "☝"},
-          "article moderation"    => {label: "lifecycle", icon: "⛾"},
-          "reviewer"              => {label: "editor", icon: "☑"},
-        },
+        json_filename: "../fixtures/v1/posting-v11.json",
+        start_lane: "UI",
 
         dsl_options_for_run_multiple_times: {
-          ["<ui> author workflow", "Create"] => {ctx_merge: {:"article moderation:Create" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
+          ["UI", "Create"] => {ctx_merge: {:"⛾.lifecycle.posting:Create" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
           # Click [UI Update] again, with invalid data.
-          ["<ui> author workflow", "Update"] => {ctx_merge: {:"article moderation:Update" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
-          ["<ui> author workflow", "Revise"] => {ctx_merge: {:"article moderation:Revise" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
+          ["UI", "Update"] => {ctx_merge: {:"⛾.lifecycle.posting:Update" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
+          ["UI", "Revise"] => {ctx_merge: {:"⛾.lifecycle.posting:Revise" => Trailblazer::Activity::Left}, config_payload: {outcome: :failure}},
         },
 
         namespace: "Posting::Collaboration",
