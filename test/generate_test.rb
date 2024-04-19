@@ -65,15 +65,15 @@ class GenerateTest < Minitest::Spec
   # UNIT TEST {Generate::Representer}
   it "works with PRO's JSON format" do
     # from ../pro-rails/test/fixtures/bpmn2/moderation.xml-exported.json
-    moderation_json = File.read("test/fixtures/v1/moderation.json")
+    moderation_json = File.read("test/fixtures/v1/posting-v11.json")
 
     collaboration = Trailblazer::Workflow::Generate::Representer::Collaboration.new(OpenStruct.new).from_json(moderation_json)
 
-    assert_equal collaboration.id, 1
+    assert_equal collaboration.id, 18
 
-    lifecycle_lane = collaboration.lanes.find { |lane| lane.id == "article moderation" }
+    lifecycle_lane = collaboration.lanes.find { |lane| lane.id == "⛾.lifecycle.posting" }
 
-    assert_equal lifecycle_lane.id, "article moderation"
+    assert_equal lifecycle_lane.id, "⛾.lifecycle.posting"
 
     # assert_equal lifecycle_lane.type "lane"
     assert_equal lifecycle_lane.elements.size, 39
@@ -97,19 +97,18 @@ class GenerateTest < Minitest::Spec
   end
 
   it do
-    moderation_json = File.read("test/fixtures/v1/moderation.json")
+    moderation_json = File.read("test/fixtures/v1/posting-v11.json")
 
     signal, (ctx, _) = Trailblazer::Workflow::Generate.invoke([{json_document: moderation_json}, {}])
 
   #@ test {:structure}, which is the directly parsed graph
-    assert_equal ctx[:structure].messages.size, 18
+    assert_equal ctx[:structure].messages.size, 21
 
     lanes = ctx[:intermediates]
 
-    # pp lanes
     # TODO: test ui lane
-    # puts lanes["article moderation"].pretty_inspect
-    assert_equal lanes["article moderation"].pretty_inspect, %(#<struct Trailblazer::Activity::Schema::Intermediate
+    # puts lanes["⛾.lifecycle.posting"].pretty_inspect
+    assert_equal lanes["⛾.lifecycle.posting"].pretty_inspect, %(#<struct Trailblazer::Activity::Schema::Intermediate
  wiring=
   {#<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
     id="Event_0odjl3c",
@@ -358,7 +357,7 @@ class GenerateTest < Minitest::Spec
 )
 
 
-    assert_equal lanes["<ui> author workflow"].pretty_inspect, %(#<struct Trailblazer::Activity::Schema::Intermediate
+    assert_equal lanes["☝.UI.blogger"].pretty_inspect, %(#<struct Trailblazer::Activity::Schema::Intermediate
  wiring=
   {#<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
     id="Event_1npw1tg",
@@ -371,7 +370,7 @@ class GenerateTest < Minitest::Spec
     data={:type=>:catch_event, :label=>"valid?"}>=>
     [#<struct Trailblazer::Activity::Schema::Intermediate::Out
       semantic=:success,
-      target="suspend-Gateway_00n4dsm">],
+      target="suspend-Gateway_1xnsssa">],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
     id="Event_1wly6jj",
     data={:type=>:catch_event, :label=>"invalid?"}>=>
@@ -684,7 +683,7 @@ class GenerateTest < Minitest::Spec
        ["catch-before-Activity_1165bw9", "catch-before-Activity_1dt5di5"],
       :type=>:suspend}>=>[],
    #<struct Trailblazer::Activity::Schema::Intermediate::TaskRef
-    id="suspend-Gateway_00n4dsm",
+    id="suspend-Gateway_1xnsssa",
     data=
      {"resumes"=>
        ["catch-before-Activity_0zsock2", "catch-before-Activity_1dt5di5"],
@@ -721,7 +720,7 @@ class GenerateTest < Minitest::Spec
    "suspend-Gateway_14h0q7a"=>:suspend,
    "suspend-Gateway_1d05yki"=>:suspend,
    "suspend-Gateway_0kknfje"=>:suspend,
-   "suspend-Gateway_00n4dsm"=>:suspend,
+   "suspend-Gateway_1xnsssa"=>:suspend,
    "suspend-gw-to-Event_1vrfxsv"=>:suspend,
    "suspend-gw-to-Event_0j1jua6"=>:suspend,
    "suspend-gw-to-Event_19ha0ea"=>:suspend,
