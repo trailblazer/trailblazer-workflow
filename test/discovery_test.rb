@@ -34,7 +34,7 @@ class DiscoveryTest < Minitest::Spec
   end
 
   it "Discovery.call" do
-    states, schema = Trailblazer::Workflow::Discovery.(
+    states, schema, parsed_structure = Trailblazer::Workflow::Discovery.(
       json_filename: "test/fixtures/v1/posting-v11.json",
       start_lane: "UI",
 
@@ -54,6 +54,7 @@ class DiscoveryTest < Minitest::Spec
       },
     )
 
+    assert_equal parsed_structure[:intermediates].keys, ["⛾.lifecycle.posting", "☝.UI.blogger", "☑.editor.reviewer"]
 
     # pp states
     assert_equal states.size, 22

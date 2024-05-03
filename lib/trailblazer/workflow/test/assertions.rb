@@ -48,7 +48,7 @@ module Trailblazer
           # we're expecting an invalid transition.
           if invalid
             # assert_equal signal.to_h[:semantic], :failure  # TODO: reuse endpoint/matcher
-            assert [:failure, :not_authorized].include?(signal.to_h[:semantic])  # TODO: reuse endpoint/matcher
+            assert [:failure, :not_authorized, :invalid_event].include?(signal.to_h[:semantic])  # TODO: reuse endpoint/matcher # FIXME: either invalid_event or not_authorized? depends on the level of endpoint.
             return ctx # FIXME: test this!
           end
 

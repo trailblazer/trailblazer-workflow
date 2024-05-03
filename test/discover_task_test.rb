@@ -87,6 +87,61 @@ module Posting::Collaboration::Generated
 end
 )
 
+    assert_equal File.read("#{TEST_ROOT}/app/concepts/posting/collaboration/schema.rb"), %(module Posting::Collaboration
+  Schema = Trailblazer::Workflow.Collaboration(
+    json_file: "../fixtures/v1/posting-v11.json",
+    lanes: {
+      "⛾.lifecycle.posting" => {
+        label: "lifecycle",
+        icon:  "⛾",
+        implementation: {
+          "Update" => Trailblazer::Activity::Railway.Subprocess(Posting::Collaboration::Update),
+          "Notify approver" => Trailblazer::Activity::Railway.Subprocess(Posting::Collaboration::Notify approver),
+          "Approve" => Trailblazer::Activity::Railway.Subprocess(Posting::Collaboration::Approve),
+          "Publish" => Trailblazer::Activity::Railway.Subprocess(Posting::Collaboration::Publish),
+          "Archive" => Trailblazer::Activity::Railway.Subprocess(Posting::Collaboration::Archive),
+          "Delete" => Trailblazer::Activity::Railway.Subprocess(Posting::Collaboration::Delete),
+          "Revise" => Trailblazer::Activity::Railway.Subprocess(Posting::Collaboration::Revise),
+          "Reject" => Trailblazer::Activity::Railway.Subprocess(Posting::Collaboration::Reject),
+          "Create" => Trailblazer::Activity::Railway.Subprocess(Posting::Collaboration::Create),
+        }
+      },
+      "☝.UI.blogger" => {
+        label: "UI",
+        icon:  "☝",
+        implementation: {
+          "Update form" => Trailblazer::Activity::Railway.Subprocess(Posting::Collaboration::Update form),
+          "Notify approver" => Trailblazer::Activity::Railway.Subprocess(Posting::Collaboration::Notify approver),
+          "Publish" => Trailblazer::Activity::Railway.Subprocess(Posting::Collaboration::Publish),
+          "Delete" => Trailblazer::Activity::Railway.Subprocess(Posting::Collaboration::Delete),
+          "Delete? form" => Trailblazer::Activity::Railway.Subprocess(Posting::Collaboration::Delete? form),
+          "Cancel" => Trailblazer::Activity::Railway.Subprocess(Posting::Collaboration::Cancel),
+          "Revise" => Trailblazer::Activity::Railway.Subprocess(Posting::Collaboration::Revise),
+          "Revise form" => Trailblazer::Activity::Railway.Subprocess(Posting::Collaboration::Revise form),
+          "Update" => Trailblazer::Activity::Railway.Subprocess(Posting::Collaboration::Update),
+          "Update form with errors" => Trailblazer::Activity::Railway.Subprocess(Posting::Collaboration::Update form with errors),
+          "Revise form with errors" => Trailblazer::Activity::Railway.Subprocess(Posting::Collaboration::Revise form with errors),
+          "Archive" => Trailblazer::Activity::Railway.Subprocess(Posting::Collaboration::Archive),
+          "Create" => Trailblazer::Activity::Railway.Subprocess(Posting::Collaboration::Create),
+          "Create form with errors" => Trailblazer::Activity::Railway.Subprocess(Posting::Collaboration::Create form with errors),
+          "Create form" => Trailblazer::Activity::Railway.Subprocess(Posting::Collaboration::Create form),
+        }
+      },
+      "☑.editor.reviewer" => {
+        label: "editor",
+        icon:  "☑",
+        implementation: {
+          "Approve" => Trailblazer::Activity::Railway.Subprocess(Posting::Collaboration::Approve),
+          "Reject" => Trailblazer::Activity::Railway.Subprocess(Posting::Collaboration::Reject),
+          "Notify" => Trailblazer::Activity::Railway.Subprocess(Posting::Collaboration::Notify),
+        }
+      },
+    }, # :lanes
+    state_guards: Posting::Collaboration::StateGuards::Decider,
+  )
+end
+)
+
   end
 
   it "Test plan " do

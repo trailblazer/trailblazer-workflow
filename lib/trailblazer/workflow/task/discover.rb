@@ -6,15 +6,17 @@ module Trailblazer
         module_function
 
         # DISCUSS: what about running this before we have a schema?
-        def call(namespace:, target_dir:, test_filename:, **discovery_options)
+        def call(namespace:, target_dir:, test_filename:, json_filename:, **discovery_options)
 
           filepath = Filepath.new(target_dir)
 
+          schema_filename         = filepath.("schema.rb")
           state_guard_filename    = filepath.("state_guards.rb")
           state_table_filename    = filepath.("generated/state_table.rb")
           iteration_set_filename  = filepath.("generated/iteration_set.json")
 
-          states, schema = Trailblazer::Workflow::Discovery.(
+          states, schema, parsed_structure = Trailblazer::Workflow::Discovery.(
+            json_filename: json_filename,
             **discovery_options
             # run_multiple_times: run_multiple_times,
           )
@@ -42,6 +44,15 @@ module Trailblazer
             state_table_filename: state_table_filename,
             namespace: namespace,
           )
+
+          Produce::Schema.(
+            parsed_structure: parsed_structure,
+            namespace: namespace,
+            filename: schema_filename,
+            json_filename: json_filename,
+          )
+
+          return states
         end
 
 
@@ -118,7 +129,17 @@ module Trailblazer
               File.write(filename, ruby_output)
             end
           end
-        end
+
+          class Schema
+            def self.call(parsed_structure:, namespace:, filename:, json_filename:, **)
+              _, (ctx, _) = Trailblazer::Workflow::Generate::Schema.invoke([{parsed_structure: parsed_structure, namespace: namespace, json_filename: json_filename}, {}])
+              ruby_output = ctx[:snippet]
+
+              File.write(filename, ruby_output)
+            end
+          end
+
+        end # Produce
 
         class Filepath
           def initialize(base_path)

@@ -37,7 +37,9 @@ module Trailblazer
 
           # TODO: add outputs
 
-          _schema = Trailblazer::Workflow::Collaboration(json_file: json_filename, lanes: stubbed_lanes) # FIXME: we're re-parsing JSON.
+          schema = Trailblazer::Workflow::Collaboration(json_file: json_filename, lanes: stubbed_lanes) # FIXME: we're re-parsing JSON.
+
+          return schema, ctx
         end
       end
 
@@ -58,7 +60,7 @@ module Trailblazer
         #          imply we start from a public resume and discover the path?
         # we could save work on {run_multiple_times} with this.
 
-        collaboration = Stub.(json_filename: json_filename)
+        collaboration, parsed_structure = Stub.(json_filename: json_filename)
 
         initial_lane_positions = Collaboration::Synchronous.initial_lane_positions(collaboration.to_h[:lanes])
         initial_lane_positions = Collaboration::Positions.new(initial_lane_positions.collect { |activity, task| Trailblazer::Workflow::Collaboration::Position.new(activity, task) }) # FIXME: initial_lane_positions should return {Collaboration::Positions}
@@ -185,7 +187,7 @@ puts "@@@@@ #{ctx.inspect}"
           end
         end
 
-        return discovered_states, collaboration
+        return discovered_states, collaboration, parsed_structure
       end
 
       module DSL
