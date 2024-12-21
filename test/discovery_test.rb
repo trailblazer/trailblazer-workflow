@@ -404,8 +404,8 @@ end
 
 class TestPlanExecutionTest < Minitest::Spec
   include Trailblazer::Workflow::Test::Assertions
-  require "trailblazer/test/assertions"
-  include Trailblazer::Test::Assertions # DISCUSS: this is for assert_advance and friends.
+  require "trailblazer/test" # FIXME: use trb-test everywhere.
+  include Trailblazer::Test::Assertion::AssertExposes # DISCUSS: this is for assert_advance and friends.
 
   it "run test plan" do
     states, stub_schema = DiscoveryTest.states()

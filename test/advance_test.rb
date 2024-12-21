@@ -111,17 +111,17 @@ class AdvanceEndpointTest < Minitest::Spec
 
 
 
-    advance_protocol = Trailblazer::Endpoint.build_protocol(protocol_template, domain_activity: Trailblazer::Workflow::Advance,
-      protocol_block: ->(*) { {Trailblazer::Activity::Railway.Output(:invalid_event) => Trailblazer::Activity::Railway.Track(:not_authorized)} }
+    advance_protocol = Trailblazer::Endpoint::Protocol.build(protocol: protocol_template, domain_activity: Trailblazer::Workflow::Advance,
+      options_for_domain_activity: {Trailblazer::Activity::Railway.Output(:invalid_event) => Trailblazer::Activity::Railway.Track(:not_authorized)}
     )
 
-    advance_protocol_with_model = Trailblazer::Endpoint.build_protocol(protocol_template_with_model, domain_activity: Trailblazer::Workflow::Advance,
-      protocol_block: ->(*) { {Trailblazer::Activity::Railway.Output(:invalid_event) => Trailblazer::Activity::Railway.Track(:not_authorized)} }
+    advance_protocol_with_model = Trailblazer::Endpoint::Protocol.build(protocol: protocol_template_with_model, domain_activity: Trailblazer::Workflow::Advance,
+      options_for_domain_activity: {Trailblazer::Activity::Railway.Output(:invalid_event) => Trailblazer::Activity::Railway.Track(:not_authorized)}
     )
 
-    # action_protocol = Trailblazer::Endpoint.build_protocol(Protocol, domain_activity: Create, protocol_block: ->(*) { {Output(:not_found) => Track(:not_found)} })
-    action_adapter  = Trailblazer::Endpoint::Adapter.build(advance_protocol) # build the simplest Adapter we got.
-    action_adapter_with_model  = Trailblazer::Endpoint::Adapter.build(advance_protocol_with_model) # build the simplest Adapter we got.
+    # action_protocol = Trailblazer::Endpoint::Protocol.build(protocol: Protocol, domain_activity: Create, protocol_block: ->(*) { {Output(:not_found) => Track(:not_found)} })
+    # action_adapter  = Trailblazer::Endpoint::Adapter.build(advance_protocol) # build the simplest Adapter we got.
+    # action_adapter_with_model  = Trailblazer::Endpoint::Adapter.build(advance_protocol_with_model) # build the simplest Adapter we got.
 
     ctx = {
     }
@@ -134,10 +134,11 @@ class AdvanceEndpointTest < Minitest::Spec
       state_guards:  state_guards,
     }
 
-    default_matcher = Trailblazer::Endpoint::Matcher.new(
+    default_matcher = {
       success:    ->(*) { raise },
       not_authorized: ->(ctx, params:, **) { render "not authorized! #{params.inspect}" }
-    )
+    }
+
     matcher_block = -> do
       success { |ctx, seq:, **| render seq.inspect }
       failure { |ctx, model:, **| render "failed: #{model}" }
@@ -150,38 +151,38 @@ class AdvanceEndpointTest < Minitest::Spec
 
 # Create
     flow_options = original_flow_options.merge(event_label: "☝ ⏵︎Create",)
-    Trailblazer::Endpoint::Runtime.({params: {}, seq: []}, adapter: action_adapter, default_matcher: default_matcher, matcher_context: self, flow_options: flow_options, &matcher_block)
+    Trailblazer::Endpoint::Runtime::Matcher.(advance_protocol, {params: {}, seq: []}, default_matcher: default_matcher, matcher_context: self, flow_options: flow_options, &matcher_block)
     assert_equal @render, %([:ui_create, :create])
 
 # Update
     flow_options = original_flow_options.merge(event_label: "☝ ⏵︎Update",)
-    Trailblazer::Endpoint::Runtime.({params: {id: 1}, seq: []}, adapter: action_adapter_with_model, default_matcher: default_matcher, matcher_context: self, flow_options: flow_options, &matcher_block)
+    Trailblazer::Endpoint::Runtime::Matcher.(advance_protocol_with_model, {params: {id: 1}, seq: []}, default_matcher: default_matcher, matcher_context: self, flow_options: flow_options, &matcher_block)
     assert_equal @render, %([:ui_update, :update])
 
 # Update: Protocol doesn't find model
     flow_options = original_flow_options.merge(event_label: "☝ ⏵︎Update",)
-    Trailblazer::Endpoint::Runtime.({params: {}, seq: []}, adapter: action_adapter_with_model, default_matcher: default_matcher, matcher_context: self, flow_options: flow_options, &matcher_block)
+    Trailblazer::Endpoint::Runtime::Matcher.(advance_protocol_with_model, {params: {}, seq: []}, default_matcher: default_matcher, matcher_context: self, flow_options: flow_options, &matcher_block)
     assert_equal @render, %(404 not found: )
 
 # Update input is invalid
     flow_options = original_flow_options.merge(event_label: "☝ ⏵︎Update",)
-    Trailblazer::Endpoint::Runtime.({params: {id: 1}, seq: [], update: false}, adapter: action_adapter_with_model, default_matcher: default_matcher, matcher_context: self, flow_options: flow_options, &matcher_block)
+    Trailblazer::Endpoint::Runtime::Matcher.(advance_protocol_with_model, {params: {id: 1}, seq: [], update: false}, default_matcher: default_matcher, matcher_context: self, flow_options: flow_options, &matcher_block)
     assert_equal @render, %(failed: #<struct Minitest::Spec::Posting id=1, state="⏸︎ Update [000]">)
 
 #@ unknown event label (not_authorized)
     flow_options = flow_options.merge(event_label: "XXX unknown ~~~")
-    Trailblazer::Endpoint::Runtime.({params: {id: 1}, seq: []}, adapter: action_adapter_with_model, default_matcher: default_matcher, matcher_context: self, flow_options: flow_options, &matcher_block)
+    Trailblazer::Endpoint::Runtime::Matcher.(advance_protocol_with_model, {params: {id: 1}, seq: []}, default_matcher: default_matcher, matcher_context: self, flow_options: flow_options, &matcher_block)
     assert_equal @render, %(not authorized! {:id=>1})
 
   #@ no state guard matches
   # DISCUSS: should we stop on a different terminus here to indicate that we found matching guards, but they were all unmet?
     flow_options = flow_options.merge(event_label: "☝ ⏵︎Archive")
-    Trailblazer::Endpoint::Runtime.({params: {id: 1}, seq: []}, adapter: action_adapter_with_model, default_matcher: default_matcher, matcher_context: self, flow_options: flow_options, &matcher_block)
+    Trailblazer::Endpoint::Runtime::Matcher.(advance_protocol_with_model, {params: {id: 1}, seq: []}, default_matcher: default_matcher, matcher_context: self, flow_options: flow_options, &matcher_block)
     assert_equal @render, %(not authorized! {:id=>1})
 
 # {flow_options} is passed correctly through the entire run.
     flow_options = original_flow_options.merge(event_label: "☝ ⏵︎Update",)
-    signal, (ctx, flow_options) = Trailblazer::Endpoint::Runtime.({params: {id: 1}, seq: []}, adapter: action_adapter_with_model, default_matcher: default_matcher, matcher_context: self, flow_options: flow_options, &matcher_block)
+    signal, (ctx, flow_options) = Trailblazer::Endpoint::Runtime::Matcher.(advance_protocol_with_model, {params: {id: 1}, seq: []}, default_matcher: default_matcher, matcher_context: self, flow_options: flow_options, &matcher_block)
     assert_equal flow_options[:event_label], "☝ ⏵︎Update"
 
     # advance "☝ ⏵︎Create" do |ctx|
